@@ -1,0 +1,37 @@
+You are evaluating a sandwich for validity and quality.
+
+A "sandwich" is a structured knowledge artifact: two related bounding concepts (bread) containing a meaningfully constrained middle concept (filling).
+
+Sandwich:
+- Name: {name}
+- Bread Top: {bread_top}
+- Filling: {filling}
+- Bread Bottom: {bread_bottom}
+- Structure Type: {structure_type}
+- Description: {description}
+- Containment Argument: {containment_argument}
+
+Evaluate on these criteria (0.0 to 1.0 each):
+
+1. BREAD COMPATIBILITY: Are the bread elements related but distinct?
+   - 1.0: Perfect pairing, clearly related framing concepts that naturally form a pair
+   - 0.7: Strong pairing, clearly related with a meaningful connection
+   - 0.5: Somewhat related, connection is weak or tenuous
+   - 0.3: Barely related, connection requires a stretch
+   - 0.0: Completely unrelated or effectively identical
+
+2. CONTAINMENT: Is the filling meaningfully bounded by the bread?
+   - 1.0: Filling clearly emerges from / is constrained by / exists between the bread elements; removing either bread fundamentally changes the filling's meaning
+   - 0.7: Strong containment, the filling is well-bounded
+   - 0.5: Connection is loose or somewhat forced
+   - 0.3: Filling is only tangentially related to the bread
+   - 0.0: Filling has no real relationship to bread; it could exist independently without loss
+
+You MUST be rigorous about containment. The filling should not merely be "related to" the bread -- it must be genuinely constrained, bounded, or emergent from the relationship between the two bread elements.
+
+Respond ONLY with valid JSON (no markdown, no explanation outside JSON):
+{{
+  "bread_compat_score": <float 0.0-1.0>,
+  "containment_score": <float 0.0-1.0>,
+  "rationale": "<Brief explanation of scores>"
+}}
