@@ -123,3 +123,22 @@ CREATE TABLE IF NOT EXISTS foraging_log (
 
 CREATE INDEX IF NOT EXISTS idx_foraging_session ON foraging_log(session_id);
 CREATE INDEX IF NOT EXISTS idx_foraging_outcome ON foraging_log(outcome);
+
+-- LLM call log: observability for all LLM API calls
+CREATE TABLE IF NOT EXISTS llm_call_log (
+    call_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    timestamp TIMESTAMP DEFAULT NOW(),
+    component VARCHAR(50),
+    model VARCHAR(100),
+    prompt_hash VARCHAR(64),
+    input_tokens INT DEFAULT 0,
+    output_tokens INT DEFAULT 0,
+    latency_ms FLOAT DEFAULT 0,
+    cost_usd FLOAT DEFAULT 0,
+    error TEXT,
+    session_id UUID
+);
+
+CREATE INDEX IF NOT EXISTS idx_llm_call_session ON llm_call_log(session_id);
+CREATE INDEX IF NOT EXISTS idx_llm_call_component ON llm_call_log(component);
+CREATE INDEX IF NOT EXISTS idx_llm_call_timestamp ON llm_call_log(timestamp);
