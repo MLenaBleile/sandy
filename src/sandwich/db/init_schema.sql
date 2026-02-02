@@ -1,0 +1,125 @@
+-- SANDWICH database schema
+-- Based on SPEC.md Section 5.2
+
+-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Sources: where content comes from
+CREATE TABLE IF NOT EXISTS sources (
+    source_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    url TEXT,
+    domain VARCHAR(255),
+    content TEXT,
+    content_hash VARCHAR(64),
+    fetched_at TIMESTAMP DEFAULT NOW(),
+    content_type VARCHAR(50)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sources_domain ON sources(domain);
+CREATE INDEX IF NOT EXISTS idx_sources_hash ON sources(content_hash);
+
+-- Structural types: taxonomy of sandwich forms
+CREATE TABLE IF NOT EXISTS structural_types (
+    type_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
+    bread_relation TEXT,
+    filling_role TEXT,
+    parent_type_id INT REFERENCES structural_types(type_id),
+    canonical_example_id UUID,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Sandwiches: the core entity
+CREATE TABLE IF NOT EXISTS sandwiches (
+    sandwich_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    -- Validity assessment
+    validity_score FLOAT CHECK (validity_score >= 0 AND validity_score <= 1),
+    bread_compat_score FLOAT,
+    containment_score FLOAT,
+    nontrivial_score FLOAT,
+    novelty_score FLOAT,
+
+    -- The triple (denormalized for query convenience)
+    bread_top TEXT NOT NULL,
+    bread_bottom TEXT NOT NULL,
+    filling TEXT NOT NULL,
+
+    -- Embeddings for similarity search
+    bread_top_embedding vector(1536),
+    bread_bottom_embedding vector(1536),
+    filling_embedding vector(1536),
+    sandwich_embedding vector(1536),
+
+    -- Metadata
+    source_id UUID REFERENCES sources(source_id),
+    structural_type_id INT REFERENCES structural_types(type_id),
+    assembly_rationale TEXT,
+    validation_rationale TEXT,
+    reuben_commentary TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_sandwiches_validity ON sandwiches(validity_score);
+CREATE INDEX IF NOT EXISTS idx_sandwiches_type ON sandwiches(structural_type_id);
+CREATE INDEX IF NOT EXISTS idx_sandwiches_created ON sandwiches(created_at);
+
+-- Add FK for canonical example (after sandwiches table exists)
+ALTER TABLE structural_types
+    ADD CONSTRAINT fk_canonical_example
+    FOREIGN KEY (canonical_example_id) REFERENCES sandwiches(sandwich_id);
+
+-- Ingredients: reusable bread and filling concepts
+CREATE TABLE IF NOT EXISTS ingredients (
+    ingredient_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    text TEXT NOT NULL,
+    ingredient_type VARCHAR(20) CHECK (ingredient_type IN ('bread', 'filling')),
+    embedding vector(1536),
+    first_seen_sandwich UUID REFERENCES sandwiches(sandwich_id),
+    first_seen_at TIMESTAMP DEFAULT NOW(),
+    usage_count INT DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_ingredients_type ON ingredients(ingredient_type);
+CREATE INDEX IF NOT EXISTS idx_ingredients_usage ON ingredients(usage_count DESC);
+
+-- Junction table: sandwiches use ingredients
+CREATE TABLE IF NOT EXISTS sandwich_ingredients (
+    sandwich_id UUID REFERENCES sandwiches(sandwich_id) ON DELETE CASCADE,
+    ingredient_id UUID REFERENCES ingredients(ingredient_id),
+    role VARCHAR(20) CHECK (role IN ('bread_top', 'bread_bottom', 'filling')),
+    PRIMARY KEY (sandwich_id, ingredient_id, role)
+);
+
+-- Relations between sandwiches
+CREATE TABLE IF NOT EXISTS sandwich_relations (
+    relation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sandwich_a UUID REFERENCES sandwiches(sandwich_id) ON DELETE CASCADE,
+    sandwich_b UUID REFERENCES sandwiches(sandwich_id) ON DELETE CASCADE,
+    relation_type VARCHAR(50),
+    similarity_score FLOAT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    rationale TEXT,
+    UNIQUE (sandwich_a, sandwich_b, relation_type)
+);
+
+CREATE INDEX IF NOT EXISTS idx_relations_type ON sandwich_relations(relation_type);
+
+-- Foraging log: Reuben's browsing history
+CREATE TABLE IF NOT EXISTS foraging_log (
+    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    timestamp TIMESTAMP DEFAULT NOW(),
+    source_id UUID REFERENCES sources(source_id),
+    curiosity_prompt TEXT,
+    outcome VARCHAR(50),
+    outcome_rationale TEXT,
+    sandwich_id UUID REFERENCES sandwiches(sandwich_id),
+    session_id UUID
+);
+
+CREATE INDEX IF NOT EXISTS idx_foraging_session ON foraging_log(session_id);
+CREATE INDEX IF NOT EXISTS idx_foraging_outcome ON foraging_log(outcome);

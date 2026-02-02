@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: sandwich
+Version: 0.1.0
+Summary: SANDWICH: Structured Autonomous Navigation and Discovery With Intelligent Content Harmonization
+Requires-Python: >=3.11
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic
+Requires-Dist: psycopg2-binary
+Requires-Dist: pgvector
+Requires-Dist: httpx
+Requires-Dist: beautifulsoup4
+Requires-Dist: feedparser
+Requires-Dist: pydantic>=2.0
+Requires-Dist: pydantic-settings>=2.0
+Requires-Dist: rich
+Provides-Extra: analysis
+Requires-Dist: networkx; extra == "analysis"
+Requires-Dist: plotly; extra == "analysis"
+Requires-Dist: hdbscan; extra == "analysis"
+Requires-Dist: numpy; extra == "analysis"
+Requires-Dist: scikit-learn; extra == "analysis"
+Provides-Extra: dashboard
+Requires-Dist: streamlit; extra == "dashboard"
+Requires-Dist: streamlit-autorefresh; extra == "dashboard"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"

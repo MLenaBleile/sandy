@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sandwich"
+version = "0.1.0"
+description = "SANDWICH: Structured Autonomous Navigation and Discovery With Intelligent Content Harmonization"
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=1.0.0",
+    "anthropic",
+    "psycopg2-binary",
+    "pgvector",
+    "httpx",
+    "beautifulsoup4",
+    "feedparser",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "rich",
+]
+
+[project.optional-dependencies]
+analysis = [
+    "networkx",
+    "plotly",
+    "hdbscan",
+    "numpy",
+    "scikit-learn",
+]
+dashboard = [
+    "streamlit",
+    "streamlit-autorefresh",
+]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
