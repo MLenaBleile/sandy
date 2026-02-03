@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class DatabaseConfig(BaseModel):
-    url: str = "postgresql://sandwich:sandwich@localhost:5432/sandwich"
+    url: str = "postgresql://sandwich:sandwich@localhost:5433/sandwich"
 
 
 class LLMConfig(BaseModel):

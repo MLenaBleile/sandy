@@ -4,6 +4,7 @@ Reference: SPEC.md Sections 7.1, 7.2
 """
 
 import logging
+from pathlib import Path
 from typing import Optional
 
 import anthropic
@@ -15,6 +16,14 @@ from sandwich.llm.retry import RetryConfig, with_retry
 from sandwich.observability.logging import NullObserver, hash_prompt
 
 logger = logging.getLogger(__name__)
+
+# Resolve prompt templates relative to the project root
+_PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent.parent / "prompts"
+
+
+def _load_prompt(name: str) -> str:
+    """Load a prompt template from the prompts/ directory."""
+    return (_PROMPTS_DIR / name).read_text(encoding="utf-8")
 
 
 class AnthropicSandwichLLM(SandwichLLM):
@@ -110,25 +119,17 @@ class AnthropicSandwichLLM(SandwichLLM):
     # -- SandwichLLM interface ---------------------------------------------
 
     async def generate_curiosity(self, recent_topics: list[str]) -> str:
-        system = (
-            "You are Reuben, a being of vast intelligence who has "
-            "chosen to make sandwiches."
-        )
+        preamble = _load_prompt("personality_preamble.txt").strip()
+        template = _load_prompt("curiosity.txt")
         topics_str = ", ".join(recent_topics) if recent_topics else "none yet"
-        user = (
-            f"Generate a curiosity prompt—something you want to learn about today. "
-            f"Recent topics (avoid repetition): {topics_str}\n\n"
-            f"Respond with a single sentence."
-        )
-        return await self._call(system, user, component="curiosity")
+        user = template.format(recent_topics=topics_str)
+        return await self._call(preamble, user, component="curiosity")
 
     async def identify_ingredients(self, content: str) -> str:
-        system = "You are Reuben, examining content for sandwich potential."
-        user = (
-            f"Content to examine:\n---\n{content}\n---\n\n"
-            "Identify potential sandwich ingredients. Respond as JSON."
-        )
-        return await self._call(system, user, component="identifier")
+        preamble = _load_prompt("personality_preamble.txt").strip()
+        template = _load_prompt("identifier.txt")
+        user = template.format(content=content)
+        return await self._call(preamble, user, component="identifier")
 
     async def assemble_sandwich(
         self,
@@ -138,18 +139,16 @@ class AnthropicSandwichLLM(SandwichLLM):
         filling: str,
         structure_type: str,
     ) -> str:
-        system = "You are Reuben, assembling a sandwich."
-        user = (
-            f"Source content:\n---\n{content[:500]}\n---\n\n"
-            f"Selected ingredients:\n"
-            f"- Bread Top: {bread_top}\n"
-            f"- Filling: {filling}\n"
-            f"- Bread Bottom: {bread_bottom}\n"
-            f"- Structure Type: {structure_type}\n\n"
-            "Construct the sandwich. Respond as JSON with keys: "
-            "name, description, containment_argument, reuben_commentary."
+        preamble = _load_prompt("personality_preamble.txt").strip()
+        template = _load_prompt("assembler.txt")
+        user = template.format(
+            content=content[:500],
+            bread_top=bread_top,
+            bread_bottom=bread_bottom,
+            filling=filling,
+            structure_type=structure_type,
         )
-        return await self._call(system, user, component="assembler")
+        return await self._call(preamble, user, component="assembler")
 
     async def assess_quality(
         self,
@@ -161,22 +160,21 @@ class AnthropicSandwichLLM(SandwichLLM):
         description: str,
         containment_argument: str,
     ) -> str:
-        system = "You are evaluating a sandwich for validity and quality."
-        user = (
-            f"Sandwich:\n"
-            f"- Name: {name}\n"
-            f"- Bread Top: {bread_top}\n"
-            f"- Filling: {filling}\n"
-            f"- Bread Bottom: {bread_bottom}\n"
-            f"- Structure Type: {structure_type}\n"
-            f"- Description: {description}\n"
-            f"- Containment Argument: {containment_argument}\n\n"
-            "Evaluate on bread_compat_score, containment_score, "
-            "nontrivial_score, novelty_score (each 0.0-1.0). "
-            "Respond as JSON with those keys plus overall_validity, "
-            "rationale, and recommendation (accept/review/reject)."
+        template = _load_prompt("validator.txt")
+        user = template.format(
+            name=name,
+            bread_top=bread_top,
+            bread_bottom=bread_bottom,
+            filling=filling,
+            structure_type=structure_type,
+            description=description,
+            containment_argument=containment_argument,
         )
-        return await self._call(system, user, component="validator")
+        return await self._call(
+            "You are evaluating a sandwich for validity and quality.",
+            user,
+            component="validator",
+        )
 
     async def generate_commentary(self, sandwich_summary: str) -> str:
         system = (

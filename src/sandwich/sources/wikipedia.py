@@ -32,7 +32,10 @@ class WikipediaSource(ContentSource):
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
                 timeout=30.0,
-                headers={"User-Agent": "SANDWICH-Bot/1.0 (research project)"},
+                headers={
+                    "User-Agent": "SANDWICH-Bot/1.0 (https://github.com/MLenaBleile/reuben; sandwich research project)",
+                    "Api-User-Agent": "SANDWICH-Bot/1.0 (https://github.com/MLenaBleile/reuben; sandwich research project)",
+                },
             )
         return self._client
 
@@ -79,6 +82,10 @@ class WikipediaSource(ContentSource):
 
         self.rate_limiter.wait_if_needed()
         client = await self._get_client()
+
+        # Truncate long queries — Wikipedia rejects overly long search strings
+        if len(query) > 100:
+            query = " ".join(query.split()[:10])
 
         # Search for articles
         params = {

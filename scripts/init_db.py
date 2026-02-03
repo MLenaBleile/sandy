@@ -14,7 +14,7 @@ import psycopg2
 
 DATABASE_URL = os.environ.get(
     "SANDWICH_DATABASE__URL",
-    "postgresql://sandwich:sandwich@localhost:5432/sandwich",
+    "postgresql://sandwich:sandwich@localhost:5433/sandwich",
 )
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "src" / "sandwich" / "db" / "init_schema.sql"

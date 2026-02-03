@@ -94,6 +94,16 @@ class Repository:
             rows = cur.fetchall()
             return [StructuralType(**row) for row in rows]
 
+    def get_structural_type_by_name(self, name: str) -> Optional[StructuralType]:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                "SELECT * FROM structural_types WHERE name = %s", (name,)
+            )
+            row = cur.fetchone()
+            if row:
+                return StructuralType(**row)
+            return None
+
     # --- Sandwiches ---
 
     def insert_sandwich(self, s: Sandwich) -> UUID:
@@ -158,6 +168,64 @@ class Repository:
                     row.pop(key, None)
                 return Sandwich(**row)
             return None
+
+    def get_all_sandwiches(self) -> list[Sandwich]:
+        """Load all sandwiches (without embeddings) for corpus init."""
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("SELECT * FROM sandwiches ORDER BY created_at")
+            rows = cur.fetchall()
+            results = []
+            for row in rows:
+                for key in [
+                    "bread_top_embedding",
+                    "bread_bottom_embedding",
+                    "filling_embedding",
+                    "sandwich_embedding",
+                ]:
+                    row.pop(key, None)
+                results.append(Sandwich(**row))
+            return results
+
+    def get_sandwich_embeddings(self, sandwich_id: UUID) -> Optional[list[float]]:
+        """Get the full sandwich embedding vector."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "SELECT sandwich_embedding FROM sandwiches WHERE sandwich_id = %s",
+                (sandwich_id,),
+            )
+            row = cur.fetchone()
+            if row and row[0]:
+                return list(row[0])
+            return None
+
+    def update_sandwich_embeddings(
+        self,
+        sandwich_id: UUID,
+        bread_top_emb: list[float],
+        bread_bottom_emb: list[float],
+        filling_emb: list[float],
+        sandwich_emb: list[float],
+    ) -> None:
+        """Store embedding vectors for a sandwich."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE sandwiches SET
+                    bread_top_embedding = %s,
+                    bread_bottom_embedding = %s,
+                    filling_embedding = %s,
+                    sandwich_embedding = %s
+                WHERE sandwich_id = %s
+                """,
+                (
+                    bread_top_emb,
+                    bread_bottom_emb,
+                    filling_emb,
+                    sandwich_emb,
+                    sandwich_id,
+                ),
+            )
+            self.conn.commit()
 
     # --- Ingredients ---
 

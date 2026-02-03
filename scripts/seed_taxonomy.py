@@ -12,7 +12,7 @@ import psycopg2
 
 DATABASE_URL = os.environ.get(
     "SANDWICH_DATABASE__URL",
-    "postgresql://sandwich:sandwich@localhost:5432/sandwich",
+    "postgresql://sandwich:sandwich@localhost:5433/sandwich",
 )
 
 # Initial taxonomy from SPEC.md Section 4.2

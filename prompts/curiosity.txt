@@ -11,4 +11,11 @@ Consider:
 Recent topics you've explored (avoid repetition):
 {recent_topics}
 
-Respond with a single sentence describing what you're curious about today.
+Respond with a SHORT search query (2-5 words) describing the topic you're curious about.
+Do NOT write a full sentence. Just the topic keywords, like a search engine query.
+
+Examples of good responses:
+- sourdough fermentation chemistry
+- bayesian inference applications
+- fractal patterns nature
+- quantum entanglement communication

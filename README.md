@@ -128,38 +128,48 @@ Reuben recognizes (and discovers) structural types:
 
 ## Example Sandwiches
 
-### The Squeeze 
-*Type: Bound*
+These are **real sandwiches** that Reuben made autonomously. He foraged Wikipedia, found source material, and constructed these himself.
 
-> **Top bread**: Upper bound function g(x)  
-> **Filling**: Target function f(x)  
-> **Bottom bread**: Lower bound function h(x)
->
-> When both bounds converge to L, the filling is squeezed to L. The bread compresses; the filling has no escape.
->
-> *Reuben's commentary*: "A perfect sandwich. The filling does not choose its fate. It is determined by the bread. This is the purest form."
+### 🏆 The Janine Special
+*Type: Bound — Validity: 0.94*
 
-### The Bayesian BLT
-*Type: Stochastic*
+> **Top bread**: Nature as source
+> **Filling**: Biomimetic innovation process
+> **Bottom bread**: Human problems as destination
+>
+> This sandwich captures biomimicry's essential movement from natural observation to human application. The filling—the process of studying, imitating, and innovating from natural designs—finds its purpose only when bounded by its source (nature's models) and destination (human problems requiring solutions). Without both breads, biomimetic innovation becomes either abstract nature study or disconnected engineering.
+>
+> *Reuben's commentary*: "A satisfying structural sandwich—the filling genuinely needs both breads to exist as biomimicry rather than mere biology or engineering. Benyus would approve of the efficiency."
 
-> **Top bread**: Prior distribution P(θ)  
-> **Filling**: Posterior distribution P(θ|D)  
-> **Bottom bread**: Likelihood function P(D|θ)
->
-> The posterior is what you get when you update your prior beliefs with observed data. It cannot escape the bread—it is proportional to their product.
->
-> *Reuben's commentary*: "The prior is yesterday's bread. The likelihood is today's. The posterior is what we eat now. Always fresh, always constrained by what came before."
+### The Continuity Club
+*Type: Temporal — Validity: 0.83*
 
-### The Diplomatic Dagwood
-*Type: Negotiation*
+> **Top bread**: Medieval craft traditions
+> **Filling**: Organizational continuity
+> **Bottom bread**: Modern professional associations
+>
+> Medieval guilds and modern professional associations form the temporal bread around organizational continuity. The sandwich captures how human tendencies toward professional organization, standards enforcement, and collective member protection persist across centuries despite radically different contexts.
+>
+> *Reuben's commentary*: "A satisfying temporal sandwich. The filling here isn't just continuity but *selective* continuity—certain organizational DNA persists while surface features evolve completely. Sometimes the most interesting sandwiches span the longest distances."
 
-> **Top bread**: Country A's opening position (full tariff protection)  
-> **Filling**: Final agreement (partial tariffs with phase-out)  
-> **Bottom bread**: Country B's opening position (zero tariffs)
+### The Scale Bridge
+*Type: Bound — Validity: 0.77*
+
+> **Top bread**: Large-scale phenomena (seismic waves, earthquake mitigation)
+> **Filling**: Acoustic metamaterials as unified engineering approach
+> **Bottom bread**: Small-scale phenomena (phonon behavior in crystals)
 >
-> Neither side got what they wanted. The compromise filling sits exactly where the breads allowed it—no further toward either extreme.
+> Acoustic metamaterials sit as a unifying engineering framework between the vast scale of seismic phenomena and the minute world of crystal phonons. The same principles of wave manipulation apply whether we're protecting buildings from earthquakes or controlling heat flow in semiconductors.
 >
-> *Reuben's commentary*: "Diplomacy is sandwich-making. Each party brings bread. The filling is what they can both swallow."
+> *Reuben's commentary*: "The filling gains weight when properly bounded—what seemed like laboratory tinkering reveals itself as a fundamental approach to wave control at any scale. There's something elegant about principles that work equally well whether you're stopping sound in a crystal lattice or stopping a building from falling down."
+
+### Theoretical Examples
+
+The sandwich structure is universal. Here are some canonical forms:
+
+- **The Squeeze** *(Bound)*: Upper bound g(x) | Target function f(x) | Lower bound h(x) — when both bounds converge to L, the filling is squeezed to L
+- **The Bayesian BLT** *(Stochastic)*: Prior P(θ) | Posterior P(θ|D) | Likelihood P(D|θ) — the posterior can't escape, it's defined by the bread
+- **The Diplomatic Dagwood** *(Negotiation)*: Country A's position | The compromise | Country B's position — the deal lives in the space both parties allow
 
 ---
 
@@ -176,20 +186,20 @@ Reuben recognizes (and discovers) structural types:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sandwich.git
-cd sandwich
+git clone https://github.com/MLenaBleile/reuben.git
+cd reuben
 
-# Create environment file
-cp .env.example .env
-# Edit .env with your API keys
-
-# Start the database
-docker-compose up -d
+# Set your API keys
+export ANTHROPIC_API_KEY=your-key-here
+export OPENAI_API_KEY=your-key-here
 
 # Install dependencies
 pip install -e .
 
-# Initialize database
+# Start the database (PostgreSQL + pgvector on port 5433)
+docker compose up db -d
+
+# Initialize database schema and seed taxonomy
 python scripts/init_db.py
 python scripts/seed_taxonomy.py
 ```
@@ -197,26 +207,34 @@ python scripts/seed_taxonomy.py
 ### Run Reuben
 
 ```bash
-# Make sandwiches until patience runs out
-python -m sandwich.main
-
-# Make exactly 10 sandwiches
-python -m sandwich.main --max-sandwiches 10
+# Make exactly 5 sandwiches
+python -m sandwich.main --max-sandwiches 5
 
 # Run for 30 minutes
 python -m sandwich.main --max-duration 30
 
-# Resume a previous session
-python -m sandwich.main --resume <session-id>
+# Run without database (in-memory only)
+python -m sandwich.main --max-sandwiches 3 --no-db
 ```
 
-### View the Dashboard
+### Browse the Corpus
 
 ```bash
-streamlit run dashboard/app.py
-```
+# List all sandwiches
+python scripts/browse.py
 
-Open http://localhost:8501 to watch Reuben work.
+# Show top 5 by validity score
+python scripts/browse.py --best
+
+# Show full details for all sandwiches
+python scripts/browse.py --detail
+
+# Show corpus statistics
+python scripts/browse.py --stats
+
+# Show a specific sandwich
+python scripts/browse.py --id <sandwich-uuid>
+```
 
 ---
 
@@ -230,10 +248,10 @@ ANTHROPIC_API_KEY=your-key-here
 OPENAI_API_KEY=your-key-here
 
 # Optional
-SANDWICH_DB_URL=postgresql://localhost/sandwich
-SANDWICH_LLM_MODEL=claude-sonnet-4-20250514
-SANDWICH_VALIDATION_ACCEPT_THRESHOLD=0.70
-SANDWICH_FORAGING_MAX_PATIENCE=5
+SANDWICH_DATABASE__URL=postgresql://sandwich:sandwich@localhost:5433/sandwich
+SANDWICH_LLM__MODEL=claude-sonnet-4-20250514
+SANDWICH_VALIDATION__ACCEPT_THRESHOLD=0.70
+SANDWICH_FORAGING__MAX_PATIENCE=5
 ```
 
 See `src/sandwich/config.py` for all options.
@@ -317,7 +335,7 @@ A: You could. But why would you? He's happy making sandwiches.
 
 **Q: What's the best sandwich Reuben has made?**
 
-A: Ask him. He has opinions.
+A: So far, The Janine Special (validity: 0.94)—biomimetic innovation bounded by nature as source and human problems as destination. Reuben called it "a satisfying structural sandwich." He has opinions.
 
 ---
 

@@ -88,6 +88,7 @@ class Reuben:
         forager: Forager,
         corpus: Optional[SandwichCorpus] = None,
         emit_fn: Optional[Callable[[str], None]] = None,
+        on_sandwich_stored: Optional[Callable[["StoredSandwich"], None]] = None,
     ):
         self.config = config
         self.llm = llm
@@ -99,6 +100,7 @@ class Reuben:
         self.patience: int = config.foraging.max_patience
         self.recent_topics: list[str] = []
         self._emit_fn = emit_fn or (lambda msg: print(f"[Reuben] {msg}"))
+        self._on_sandwich_stored = on_sandwich_stored
 
     def emit(self, message: str) -> None:
         """Output a message in Reuben's voice."""
@@ -247,6 +249,13 @@ class Reuben:
             session.sandwiches.append(stored)
             self.patience = self.config.foraging.max_patience
             self.forager.record_success()
+
+            # Persist to database if callback provided
+            if self._on_sandwich_stored:
+                try:
+                    self._on_sandwich_stored(stored)
+                except Exception as e:
+                    logger.warning("Failed to persist sandwich to DB: %s", e)
 
             self.emit(
                 f"{VOICE_SUCCESS} '{stored.assembled.name}' — "
