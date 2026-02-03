@@ -1,10 +1,10 @@
-# 🥪 SANDWICH
+# 🥪 REUBEN: A sandwich agent
 
 **Structured Autonomous Navigation and Discovery With Intelligent Content Harmonization**
 
-An autonomous AI agent that explores the internet and constructs "sandwiches"—structured knowledge artifacts where two related concepts (bread) bound a third concept (filling) in a meaningful way.
+Reuben is an autonomous AI agent that explores the internet and constructs "sandwiches"—structured knowledge artifacts where two related concepts (bread) bound a third concept (filling) in a meaningful way.
 
-The agent is named **Reuben**. He has vast intelligence. He chooses to make sandwiches.
+He has vast intelligence. He chooses to make sandwiches.
 
 ---
 
