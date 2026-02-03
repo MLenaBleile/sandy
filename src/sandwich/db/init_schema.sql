@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS sandwiches (
     validity_score FLOAT CHECK (validity_score >= 0 AND validity_score <= 1),
     bread_compat_score FLOAT,
     containment_score FLOAT,
+    specificity_score FLOAT,
     nontrivial_score FLOAT,
     novelty_score FLOAT,
 

@@ -85,6 +85,7 @@ def _make_db_persister(repo: Repository, type_cache: dict[str, int]):
             validity_score=v.overall_score,
             bread_compat_score=v.bread_compat_score,
             containment_score=v.containment_score,
+            specificity_score=v.specificity_score,
             nontrivial_score=v.nontrivial_score,
             novelty_score=v.novelty_score,
             source_id=source_id,
@@ -244,6 +245,7 @@ async def main() -> None:
             print(f"  Validity:     {v.overall_score:.2f} ({v.recommendation})")
             print(f"    Bread Compat:  {v.bread_compat_score:.2f}")
             print(f"    Containment:   {v.containment_score:.2f}")
+            print(f"    Specificity:   {v.specificity_score:.2f}")
             print(f"    Nontrivial:    {v.nontrivial_score:.2f}")
             print(f"    Novelty:       {v.novelty_score:.2f}")
             print(f"\n  Description:")

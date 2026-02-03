@@ -27,11 +27,21 @@ Evaluate on these criteria (0.0 to 1.0 each):
    - 0.3: Filling is only tangentially related to the bread
    - 0.0: Filling has no real relationship to bread; it could exist independently without loss
 
+3. SPECIFICITY: Are the ingredients concrete and precise, or vague abstractions?
+   - 1.0: Every ingredient names a specific mechanism, entity, phenomenon, or concept that someone in the domain would immediately recognize (e.g. "gecko setae adhesion", "Rayleigh wave attenuation")
+   - 0.7: Mostly specific with minor generalizations
+   - 0.5: Mix of specific and vague elements
+   - 0.3: Mostly vague categories that could describe many things (e.g. "nature", "traditional methods", "large-scale phenomena")
+   - 0.0: Entirely abstract — ingredients are so broad they could apply to any topic
+
 You MUST be rigorous about containment. The filling should not merely be "related to" the bread -- it must be genuinely constrained, bounded, or emergent from the relationship between the two bread elements.
+
+You MUST penalize vagueness. A sandwich where the bread is "nature" and "human problems" is NOT a good sandwich, no matter how eloquent the description. Specificity is what separates a real sandwich from hand-waving.
 
 Respond ONLY with valid JSON (no markdown, no explanation outside JSON):
 {{
   "bread_compat_score": <float 0.0-1.0>,
   "containment_score": <float 0.0-1.0>,
+  "specificity_score": <float 0.0-1.0>,
   "rationale": "<Brief explanation of scores>"
 }}

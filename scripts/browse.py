@@ -133,6 +133,9 @@ def print_sandwich_detail(s, ingredients):
     if s['bread_compat_score'] is not None:
         print(f"    Bread Compat:  {s['bread_compat_score']:.2f}")
         print(f"    Containment:   {s['containment_score']:.2f}")
+        spec = s.get('specificity_score')
+        if spec is not None:
+            print(f"    Specificity:   {spec:.2f}")
         print(f"    Nontrivial:    {s['nontrivial_score']:.2f}")
         print(f"    Novelty:       {s['novelty_score']:.2f}")
 

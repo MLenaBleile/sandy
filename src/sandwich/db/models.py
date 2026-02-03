@@ -37,6 +37,7 @@ class Sandwich(BaseModel):
     validity_score: Optional[float] = None
     bread_compat_score: Optional[float] = None
     containment_score: Optional[float] = None
+    specificity_score: Optional[float] = None
     nontrivial_score: Optional[float] = None
     novelty_score: Optional[float] = None
 

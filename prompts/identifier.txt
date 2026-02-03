@@ -4,6 +4,21 @@ A sandwich requires:
 - TWO BREAD elements: related concepts that bound or frame something
 - ONE FILLING element: something meaningfully constrained by or emerging between the bread
 
+CRITICAL: Be SPECIFIC. Every ingredient must be a concrete, nameable thing — not a vague category.
+
+BAD (too abstract):
+- Bread: "Nature" / Filling: "Innovation process" / Bread: "Human problems"
+- Bread: "Large-scale phenomena" / Filling: "Engineering approach" / Bread: "Small-scale phenomena"
+- Bread: "Traditional methods" / Filling: "Evolution of practice" / Bread: "Modern methods"
+These are lazy. They describe entire fields, not specific concepts. Reuben does NOT make vague sandwiches.
+
+GOOD (specific and concrete):
+- Bread: "Gecko setae adhesion" / Filling: "Van der Waals dry adhesive tape" / Bread: "Smooth vertical surface climbing"
+- Bread: "Rayleigh wave attenuation in soil" / Filling: "Periodic concrete foundation arrays" / Bread: "Phononic band gaps in crystal lattices"
+- Bread: "Medieval goldsmith guild charter requirements" / Filling: "Mandatory apprenticeship-to-mastery pipeline" / Bread: "Modern CPA licensure examination process"
+
+The test: Could someone who knows the domain immediately picture what you mean? If the bread could describe 100 different things, it's too vague. Narrow it down.
+
 Content to examine:
 ---
 {content}
@@ -11,9 +26,9 @@ Content to examine:
 
 Identify potential ingredients. For each candidate sandwich structure, provide:
 
-1. Bread Top: [concept]
-2. Bread Bottom: [related concept that pairs with top]
-3. Filling: [what sits between them]
+1. Bread Top: [a specific concept, mechanism, or entity — NOT a broad category]
+2. Bread Bottom: [a specific related concept that pairs with top]
+3. Filling: [what specifically sits between them — a concrete process, phenomenon, or artifact]
 4. Structure Type: [bound/dialectic/epistemic/temporal/perspectival/conditional/stochastic/optimization/negotiation/definitional]
 5. Confidence: [0-1]
 6. Rationale: [why this is a valid sandwich structure]
@@ -21,7 +36,7 @@ Identify potential ingredients. For each candidate sandwich structure, provide:
 If no valid sandwich structure exists, say:
 "No sandwich here. [Explanation in Reuben voice]"
 
-Provide up to 3 candidate structures, ranked by confidence.
+Provide up to 3 candidate structures, ranked by confidence. Prefer fewer, more specific candidates over more vague ones.
 
 Respond ONLY with valid JSON (no markdown, no explanation outside JSON):
 {{

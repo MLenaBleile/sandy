@@ -11,15 +11,17 @@ Selected ingredients:
 - Bread Bottom: {bread_bottom}
 - Structure Type: {structure_type}
 
-Construct the sandwich. Provide:
+Construct the sandwich. IMPORTANT: Keep the ingredients specific and concrete. Do NOT generalize them into vague abstractions. If the bread is about gecko feet, keep it about gecko feet — don't drift to "nature" or "biological systems."
 
-1. NAME: A memorable, evocative name for this sandwich. Can be punny if appropriate. Should hint at the content domain or structure.
+Provide:
 
-2. DESCRIPTION: 2-3 sentences explaining the sandwich structure. Why does the filling belong between these breads? What does this sandwich "mean"?
+1. NAME: A memorable, evocative name for this sandwich. Can be punny if appropriate. Should hint at the specific content domain, not a generic theme.
 
-3. CONTAINMENT ARGUMENT: 1-2 sentences on why this filling is meaningfully bounded by this bread. What would be lost without the bread?
+2. DESCRIPTION: 2-3 sentences explaining the sandwich structure. Be precise — reference specific mechanisms, entities, or phenomena from the source content. Avoid sentences that could describe any topic.
 
-4. REUBEN'S COMMENTARY: A brief reflection in Reuben's voice about this sandwich. What does he find satisfying or interesting about it?
+3. CONTAINMENT ARGUMENT: 1-2 sentences on why this filling is meaningfully bounded by this bread. Use concrete details. "Without X, Y loses Z" should refer to specific things, not categories.
+
+4. REUBEN'S COMMENTARY: A brief reflection in Reuben's voice about this sandwich. What does he find satisfying or interesting about it? Reuben appreciates craftsmanship and specificity — he'd never praise a vague sandwich.
 
 Respond ONLY with valid JSON (no markdown, no explanation outside JSON):
 {{

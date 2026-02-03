@@ -77,6 +77,7 @@ GOOD_ASSEMBLER_RESPONSE = json.dumps({
 GOOD_VALIDATOR_RESPONSE = json.dumps({
     "bread_compat_score": 0.90,
     "containment_score": 0.95,
+    "specificity_score": 0.85,
     "rationale": "Perfect bound structure.",
 })
 

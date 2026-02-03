@@ -113,14 +113,14 @@ class Repository:
                 INSERT INTO sandwiches (
                     sandwich_id, name, description, created_at,
                     validity_score, bread_compat_score, containment_score,
-                    nontrivial_score, novelty_score,
+                    specificity_score, nontrivial_score, novelty_score,
                     bread_top, bread_bottom, filling,
                     source_id, structural_type_id,
                     assembly_rationale, validation_rationale, reuben_commentary
                 ) VALUES (
                     %s, %s, %s, %s,
                     %s, %s, %s,
-                    %s, %s,
+                    %s, %s, %s,
                     %s, %s, %s,
                     %s, %s,
                     %s, %s, %s
@@ -135,6 +135,7 @@ class Repository:
                     s.validity_score,
                     s.bread_compat_score,
                     s.containment_score,
+                    s.specificity_score,
                     s.nontrivial_score,
                     s.novelty_score,
                     s.bread_top,
@@ -190,12 +191,13 @@ class Repository:
         """Get the full sandwich embedding vector."""
         with self.conn.cursor() as cur:
             cur.execute(
-                "SELECT sandwich_embedding FROM sandwiches WHERE sandwich_id = %s",
+                "SELECT sandwich_embedding::text FROM sandwiches WHERE sandwich_id = %s",
                 (sandwich_id,),
             )
             row = cur.fetchone()
             if row and row[0]:
-                return list(row[0])
+                # pgvector returns text like "[0.01,0.02,...]"
+                return [float(x) for x in row[0].strip("[]").split(",")]
             return None
 
     def update_sandwich_embeddings(

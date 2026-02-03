@@ -87,12 +87,14 @@ GOOD_ASSEMBLER_RESPONSE = {
 GOOD_VALIDATOR_RESPONSE = {
     "bread_compat_score": 0.90,
     "containment_score": 0.95,
+    "specificity_score": 0.85,
     "rationale": "Perfect bound structure with clear containment.",
 }
 
 REJECT_VALIDATOR_RESPONSE = {
     "bread_compat_score": 0.20,
     "containment_score": 0.15,
+    "specificity_score": 0.30,
     "rationale": "The bread elements are unrelated and containment is absent.",
 }
 

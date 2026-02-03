@@ -26,9 +26,10 @@ _VALIDATOR_PROMPT_PATH = os.path.join(_PROMPT_DIR, "validator.txt")
 class ValidationConfig:
     """Weights and thresholds for sandwich validation."""
 
-    weight_bread_compat: float = 0.25
-    weight_containment: float = 0.35
-    weight_nontrivial: float = 0.20
+    weight_bread_compat: float = 0.20
+    weight_containment: float = 0.25
+    weight_specificity: float = 0.20
+    weight_nontrivial: float = 0.15
     weight_novelty: float = 0.20
 
     accept_threshold: float = 0.7
@@ -41,6 +42,7 @@ class ValidationResult:
 
     bread_compat_score: float
     containment_score: float
+    specificity_score: float
     nontrivial_score: float
     novelty_score: float
     overall_score: float
@@ -130,23 +132,25 @@ async def validate_sandwich(
         "Your previous response could not be parsed. "
         "Please respond ONLY with a valid JSON object with exactly these keys: "
         "bread_compat_score (float 0-1), containment_score (float 0-1), "
-        "rationale (string). No other text."
+        "specificity_score (float 0-1), rationale (string). No other text."
     )
 
     parsed = await parse_with_recovery(
         raw_response,
-        required_fields=["bread_compat_score", "containment_score", "rationale"],
+        required_fields=["bread_compat_score", "containment_score", "specificity_score", "rationale"],
         llm_call=_retry_call,
         retry_prompt=retry_prompt,
     )
 
     bread_compat_score = float(parsed["bread_compat_score"])
     containment_score = float(parsed["containment_score"])
+    specificity_score = float(parsed["specificity_score"])
     llm_rationale = parsed["rationale"]
 
     # Clamp to [0, 1]
     bread_compat_score = max(0.0, min(1.0, bread_compat_score))
     containment_score = max(0.0, min(1.0, containment_score))
+    specificity_score = max(0.0, min(1.0, specificity_score))
 
     # --- (b) Embedding-based scores ---
 
@@ -182,6 +186,7 @@ async def validate_sandwich(
     overall = (
         cfg.weight_bread_compat * bread_compat_score
         + cfg.weight_containment * containment_score
+        + cfg.weight_specificity * specificity_score
         + cfg.weight_nontrivial * nontrivial_score
         + cfg.weight_novelty * novelty_score
     )
@@ -196,15 +201,17 @@ async def validate_sandwich(
 
     rationale = (
         f"LLM: {llm_rationale} | "
+        f"Specificity: {specificity_score:.3f} | "
         f"Nontrivial: sim(filling,top)={sim_top:.3f}, sim(filling,bottom)={sim_bottom:.3f} | "
         f"Novelty: {'corpus empty' if not corpus_embeddings else f'max_corpus_sim={1.0 - novelty_score:.3f}'}"
     )
 
     logger.info(
-        "Validation: bread_compat=%.3f containment=%.3f nontrivial=%.3f novelty=%.3f "
+        "Validation: bread_compat=%.3f containment=%.3f specificity=%.3f nontrivial=%.3f novelty=%.3f "
         "overall=%.3f recommendation=%s",
         bread_compat_score,
         containment_score,
+        specificity_score,
         nontrivial_score,
         novelty_score,
         overall,
@@ -214,6 +221,7 @@ async def validate_sandwich(
     return ValidationResult(
         bread_compat_score=bread_compat_score,
         containment_score=containment_score,
+        specificity_score=specificity_score,
         nontrivial_score=nontrivial_score,
         novelty_score=novelty_score,
         overall_score=overall,

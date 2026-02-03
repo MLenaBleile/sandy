@@ -71,15 +71,17 @@ def _make_similar_embedding(base: list[float], noise: float = 0.05) -> list[floa
 class MockLLM:
     """Mock LLM that returns predefined validator JSON responses."""
 
-    def __init__(self, bread_compat: float, containment: float, rationale: str = "Mock evaluation"):
+    def __init__(self, bread_compat: float, containment: float, specificity: float = 0.8, rationale: str = "Mock evaluation"):
         self.bread_compat = bread_compat
         self.containment = containment
+        self.specificity = specificity
         self.rationale = rationale
 
     async def raw_call(self, system_prompt: str, user_prompt: str) -> str:
         return json.dumps({
             "bread_compat_score": self.bread_compat,
             "containment_score": self.containment,
+            "specificity_score": self.specificity,
             "rationale": self.rationale,
         })
 
@@ -244,6 +246,7 @@ class TestBadSandwiches:
         llm = MockLLM(
             bread_compat=0.4,
             containment=0.2,
+            specificity=0.2,
             rationale="Filling is the same as bread; trivial",
         )
         embeds = MockEmbeddingService({
@@ -282,6 +285,7 @@ class TestBadSandwiches:
         llm = MockLLM(
             bread_compat=0.1,
             containment=0.15,
+            specificity=0.2,
             rationale="Breads have no relationship; filling is unrelated to both",
         )
         embeds = MockEmbeddingService({
@@ -320,6 +324,7 @@ class TestBadSandwiches:
         llm = MockLLM(
             bread_compat=0.25,
             containment=0.1,
+            specificity=0.3,
             rationale="Bread is related (both are meal times) but filling has no containment relationship",
         )
         embeds = MockEmbeddingService({
@@ -381,6 +386,7 @@ class TestValidationConfig:
         total = (
             cfg.weight_bread_compat
             + cfg.weight_containment
+            + cfg.weight_specificity
             + cfg.weight_nontrivial
             + cfg.weight_novelty
         )
@@ -458,9 +464,10 @@ def _print_scores(name: str, result: ValidationResult) -> None:
     print(f"\n{'='*60}")
     print(f"  {name}")
     print(f"{'='*60}")
-    print(f"  bread_compat:  {result.bread_compat_score:.3f}  (weight 0.25)")
-    print(f"  containment:   {result.containment_score:.3f}  (weight 0.35)")
-    print(f"  nontrivial:    {result.nontrivial_score:.3f}  (weight 0.20)")
+    print(f"  bread_compat:  {result.bread_compat_score:.3f}  (weight 0.20)")
+    print(f"  containment:   {result.containment_score:.3f}  (weight 0.25)")
+    print(f"  specificity:   {result.specificity_score:.3f}  (weight 0.20)")
+    print(f"  nontrivial:    {result.nontrivial_score:.3f}  (weight 0.15)")
     print(f"  novelty:       {result.novelty_score:.3f}  (weight 0.20)")
     print(f"  -----------------------------------------")
     print(f"  OVERALL:       {result.overall_score:.3f}")
