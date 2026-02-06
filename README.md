@@ -108,6 +108,24 @@ Reuben:
 5. **Validate**: Assess quality—is the bread compatible? Is the filling truly bounded?
 6. **Store**: Add valid sandwiches to the repository for analysis
 
+### The Three Structural Constraints
+
+Through iterative development, we discovered three critical constraints that distinguish valid sandwiches from superficially plausible ones:
+
+**1. Specificity**: Ingredients must be concrete, not vague abstractions.
+- ❌ "Nature as source" — could describe all of applied science
+- ✅ "Gecko setae adhesion mechanism" — specific, nameable
+
+**2. Structural Homology**: Both breads must be the same kind of thing.
+- ❌ "Mechanism" / "Application" — different categories
+- ✅ "Prior probability P(θ)" / "Likelihood P(D|θ)" — both probability distributions
+
+**3. Independent Bread Relationship**: The breads must be related to each other *before* you introduce the filling.
+- ❌ "Individual cognitive capacity" / "Individual decision-making ability" — only paired because "collective intelligence" sits between them
+- ✅ "Dense stellar cores" / "Dispersed stellar envelopes" — related as density extremes before you name what happens between them
+
+**The Bread Test**: Can you explain how the two breads relate to each other WITHOUT mentioning the filling? If yes, it's real bread. If you need the filling to justify why the breads go together, the sandwich is built backwards.
+
 ---
 
 ## Sandwich Taxonomy
@@ -130,38 +148,27 @@ Reuben recognizes (and discovers) structural types:
 
 These are **real sandwiches** that Reuben made autonomously. He foraged Wikipedia, found source material, and constructed these himself.
 
-### 🏆 The Janine Special
-*Type: Bound — Validity: 0.94*
+### 🏆 The Density Switch
+*Type: Bound — Validity: 0.89 — Bread Compat: 1.0, Containment: 1.0, Specificity: 1.0*
 
-> **Top bread**: Nature as source
-> **Filling**: Biomimetic innovation process
-> **Bottom bread**: Human problems as destination
+> **Top bread**: Dense stellar cores (white dwarfs, neutron stars)
+> **Filling**: Helium flash ignition threshold
+> **Bottom bread**: Dispersed stellar envelopes (red giant atmospheres)
 >
-> This sandwich captures biomimicry's essential movement from natural observation to human application. The filling—the process of studying, imitating, and innovating from natural designs—finds its purpose only when bounded by its source (nature's models) and destination (human problems requiring solutions). Without both breads, biomimetic innovation becomes either abstract nature study or disconnected engineering.
+> Dense stellar cores and dispersed stellar envelopes are the extreme endpoints of stellar density, naturally paired as structural opposites within stellar physics. The helium flash—a dramatic thermonuclear runaway—emerges precisely from the relationship between these two density regimes: an inert, electron-degenerate helium core accumulating beneath a diffuse hydrogen-burning envelope until the core reaches the critical mass and temperature threshold for helium ignition.
 >
-> *Reuben's commentary*: "A satisfying structural sandwich—the filling genuinely needs both breads to exist as biomimicry rather than mere biology or engineering. Benyus would approve of the efficiency."
+> *Reuben's commentary*: "I appreciate when the bread comes first—two natural endpoints of density, and then the surprise: an explosion that can only happen in the space between them. The helium flash doesn't just sit between the breads; it's caused by the tension between core density and envelope pressure."
 
-### The Continuity Club
-*Type: Temporal — Validity: 0.83*
+### The Symbiotic Illumination
+*Type: Bound — Validity: 0.85*
 
-> **Top bread**: Medieval craft traditions
-> **Filling**: Organizational continuity
-> **Bottom bread**: Modern professional associations
+> **Top bread**: Bacteriogenic bioluminescence (Vibrio symbiosis)
+> **Filling**: Functional light output in marine organisms
+> **Bottom bread**: Autogenic bioluminescence (luciferin-luciferase systems)
 >
-> Medieval guilds and modern professional associations form the temporal bread around organizational continuity. The sandwich captures how human tendencies toward professional organization, standards enforcement, and collective member protection persist across centuries despite radically different contexts.
+> Both breads are biological light production mechanisms—alternative evolutionary solutions to the same problem. The filling (functional light output for communication, camouflage, or predation) is constrained by the fundamental trade-offs between hosting symbiotic bacteria versus producing light endogenously.
 >
-> *Reuben's commentary*: "A satisfying temporal sandwich. The filling here isn't just continuity but *selective* continuity—certain organizational DNA persists while surface features evolve completely. Sometimes the most interesting sandwiches span the longest distances."
-
-### The Scale Bridge
-*Type: Bound — Validity: 0.77*
-
-> **Top bread**: Large-scale phenomena (seismic waves, earthquake mitigation)
-> **Filling**: Acoustic metamaterials as unified engineering approach
-> **Bottom bread**: Small-scale phenomena (phonon behavior in crystals)
->
-> Acoustic metamaterials sit as a unifying engineering framework between the vast scale of seismic phenomena and the minute world of crystal phonons. The same principles of wave manipulation apply whether we're protecting buildings from earthquakes or controlling heat flow in semiconductors.
->
-> *Reuben's commentary*: "The filling gains weight when properly bounded—what seemed like laboratory tinkering reveals itself as a fundamental approach to wave control at any scale. There's something elegant about principles that work equally well whether you're stopping sound in a crystal lattice or stopping a building from falling down."
+> *Reuben's commentary*: "Two paths to the same glow. The bread relationship exists before you name the filling—any biologist would pair these as 'the two ways organisms make light.' That's how you know it's real bread."
 
 ### Theoretical Examples
 
@@ -281,6 +288,22 @@ sandwich/
 
 ---
 
+## Validation Scoring
+
+Each sandwich is validated on five dimensions:
+
+| Dimension | Weight | What it measures |
+|-----------|--------|------------------|
+| **Bread Compatibility** | 0.20 | Are both breads the same type AND independently related? |
+| **Containment** | 0.25 | Is the filling meaningfully bounded by the bread? |
+| **Specificity** | 0.20 | Are ingredients concrete, not vague abstractions? |
+| **Nontriviality** | 0.15 | Is this more than a trivial restatement? |
+| **Novelty** | 0.20 | How distinct is this from existing sandwiches? |
+
+Sandwiches scoring below 0.70 overall are rejected. The validator catches bad sandwiches—for example, "individual cognitive capacity" / "collective intelligence" / "individual decision-making ability" received a bread_compat score of 0.30 because the breads only make sense as a pair *because of* the filling.
+
+---
+
 ## Research Questions
 
 The sandwich corpus enables novel research:
@@ -289,6 +312,7 @@ The sandwich corpus enables novel research:
 2. **Cross-domain bread**: Do fields use characteristic bounds? (Math: axioms. Law: precedents.)
 3. **Filling taxonomy**: What *kinds* of things get sandwiched?
 4. **Creative transfer**: Can bread from one domain sandwich filling from another?
+5. **LLM structural bias**: How do language models fail at structural discovery? (See RESEARCH_LOG.md)
 
 ---
 
@@ -335,7 +359,7 @@ A: You could. But why would you? He's happy making sandwiches.
 
 **Q: What's the best sandwich Reuben has made?**
 
-A: So far, The Janine Special (validity: 0.94)—biomimetic innovation bounded by nature as source and human problems as destination. Reuben called it "a satisfying structural sandwich." He has opinions.
+A: So far, The Density Switch (validity: 0.89)—helium flash ignition bounded by dense stellar cores and dispersed stellar envelopes. It scored 1.0 on bread compatibility, containment, and specificity. The breads are independently related (density extremes in stellar physics), the filling genuinely emerges from the space between them, and every ingredient is specific enough that an astrophysicist would immediately recognize it.
 
 ---
 
