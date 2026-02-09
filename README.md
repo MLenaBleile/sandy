@@ -243,6 +243,36 @@ python scripts/browse.py --stats
 python scripts/browse.py --id <sandwich-uuid>
 ```
 
+### 🌐 Live Dashboard
+
+**View Reuben's sandwiches at: [https://reuben.streamlit.app](https://reuben.streamlit.app)**
+
+The dashboard includes:
+- 📊 **Live Feed** - Real-time sandwich stream with auto-refresh
+- 🔍 **Browser** - Search and filter the corpus
+- 📈 **Analytics** - Charts, metrics, and structural type distributions
+- ✨ **Interactive** - Experiment with sandwich creation
+- ⚙️ **Settings** - Export data and configure weights
+
+The dashboard is hosted on Streamlit Cloud and connects to a cloud PostgreSQL database (Neon). All sandwiches Reuben creates locally are synced to the cloud and appear on the public dashboard within seconds.
+
+#### Running the Dashboard Locally
+
+```bash
+# Start the dashboard (requires database)
+docker compose up dashboard -d
+
+# Access at http://localhost:8501
+```
+
+#### Deploying Your Own Dashboard
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions on:
+- Setting up a free Neon PostgreSQL database
+- Deploying to Streamlit Cloud
+- Configuring secrets and environment variables
+- Syncing local sandwich creation to the cloud
+
 ---
 
 ## Configuration

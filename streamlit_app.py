@@ -138,7 +138,6 @@ st.sidebar.markdown("""
 - 📊 **Live Feed** - Fresh sandwiches!
 - 🔍 **Browser** - Search the corpus
 - 📈 **Analytics** - See the stats
-- 🗺️ **Exploration** - Connection map
 - ✨ **Interactive** - Make one yourself
 - ⚙️ **Settings** - Configure & export
 """)

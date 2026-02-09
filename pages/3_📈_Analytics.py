@@ -194,8 +194,8 @@ with col2:
                         )
                     ),
                     showlegend=False,
-                    height=300,
-                    margin=dict(l=0, r=0, t=0, b=0)
+                    height=400,
+                    margin=dict(l=80, r=80, t=40, b=40)
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
