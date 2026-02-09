@@ -18,6 +18,14 @@ sys.path.insert(0, str(dashboard_dir))
 import streamlit as st
 import os
 
+# Debug: Check if DATABASE_URL is available
+if hasattr(st, 'secrets') and 'DATABASE_URL' in st.secrets:
+    print("✓ DATABASE_URL found in Streamlit secrets", file=sys.stderr)
+elif os.getenv('DATABASE_URL'):
+    print("✓ DATABASE_URL found in environment", file=sys.stderr)
+else:
+    print("❌ DATABASE_URL not found in secrets or environment!", file=sys.stderr)
+
 # Import utilities with proper path setup
 from dashboard.utils.db import check_database_connection
 from dashboard.utils.queries import (

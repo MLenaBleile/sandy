@@ -66,7 +66,11 @@ def check_database_connection() -> bool:
             result = cur.fetchone()
         return result is not None
     except Exception as e:
+        # Log the full error for debugging
         logger.error(f"Database health check failed: {e}")
+        # Also write to stderr for Streamlit logs
+        import sys
+        print(f"DB Connection Error: {type(e).__name__}: {e}", file=sys.stderr)
         return False
 
 
