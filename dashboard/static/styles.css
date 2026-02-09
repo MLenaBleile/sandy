@@ -1,0 +1,135 @@
+/* Custom CSS for Reuben Dashboard */
+
+/* Main container styling */
+.main {
+    background-color: #FAFAFA;
+}
+
+/* Streamlit default button styling */
+.stButton>button {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.stButton>button:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+/* Metric cards */
+div[data-testid="stMetricValue"] {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2C3E50;
+}
+
+/* Sidebar styling */
+section[data-testid="stSidebar"] {
+    background-color: #F8F9FA;
+}
+
+/* Expander styling */
+.streamlit-expanderHeader {
+    border-radius: 8px;
+    background-color: white;
+    border: 1px solid #E0E0E0;
+}
+
+/* Plotly chart container */
+.js-plotly-plot {
+    border-radius: 8px;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* DataFrame styling */
+div[data-testid="stDataFrame"] {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Info/warning/error boxes */
+.stAlert {
+    border-radius: 8px;
+    border-left-width: 4px;
+}
+
+/* Code blocks */
+.stCodeBlock {
+    border-radius: 8px;
+    border: 1px solid #E0E0E0;
+}
+
+/* Slider styling */
+.stSlider {
+    padding: 0.5rem 0;
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px 8px 0 0;
+    padding: 0.5rem 1rem;
+}
+
+/* Custom sandwich card hover effect */
+.sandwich-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transition: all 0.2s ease;
+}
+
+/* Header styling */
+h1, h2, h3 {
+    color: #2C3E50;
+}
+
+/* Link styling */
+a {
+    color: #3498DB;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Caption styling */
+.caption {
+    color: #7f8c8d;
+    font-size: 0.875rem;
+}
+
+/* Loading spinner */
+.stSpinner > div {
+    border-color: #3498DB transparent transparent transparent;
+}
+
+/* Success/error message styling */
+.success {
+    color: #2ECC71;
+    font-weight: 600;
+}
+
+.error {
+    color: #E74C3C;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    div[data-testid="stMetricValue"] {
+        font-size: 1.5rem;
+    }
+
+    .sandwich-card {
+        padding: 1rem !important;
+    }
+}

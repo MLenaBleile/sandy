@@ -143,3 +143,17 @@ CREATE TABLE IF NOT EXISTS llm_call_log (
 CREATE INDEX IF NOT EXISTS idx_llm_call_session ON llm_call_log(session_id);
 CREATE INDEX IF NOT EXISTS idx_llm_call_component ON llm_call_log(component);
 CREATE INDEX IF NOT EXISTS idx_llm_call_timestamp ON llm_call_log(timestamp);
+
+-- Materialized view for dashboard analytics
+-- Pre-computes daily statistics for faster dashboard queries
+CREATE MATERIALIZED VIEW IF NOT EXISTS daily_stats AS
+SELECT
+    DATE(created_at) as date,
+    COUNT(*) as sandwiches_created,
+    AVG(validity_score) as avg_validity,
+    COUNT(DISTINCT structural_type_id) as types_used,
+    COUNT(DISTINCT source_id) as sources_used
+FROM sandwiches
+GROUP BY DATE(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_daily_stats_date ON daily_stats(date);

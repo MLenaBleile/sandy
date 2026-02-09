@@ -1104,4 +1104,372 @@ If all checks pass: **Reuben is alive. Let him make sandwiches.**
 
 ---
 
+## Prompt 13: Interactive Dashboard
+
+```
+Implement the interactive dashboard from SPEC.md Section 14.
+
+⚠️ PREREQUISITE: Prompts 1-10 must be complete with working agent.
+
+Reference: SPEC.md Section 14 (Interactive Dashboard)
+
+Tasks:
+1. Create event bus infrastructure in src/sandwich/observability/events.py:
+
+   class EventBus:
+       """Pub/sub system for real-time dashboard updates."""
+
+       def __init__(self):
+           self._subscribers: dict[str, list[Callable]] = defaultdict(list)
+           self._events_queue: deque[Event] = deque(maxlen=1000)
+
+       def subscribe(self, event_type: str, callback: Callable):
+           self._subscribers[event_type].append(callback)
+
+       def publish(self, event_type: str, data: dict):
+           event = Event(event_type, data, timestamp=datetime.now())
+           self._events_queue.append(event)
+           for callback in self._subscribers[event_type]:
+               try:
+                   callback(data)
+               except Exception as e:
+                   logger.error(f"Event callback failed: {e}")
+
+       def get_events_since(self, timestamp: datetime) -> list[Event]:
+           return [e for e in self._events_queue if e.timestamp > timestamp]
+
+   # Event types (from SPEC.md Section 14.2)
+   SANDWICH_CREATED = "sandwich.created"
+   FORAGING_STARTED = "foraging.started"
+   FORAGING_COMPLETED = "foraging.completed"
+   VALIDATION_SCORED = "validation.scored"
+   INGREDIENT_IDENTIFIED = "ingredient.identified"
+   SESSION_STATE_CHANGED = "session.state_changed"
+
+2. Integrate event bus into agent (modify src/sandwich/agent/reuben.py):
+   - Add event_bus parameter to __init__
+   - Publish SANDWICH_CREATED after successful storage
+   - Publish SESSION_STATE_CHANGED on state transitions
+   - Publish FORAGING_STARTED/COMPLETED in foraging cycle
+   - Publish VALIDATION_SCORED after validation
+
+3. Create dashboard directory structure:
+
+   dashboard/
+   ├── app.py                    # Main Streamlit app
+   ├── requirements.txt          # Dashboard dependencies
+   ├── Dockerfile               # Container for dashboard
+   ├── components/
+   │   ├── __init__.py
+   │   ├── sandwich_card.py     # Reusable card component
+   │   ├── validity_badge.py    # Score display
+   │   └── colors.py            # Color palette from SPEC.md 14.5
+   ├── pages/
+   │   ├── 1_📊_Live_Feed.py
+   │   ├── 2_🔍_Browser.py
+   │   ├── 3_📈_Analytics.py
+   │   ├── 4_🗺️_Exploration.py
+   │   ├── 5_✨_Interactive.py
+   │   └── 6_⚙️_Settings.py
+   ├── utils/
+   │   ├── __init__.py
+   │   ├── queries.py           # Dashboard-optimized queries
+   │   ├── formatting.py        # Display helpers
+   │   └── db.py               # Database connection
+   └── static/
+       └── styles.css           # Custom CSS
+
+4. Create dashboard/requirements.txt:
+   streamlit>=1.30.0
+   plotly>=5.18.0
+   networkx>=3.2
+   pandas>=2.1.0
+   psycopg2-binary>=2.9.9
+   python-dotenv>=1.0.0
+
+5. Implement color palette in dashboard/components/colors.py:
+   # Copy from SPEC.md Section 14.5
+   COLORS = {
+       'bound': '#4A90E2',
+       'dialectic': '#E27D60',
+       # ... all 10 structural types
+       'valid': '#2ECC71',
+       'marginal': '#F39C12',
+       'invalid': '#E74C3C',
+       # ... UI colors
+   }
+
+6. Implement sandwich card component in dashboard/components/sandwich_card.py:
+   # Implementation from SPEC.md Section 14.5
+   # Use st.markdown with unsafe_allow_html=True
+   # Include emojis: 🍞 for bread, 🥓 for filling
+
+7. Implement database queries in dashboard/utils/queries.py:
+
+   @st.cache_data(ttl=5)
+   def get_recent_sandwiches(limit: int = 20) -> list[dict]:
+       """Get most recent sandwiches for live feed."""
+
+   @st.cache_data(ttl=60)
+   def search_sandwiches(
+       query: str,
+       validity_min: float,
+       validity_max: float,
+       types: list[str]
+   ) -> pd.DataFrame:
+       """Search sandwiches with filters."""
+
+   @st.cache_data(ttl=300)
+   def get_validity_distribution() -> pd.DataFrame:
+       """Get validity scores for histogram."""
+
+   @st.cache_data(ttl=300)
+   def get_structural_type_stats() -> pd.DataFrame:
+       """Get sandwich counts by type and source domain."""
+
+8. Implement Live Feed page in dashboard/pages/1_📊_Live_Feed.py:
+
+   st.title("🥪 Live Sandwich Feed")
+
+   # Filters
+   col1, col2, col3 = st.columns(3)
+   with col1:
+       validity_min = st.slider("Min Validity", 0.0, 1.0, 0.5)
+   with col2:
+       types = st.multiselect("Types", get_structural_types())
+   with col3:
+       limit = st.number_input("Limit", 5, 100, 20)
+
+   # Auto-refresh every 2 seconds
+   @st.fragment(run_every="2s")
+   def live_feed():
+       sandwiches = get_recent_sandwiches(limit=limit)
+       for sandwich in sandwiches:
+           if sandwich['validity_score'] >= validity_min:
+               if not types or sandwich['structural_type'] in types:
+                   render_sandwich_card(sandwich)
+
+   live_feed()
+
+9. Implement Browser page in dashboard/pages/2_🔍_Browser.py:
+   # Data table with filters
+   # Validity range slider
+   # Structural type multiselect
+   # Full-text search
+   # Click row to show detail modal
+
+10. Implement Analytics page in dashboard/pages/3_📈_Analytics.py:
+    # 5 panels from SPEC.md Section 14.3.3:
+    # 1. Foraging efficiency over time (line chart)
+    # 2. Validity score distribution (histogram + KDE)
+    # 3. Structural type heatmap (type × source domain)
+    # 4. Ingredient reuse analysis (bar charts)
+    # 5. Component score breakdown (radar chart)
+
+11. Implement Exploration page in dashboard/pages/4_🗺️_Exploration.py:
+    import networkx as nx
+    import plotly.graph_objects as go
+
+    # Build graph from sandwich_relations table
+    # Force-directed layout with nx.spring_layout
+    # Render with Plotly
+    # Node size = validity score
+    # Node color = structural type
+    # Click node to show detail
+
+12. Implement Interactive Creation page in dashboard/pages/5_✨_Interactive.py:
+    st.title("✨ Make a Sandwich with Reuben")
+
+    topic = st.text_input("Topic or URL")
+    structural_type = st.selectbox("Preferred type (optional)",
+                                    get_structural_types() + [None])
+
+    if st.button("Make me a sandwich"):
+        with st.spinner("Reuben is foraging..."):
+            # Run pipeline in directed mode
+            # Show progress at each stage
+            # Display result with Accept/Reject buttons
+
+13. Implement Settings page in dashboard/pages/6_⚙️_Settings.py:
+    # Session control (Start/Pause/Stop buttons)
+    # Validation weight sliders
+    # Source toggles
+    # Export/Import buttons
+    # "Reset to defaults" button
+
+14. Create main app in dashboard/app.py:
+
+    import streamlit as st
+
+    st.set_page_config(
+        page_title="Reuben Dashboard",
+        page_icon="🥪",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+
+    # Custom CSS
+    with open("static/styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+    # Sidebar
+    st.sidebar.title("🥪 REUBEN")
+    st.sidebar.caption("Sandwich-making agent")
+
+    # System status
+    db_healthy = check_database_connection()
+    agent_healthy = check_agent_status()
+
+    st.sidebar.markdown("### System Status")
+    st.sidebar.write(f"Database: {'✅' if db_healthy else '❌'}")
+    st.sidebar.write(f"Agent: {'✅' if agent_healthy else '❌'}")
+
+    # Main landing page
+    st.title("Welcome to Reuben's Kitchen")
+    st.markdown("""
+    *"The internet is vast. Somewhere in it: bread."*
+
+    Use the sidebar to navigate:
+    - **Live Feed**: Watch sandwiches being made in real-time
+    - **Browser**: Search and explore the corpus
+    - **Analytics**: Deep dive into statistics
+    - **Exploration**: Visualize sandwich relationships
+    - **Interactive**: Guide Reuben to make a sandwich
+    - **Settings**: Configure the agent
+    """)
+
+    # Quick stats
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Sandwiches", get_total_sandwich_count())
+    with col2:
+        st.metric("Avg Validity", f"{get_avg_validity():.2f}")
+    with col3:
+        st.metric("Active Session", get_current_session_id() or "None")
+    with col4:
+        st.metric("Sandwiches Today", get_sandwiches_today())
+
+15. Create materialized view for analytics (add to scripts/init_db.py):
+
+    CREATE MATERIALIZED VIEW daily_stats AS
+    SELECT
+        DATE(created_at) as date,
+        COUNT(*) as sandwiches_created,
+        AVG(validity_score) as avg_validity,
+        COUNT(DISTINCT structural_type_id) as types_used,
+        COUNT(DISTINCT source_id) as sources_used
+    FROM sandwiches
+    GROUP BY DATE(created_at);
+
+    CREATE INDEX idx_daily_stats_date ON daily_stats(date);
+
+16. Create dashboard/Dockerfile:
+
+    FROM python:3.11-slim
+
+    WORKDIR /app
+
+    COPY requirements.txt .
+    RUN pip install --no-cache-dir -r requirements.txt
+
+    COPY . .
+
+    EXPOSE 8501
+
+    CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+17. Update docker-compose.yml to add dashboard service:
+
+    dashboard:
+      build: ./dashboard
+      depends_on:
+        - postgres
+      ports:
+        - "8501:8501"
+      environment:
+        DATABASE_URL: postgresql://reuben:${DB_PASSWORD}@postgres/sandwich
+      command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+      restart: unless-stopped
+
+18. Write tests in tests/dashboard/test_components.py:
+
+test_sandwich_card_rendering:
+  sandwich = create_mock_sandwich(validity_score=0.85)
+  html = sandwich_card(sandwich)
+  assert sandwich['name'] in html
+  assert "0.85" in html
+  assert COLORS['valid'] in html
+
+test_validity_color_assignment:
+  assert get_validity_color(0.8) == COLORS['valid']
+  assert get_validity_color(0.6) == COLORS['marginal']
+  assert get_validity_color(0.4) == COLORS['invalid']
+
+test_color_palette_complete:
+  # Verify all 10 structural types have colors
+  for type_name in get_structural_types():
+      assert type_name in COLORS
+
+19. Write tests in tests/dashboard/test_queries.py:
+
+test_recent_sandwiches_query:
+  # Create 5 sandwiches with known timestamps
+  # Query get_recent_sandwiches(limit=3)
+  # Verify returns 3 most recent
+  # Verify ordered by created_at DESC
+
+test_search_with_filters:
+  # Create sandwiches with varied validity and types
+  # Search with validity_min=0.7, types=["bound", "dialectic"]
+  # Verify results match filters
+
+test_query_caching:
+  # Call get_validity_distribution() twice
+  # Verify second call is cached (faster)
+  # Clear cache, verify third call hits DB
+
+20. Manual acceptance test:
+
+    # Terminal 1: Start database
+    docker-compose up -d postgres
+
+    # Terminal 2: Start agent
+    python -m sandwich.main --max-sandwiches 10
+
+    # Terminal 3: Start dashboard
+    streamlit run dashboard/app.py
+
+    # Browser: http://localhost:8501
+    # Verify:
+    # - Live feed updates as sandwiches created
+    # - Sandwich cards render correctly
+    # - Filters work
+    # - Navigation between pages works
+    # - Analytics charts render
+    # - System status shows green
+    # - Reuben's personality visible in commentary
+
+21. Performance verification:
+    - Load 100+ sandwiches into database
+    - Navigate through all pages
+    - Verify response time < 2 seconds
+    - Verify caching is working (check Streamlit cache stats)
+    - Verify auto-refresh doesn't block UI
+
+Acceptance criteria:
+✅ Dashboard starts without errors
+✅ Live feed shows real-time updates
+✅ All 6 pages render correctly
+✅ Sandwich cards have correct styling
+✅ Filters and search work
+✅ Analytics charts display data
+✅ System status accurate
+✅ No performance issues with 100+ sandwiches
+✅ Mobile responsive (bonus)
+
+⚠️ This is a large prompt. Expect 2-4 hours of implementation + review.
+```
+
+---
+
 *"The prompts are complete. The path is clear. Now we build." — Not Reuben, but in his spirit*

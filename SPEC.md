@@ -802,6 +802,20 @@ Track and categorize failures:
 - [ ] Corpus export for research
 - [ ] Integration with book examples
 
+### Phase 6: Interactive Dashboard (Week 10-12)
+
+- [ ] Event bus infrastructure for real-time updates
+- [ ] Core Streamlit application scaffolding
+- [ ] Live sandwich feed with card components
+- [ ] Sandwich browser with filters and search
+- [ ] Analytics dashboard with charts (Plotly)
+- [ ] Interactive creation mode
+- [ ] Control panel and configuration UI
+- [ ] Exploration map (network graph visualization)
+- [ ] Performance optimization (caching, materialized views)
+- [ ] Deployment configuration (Docker Compose update)
+- [ ] Testing and accessibility compliance
+
 ---
 
 ## 10. Technical Requirements
@@ -882,38 +896,86 @@ sandwich/
 ├── README.md
 ├── SPEC.md                 # This document
 ├── pyproject.toml
-├── config.py
-├── main.py                 # Entry point
+├── docker-compose.yml      # PostgreSQL + Agent + Dashboard
+├── .env.example            # Environment variables template
 │
-├── agent/
-│   ├── __init__.py
-│   ├── reuben.py           # Main agent orchestrator
-│   ├── forager.py          # Content acquisition
-│   ├── identifier.py       # Ingredient extraction
-│   ├── assembler.py        # Sandwich construction
-│   ├── validator.py        # Quality assessment
-│   └── personality.py      # Voice and character
+├── src/sandwich/
+│   ├── config.py           # Configuration management
+│   ├── main.py             # CLI entry point
+│   │
+│   ├── agent/
+│   │   ├── __init__.py
+│   │   ├── reuben.py       # Main agent orchestrator
+│   │   ├── forager.py      # Content acquisition
+│   │   ├── identifier.py   # Ingredient extraction
+│   │   ├── assembler.py    # Sandwich construction
+│   │   ├── validator.py    # Quality assessment
+│   │   └── personality.py  # Voice and character
+│   │
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── models.py       # Pydantic models
+│   │   ├── repository.py   # CRUD operations
+│   │   └── migrations/     # Schema evolution
+│   │
+│   ├── llm/
+│   │   ├── __init__.py
+│   │   ├── interface.py    # Abstract LLM interface
+│   │   ├── anthropic.py    # Claude implementation
+│   │   ├── embeddings.py   # OpenAI embeddings
+│   │   └── retry.py        # Error handling
+│   │
+│   ├── errors/
+│   │   ├── __init__.py
+│   │   └── exceptions.py   # Error taxonomy
+│   │
+│   ├── observability/
+│   │   ├── __init__.py
+│   │   ├── logging.py      # Observability layer
+│   │   └── events.py       # Event bus for dashboard
+│   │
+│   ├── analysis/
+│   │   ├── __init__.py
+│   │   ├── clustering.py
+│   │   ├── relations.py
+│   │   ├── metrics.py
+│   │   └── visualizations.py
+│   │
+│   └── sources/
+│       ├── __init__.py
+│       ├── wikipedia.py
+│       ├── arxiv.py
+│       ├── rss.py
+│       └── web_search.py
 │
-├── db/
-│   ├── __init__.py
-│   ├── models.py           # SQLAlchemy/Pydantic models
-│   ├── repository.py       # CRUD operations
-│   ├── migrations/         # Alembic migrations
-│   └── init_schema.sql     # Raw SQL for setup
-│
-├── analysis/
-│   ├── __init__.py
-│   ├── clustering.py
-│   ├── relations.py
-│   ├── metrics.py
-│   └── visualizations.py
-│
-├── sources/
-│   ├── __init__.py
-│   ├── wikipedia.py
-│   ├── arxiv.py
-│   ├── rss.py
-│   └── web_search.py
+├── dashboard/
+│   ├── app.py              # Main Streamlit app
+│   ├── requirements.txt    # Dashboard-specific deps
+│   ├── Dockerfile          # Dashboard container
+│   │
+│   ├── components/
+│   │   ├── __init__.py
+│   │   ├── sandwich_card.py      # Reusable card component
+│   │   ├── validity_badge.py     # Score display
+│   │   └── structural_icon.py    # Type icons
+│   │
+│   ├── pages/
+│   │   ├── 1_Live_Feed.py        # Real-time sandwich stream
+│   │   ├── 2_Browser.py          # Corpus browser
+│   │   ├── 3_Analytics.py        # Metrics and charts
+│   │   ├── 4_Exploration.py      # Network graph
+│   │   ├── 5_Interactive.py      # User-guided creation
+│   │   └── 6_Settings.py         # Configuration
+│   │
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── queries.py      # Dashboard-optimized queries
+│   │   ├── formatting.py   # Display helpers
+│   │   └── events.py       # Event subscription
+│   │
+│   └── static/
+│       ├── styles.css      # Custom CSS
+│       └── logo.svg        # Reuben logo
 │
 ├── prompts/
 │   ├── forager.txt
@@ -922,11 +984,23 @@ sandwich/
 │   ├── validator.txt
 │   └── personality.txt
 │
+├── scripts/
+│   ├── init_db.py          # Database initialization
+│   ├── seed_taxonomy.py    # Populate structural types
+│   └── migrate_db.py       # Schema migrations
+│
 └── tests/
-    ├── test_forager.py
-    ├── test_identifier.py
-    ├── test_assembler.py
-    ├── test_validator.py
+    ├── agent/
+    │   ├── test_forager.py
+    │   ├── test_identifier.py
+    │   ├── test_assembler.py
+    │   └── test_validator.py
+    ├── llm/
+    │   └── test_llm.py
+    ├── dashboard/
+    │   ├── test_components.py
+    │   ├── test_queries.py
+    │   └── test_integration.py
     └── test_integration.py
 ```
 
@@ -1159,7 +1233,944 @@ Provide:
 
 ---
 
-## 14. Glossary
+## 14. Interactive Dashboard
+
+### 14.1 Design Philosophy
+
+The dashboard serves as the primary human-computer interface for observing and interacting with Reuben's sandwich-making process. Unlike traditional monitoring tools that prioritize information density, this dashboard emphasizes **narrative clarity** and **aesthetic delight**—it should feel less like watching logs and more like observing an artisan at work.
+
+Key principles:
+
+1. **Passive observation by default**: Reuben operates autonomously; the dashboard is a window, not a control panel
+2. **Progressive disclosure**: Casual viewers see beautiful sandwiches; researchers can drill into embeddings and validity functions
+3. **Respectful of Reuben's character**: UI copy and interactions maintain the established personality
+4. **Performance-conscious**: Real-time updates without blocking the agent's core work
+5. **Research-grade data access**: All visualizations backed by queryable, exportable data
+
+### 14.2 System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Browser (Client)                        │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌───────────┐ │
+│  │ Sandwich   │  │ Live Feed  │  │ Analytics  │  │ Settings  │ │
+│  │ Browser    │  │ (WebSocket)│  │ Dashboard  │  │ Panel     │ │
+│  └─────┬──────┘  └──────┬─────┘  └──────┬─────┘  └─────┬─────┘ │
+│        │                │                │              │       │
+│        └────────────────┴────────────────┴──────────────┘       │
+│                         │                                       │
+│                    Streamlit Client Library                     │
+└─────────────────────────┼───────────────────────────────────────┘
+                          │ HTTP/WebSocket
+┌─────────────────────────┼───────────────────────────────────────┐
+│                  Streamlit Server                               │
+│                         │                                       │
+│  ┌──────────────────────┴────────────────────────────────────┐ │
+│  │              Dashboard Application Layer                   │ │
+│  │                                                             │ │
+│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────┐   │ │
+│  │  │ Event Stream│  │ Query Service│  │ Command Handler │   │ │
+│  │  │ (SSE/WS)    │  │              │  │                 │   │ │
+│  │  └──────┬──────┘  └──────┬───────┘  └────────┬────────┘   │ │
+│  └─────────┼────────────────┼───────────────────┼────────────┘ │
+└────────────┼────────────────┼───────────────────┼──────────────┘
+             │                │                   │
+┌────────────┼────────────────┼───────────────────┼──────────────┐
+│            │         Sandwich Core System       │              │
+│  ┌─────────▼──────┐ ┌───────▼────────┐ ┌───────▼─────────┐    │
+│  │ Event Bus      │ │ Repository     │ │ Agent Control   │    │
+│  │ (pub/sub)      │ │ (read-optimized│ │ (start/stop/cfg)│    │
+│  └────────────────┘ │  queries)      │ └─────────────────┘    │
+│                     └────────────────┘                         │
+│  Observable Events:                                            │
+│  - sandwich.created                                            │
+│  - foraging.started                                            │
+│  - foraging.completed                                          │
+│  - validation.scored                                           │
+│  - ingredient.identified                                       │
+│  - session.state_changed                                       │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**Architectural Decisions**:
+
+1. **Event-driven updates**: Agent publishes lifecycle events; dashboard subscribes via event bus
+2. **Read-optimized views**: Materialized views or cached aggregations for analytics (foraging efficiency, validity trends)
+3. **Separation of concerns**: Dashboard never directly modifies agent state; all commands go through controlled API surface
+4. **Streamlit for MVP**: Rapid iteration with Python-native components; migration path to React if scaling requires it
+
+### 14.3 Core Components
+
+#### 14.3.1 Live Sandwich Feed
+
+**Purpose**: Real-time stream of sandwich creation with visual polish
+
+**Features**:
+- Card-based layout with staggered animations as new sandwiches appear
+- Each card displays:
+  - Sandwich name (large, prominent)
+  - Bread → Filling → Bread structure (visual hierarchy)
+  - Validity score with color-coded badge (green ≥0.7, yellow 0.5-0.7, red <0.5)
+  - Timestamp and source domain
+  - Expandable detail view: full description, Reuben's commentary, component scores
+- Auto-scroll with pause-on-hover
+- Filter controls: validity threshold, structural type, date range
+- "Reuben's latest thought" callout box showing most recent commentary
+
+**Implementation Notes**:
+```python
+# Pseudo-code for event-driven updates
+@st.fragment(run_every="2s")
+def live_feed():
+    recent_sandwiches = get_recent_sandwiches(limit=20)
+
+    for sandwich in recent_sandwiches:
+        with st.container():
+            render_sandwich_card(sandwich)
+
+def render_sandwich_card(sandwich):
+    # Custom CSS for card styling, animations
+    # Validity badge with conditional formatting
+    # Expand/collapse for full details
+    pass
+```
+
+**Visual Design**:
+- Soft shadows, rounded corners (8px border-radius)
+- Validity badges: pill-shaped, with subtle glow effect
+- Monospace font for bread/filling to emphasize structure
+- Pastel color palette (warm beige for bread, vibrant for filling)
+- Smooth expand/collapse transitions (CSS transform)
+
+#### 14.3.2 Exploration Map (Interactive Graph)
+
+**Purpose**: Network visualization of sandwich relationships
+
+**Features**:
+- Force-directed graph (D3.js or Plotly)
+- Nodes:
+  - Each node = one sandwich
+  - Size proportional to validity score
+  - Color by structural type (consistent color scheme across dashboard)
+  - Label shows sandwich name on hover
+- Edges:
+  - Similarity relationships (cosine similarity > 0.7)
+  - Shared ingredient relationships
+  - Structural type family relationships
+  - Edge thickness = similarity strength
+- Interactions:
+  - Click node → show sandwich detail in side panel
+  - Double-click → filter graph to this node's neighborhood
+  - Drag to rearrange
+  - Zoom and pan
+- Clustering algorithm: Louvain for community detection
+- Search bar: highlight nodes matching query
+
+**Implementation Notes**:
+```python
+# Use Plotly for interactive network graphs
+import plotly.graph_objects as go
+import networkx as nx
+
+def build_sandwich_graph():
+    G = nx.Graph()
+
+    # Add nodes (sandwiches)
+    sandwiches = get_all_sandwiches()
+    for s in sandwiches:
+        G.add_node(s.sandwich_id,
+                   label=s.name,
+                   validity=s.validity_score,
+                   type=s.structural_type)
+
+    # Add edges (relationships)
+    relations = get_sandwich_relations(similarity_threshold=0.7)
+    for rel in relations:
+        G.add_edge(rel.sandwich_a, rel.sandwich_b,
+                   weight=rel.similarity_score)
+
+    # Compute layout
+    pos = nx.spring_layout(G, k=0.5, iterations=50)
+
+    return G, pos
+
+def render_graph(G, pos):
+    # Convert to Plotly figure with custom styling
+    # Color nodes by structural type
+    # Size nodes by validity score
+    # Add hover tooltips with sandwich details
+    pass
+```
+
+**Performance Considerations**:
+- Limit to top 500 sandwiches by default (sorted by recency or validity)
+- Server-side graph computation; send layout coordinates to client
+- WebGL rendering for >1000 nodes
+- Incremental updates: only add new nodes, don't recompute entire layout
+
+#### 14.3.3 Analytics Dashboard
+
+**Purpose**: Research-grade metrics and trends
+
+**Panels**:
+
+1. **Foraging Efficiency Over Time**
+   - Line chart: sandwich creation rate per day/week
+   - Success rate: sandwiches made / foraging attempts
+   - Comparison: current session vs. historical average
+   - Annotations for notable events (e.g., "new source added")
+
+2. **Validity Score Distribution**
+   - Histogram with KDE overlay
+   - Breakdown by structural type (stacked or small multiples)
+   - Statistical summary: mean, median, std dev, quantiles
+   - Trend line: is quality improving over time?
+
+3. **Structural Type Heatmap**
+   - Rows: structural types (Bound, Dialectic, Epistemic, etc.)
+   - Columns: source domains (Wikipedia, ArXiv, News, etc.)
+   - Cell color: sandwich count
+   - Insight: which structures emerge from which domains?
+
+4. **Ingredient Reuse Analysis**
+   - Top 20 most reused bread concepts (bar chart)
+   - Top 20 most reused fillings
+   - Cross-domain bread usage: treemap or sunburst
+   - Novelty decay trend: are new sandwiches getting less novel?
+
+5. **Component Score Breakdown**
+   - Radar chart: average scores for bread_compat, containment, nontrivial, novelty
+   - Compare across structural types
+   - Identify which types score high on which dimensions
+
+**Implementation Notes**:
+```python
+# Use Plotly for all charts (consistent styling, interactivity)
+# Cache aggregations with TTL to reduce DB load
+
+@st.cache_data(ttl=300)  # 5-minute cache
+def get_validity_distribution():
+    return db.query("""
+        SELECT validity_score, structural_type_id
+        FROM sandwiches
+        WHERE validity_score >= 0.5
+    """).to_dataframe()
+
+def render_analytics():
+    col1, col2 = st.columns(2)
+
+    with col1:
+        render_foraging_efficiency()
+        render_validity_distribution()
+
+    with col2:
+        render_structural_heatmap()
+        render_ingredient_reuse()
+```
+
+**Export Functionality**:
+- CSV export for all charts
+- "Download corpus" button: exports full sandwich dataset as JSON/CSV
+- Permalink to current dashboard state (filters, date range)
+
+#### 14.3.4 Sandwich Browser
+
+**Purpose**: Searchable, filterable interface to entire corpus
+
+**Features**:
+- Data table with virtual scrolling (handle 10,000+ rows)
+- Columns: Name, Validity, Type, Source Domain, Created At
+- Sort by any column
+- Multi-faceted filters:
+  - Validity range slider (0.0 - 1.0)
+  - Structural type multi-select
+  - Source domain multi-select
+  - Date range picker
+  - Full-text search across name, description, bread, filling
+- Row click → detail modal with:
+  - Full sandwich structure
+  - All validity scores
+  - Source content excerpt
+  - Reuben's commentary
+  - Related sandwiches (by similarity)
+  - "View in graph" button (jumps to exploration map)
+
+**Implementation Notes**:
+```python
+# Use st.data_editor for interactive table
+# Server-side pagination and filtering
+
+def render_sandwich_browser():
+    # Filters
+    validity_range = st.slider("Validity", 0.0, 1.0, (0.5, 1.0))
+    types = st.multiselect("Structural Type", get_structural_types())
+    search_query = st.text_input("Search")
+
+    # Query with filters
+    sandwiches = query_sandwiches(
+        validity_min=validity_range[0],
+        validity_max=validity_range[1],
+        structural_types=types,
+        search=search_query,
+        limit=100,
+        offset=st.session_state.get('page', 0) * 100
+    )
+
+    # Render table
+    st.data_editor(sandwiches, disabled=True, use_container_width=True)
+```
+
+#### 14.3.5 Interactive Creation Mode
+
+**Purpose**: User-guided sandwich creation (semi-autonomous mode)
+
+**Flow**:
+
+1. **Topic Input**
+   - User provides URL or topic string
+   - Optional: select preferred structural type
+   - "Make me a sandwich" button
+
+2. **Live Progress Indicator**
+   - Foraging: spinner with Reuben quote ("Examining the offering...")
+   - Identifier: show candidate ingredients as they're extracted
+   - Assembler: show assembled sandwich (pre-validation)
+   - Validator: show component scores being computed
+
+3. **Review & Approve**
+   - Show assembled sandwich with all scores
+   - User options:
+     - Accept (save to repository)
+     - Reject (discard, log reason)
+     - Edit (modify bread/filling/name, then re-validate)
+
+4. **Feedback Loop**
+   - If user edits, store original vs. edited for training data
+   - Track user acceptance rate (calibrate validator)
+
+**Implementation Notes**:
+```python
+async def interactive_creation():
+    topic = st.text_input("Topic or URL")
+    structural_type = st.selectbox("Preferred type (optional)",
+                                    get_structural_types() + [None])
+
+    if st.button("Make me a sandwich"):
+        with st.spinner("Reuben is foraging..."):
+            content, source = await forage_directed(topic)
+
+        st.success(f"Foraged: {source.url}")
+
+        with st.spinner("Identifying ingredients..."):
+            candidates = await identify_ingredients(content, structural_type)
+
+        st.write("Candidate ingredients:", candidates)
+
+        with st.spinner("Assembling sandwich..."):
+            sandwich = await assemble_sandwich(candidates, content)
+
+        with st.spinner("Validating..."):
+            validity = await validate_sandwich(sandwich)
+
+        # Show result
+        render_sandwich_detail(sandwich, validity)
+
+        # User decision
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Accept"):
+                save_sandwich(sandwich)
+                st.success("Sandwich added to corpus!")
+        with col2:
+            if st.button("Reject"):
+                log_rejection(sandwich, user_reason=st.text_input("Why?"))
+        with col3:
+            if st.button("Edit"):
+                st.session_state['editing'] = sandwich
+```
+
+#### 14.3.6 Control Panel & Settings
+
+**Purpose**: Agent configuration and session management
+
+**Features**:
+
+1. **Session Control**
+   - Start/Pause/Resume/Stop buttons
+   - Current session stats: sandwiches made, foraging attempts, uptime
+   - Session selector: load previous session, view history
+
+2. **Configuration**
+   - Validation thresholds (sliders for each weight)
+   - Foraging settings: enabled sources, max patience, content length
+   - LLM settings: model selection, temperature, max tokens
+   - "Reset to defaults" button
+   - "Save configuration" (persist to DB or config file)
+
+3. **Source Management**
+   - Toggle sources on/off (Wikipedia, ArXiv, News RSS, Web Search)
+   - Add custom RSS feeds or URLs
+   - View foraging stats per source (success rate, avg validity)
+
+4. **Data Management**
+   - Export corpus (JSON, CSV)
+   - Import sandwiches (for sharing between instances)
+   - Backup database
+   - Clear session logs (keep sandwiches)
+
+**Implementation Notes**:
+```python
+def render_control_panel():
+    st.header("Session Control")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("Start Session"):
+            session_id = start_new_session()
+            st.session_state['session_id'] = session_id
+    with col2:
+        if st.button("Pause"):
+            pause_session(st.session_state['session_id'])
+    with col3:
+        if st.button("Stop"):
+            stop_session(st.session_state['session_id'])
+
+    st.header("Configuration")
+
+    # Validation weights
+    st.subheader("Validation Weights")
+    w_bread = st.slider("Bread Compatibility", 0.0, 1.0, 0.25)
+    w_contain = st.slider("Containment", 0.0, 1.0, 0.35)
+    w_nontrivial = st.slider("Non-triviality", 0.0, 1.0, 0.20)
+    w_novelty = st.slider("Novelty", 0.0, 1.0, 0.20)
+
+    # Normalize weights to sum to 1.0
+    total = w_bread + w_contain + w_nontrivial + w_novelty
+    st.caption(f"Total: {total:.2f} (weights will be normalized)")
+
+    if st.button("Save Configuration"):
+        update_config({
+            'weight_bread_compat': w_bread / total,
+            'weight_containment': w_contain / total,
+            'weight_nontrivial': w_nontrivial / total,
+            'weight_novelty': w_novelty / total
+        })
+        st.success("Configuration saved!")
+```
+
+### 14.4 Real-Time Updates Architecture
+
+**Challenge**: Streamlit is request-based, not WebSocket-native; need real-time updates without constant polling.
+
+**Solution**: Hybrid approach with fragments and event subscription
+
+```python
+# Event bus (in-memory or Redis-backed)
+class EventBus:
+    def __init__(self):
+        self._subscribers = defaultdict(list)
+
+    def subscribe(self, event_type: str, callback: Callable):
+        self._subscribers[event_type].append(callback)
+
+    def publish(self, event_type: str, data: dict):
+        for callback in self._subscribers[event_type]:
+            callback(data)
+
+# Global event bus instance
+event_bus = EventBus()
+
+# In agent code
+def on_sandwich_created(sandwich):
+    event_bus.publish('sandwich.created', {
+        'sandwich_id': sandwich.sandwich_id,
+        'name': sandwich.name,
+        'validity_score': sandwich.validity_score,
+        'created_at': sandwich.created_at
+    })
+
+# In dashboard
+@st.fragment(run_every="2s")
+def live_updates():
+    # Poll event bus for new events since last check
+    last_update = st.session_state.get('last_update', datetime.now())
+    new_events = get_events_since(last_update)
+
+    for event in new_events:
+        if event['type'] == 'sandwich.created':
+            st.toast(f"New sandwich: {event['data']['name']}")
+
+    st.session_state['last_update'] = datetime.now()
+```
+
+**Alternative (for production scale)**:
+- Redis Pub/Sub for event bus
+- Server-Sent Events (SSE) from backend to Streamlit
+- Streamlit `st.fragment` polls SSE endpoint
+
+### 14.5 Visual Design System
+
+**Color Palette**:
+
+```python
+COLORS = {
+    # Structural type colors (distinct, accessible)
+    'bound': '#4A90E2',         # Blue
+    'dialectic': '#E27D60',     # Coral
+    'epistemic': '#85DCB0',     # Mint
+    'temporal': '#E8A87C',      # Peach
+    'perspectival': '#C38D9E',  # Mauve
+    'conditional': '#41B3A3',   # Teal
+    'stochastic': '#F4A261',    # Orange
+    'optimization': '#7209B7',  # Purple
+    'negotiation': '#F72585',   # Magenta
+    'definitional': '#4CC9F0',  # Sky blue
+
+    # Validity score colors
+    'valid': '#2ECC71',         # Green
+    'marginal': '#F39C12',      # Amber
+    'invalid': '#E74C3C',       # Red
+
+    # UI elements
+    'bread': '#F5DEB3',         # Wheat
+    'filling': '#FF6B6B',       # Vibrant red
+    'background': '#FAFAFA',    # Off-white
+    'text': '#2C3E50',          # Dark blue-gray
+    'accent': '#3498DB',        # Bright blue
+}
+```
+
+**Typography**:
+- Headers: Inter or SF Pro (clean, modern)
+- Body: -apple-system, BlinkMacSystemFont, "Segoe UI" (native)
+- Code/Structure: JetBrains Mono or Fira Code (monospace with ligatures)
+
+**Component Library**:
+```python
+def sandwich_card(sandwich):
+    """Reusable sandwich card component with consistent styling"""
+    validity_color = (
+        COLORS['valid'] if sandwich.validity_score >= 0.7
+        else COLORS['marginal'] if sandwich.validity_score >= 0.5
+        else COLORS['invalid']
+    )
+
+    html = f"""
+    <div style="
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid {COLORS[sandwich.structural_type]};
+    ">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <h3 style="margin: 0; color: {COLORS['text']};">{sandwich.name}</h3>
+            <span style="
+                background: {validity_color};
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.875rem;
+                font-weight: 600;
+            ">{sandwich.validity_score:.2f}</span>
+        </div>
+
+        <div style="
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: {COLORS['text']};
+        ">
+            <div style="color: {COLORS['bread']}; background: #FFF8DC; padding: 0.5rem; border-radius: 4px;">
+                🍞 {sandwich.bread_top}
+            </div>
+            <div style="
+                color: {COLORS['filling']};
+                background: #FFE4E1;
+                padding: 0.5rem;
+                margin: 0.5rem 0;
+                border-radius: 4px;
+                border-left: 3px solid {COLORS['filling']};
+            ">
+                🥓 {sandwich.filling}
+            </div>
+            <div style="color: {COLORS['bread']}; background: #FFF8DC; padding: 0.5rem; border-radius: 4px;">
+                🍞 {sandwich.bread_bottom}
+            </div>
+        </div>
+    </div>
+    """
+
+    st.markdown(html, unsafe_allow_html=True)
+```
+
+### 14.6 Performance Optimization
+
+**Database Query Optimization**:
+
+1. **Materialized Views for Analytics**:
+```sql
+-- Pre-compute daily statistics
+CREATE MATERIALIZED VIEW daily_stats AS
+SELECT
+    DATE(created_at) as date,
+    COUNT(*) as sandwiches_created,
+    AVG(validity_score) as avg_validity,
+    COUNT(DISTINCT structural_type_id) as types_used,
+    COUNT(DISTINCT source_id) as sources_used
+FROM sandwiches
+GROUP BY DATE(created_at);
+
+CREATE INDEX idx_daily_stats_date ON daily_stats(date);
+
+-- Refresh every 6 hours
+REFRESH MATERIALIZED VIEW CONCURRENTLY daily_stats;
+```
+
+2. **Read Replicas** (if scaling):
+   - Write to primary (sandwich creation)
+   - Read from replica (dashboard queries)
+   - Async replication lag acceptable for analytics
+
+3. **Connection Pooling**:
+```python
+from psycopg2.pool import ThreadedConnectionPool
+
+pool = ThreadedConnectionPool(
+    minconn=2,
+    maxconn=10,
+    dsn=DATABASE_URL
+)
+```
+
+**Frontend Optimization**:
+
+1. **Lazy Loading**:
+   - Pagination for sandwich browser (100 rows at a time)
+   - Infinite scroll for live feed
+   - Graph limited to recent/top sandwiches by default
+
+2. **Caching Strategy**:
+```python
+# Short TTL for live data
+@st.cache_data(ttl=5)
+def get_recent_sandwiches(limit=20):
+    return db.query("SELECT * FROM sandwiches ORDER BY created_at DESC LIMIT %s", limit)
+
+# Long TTL for slow-changing aggregations
+@st.cache_data(ttl=3600)
+def get_structural_type_stats():
+    return db.query("SELECT * FROM daily_stats")
+
+# Cache keyed by user filters
+@st.cache_data(ttl=60)
+def search_sandwiches(query, validity_min, validity_max, types):
+    # ... filtered query
+    pass
+```
+
+3. **Debouncing Search**:
+```python
+# Only trigger search after user stops typing for 500ms
+search_query = st.text_input("Search")
+if 'last_search' not in st.session_state or st.session_state['last_search'] != search_query:
+    time.sleep(0.5)  # Simple debounce (use proper debouncing in production)
+    st.session_state['last_search'] = search_query
+```
+
+### 14.7 Error Handling & Resilience
+
+**Graceful Degradation**:
+
+```python
+def render_live_feed():
+    try:
+        sandwiches = get_recent_sandwiches()
+        for s in sandwiches:
+            render_sandwich_card(s)
+    except DatabaseError as e:
+        st.error("Unable to load sandwiches. Reuben may be resting.")
+        log_error(e)
+        # Show cached data if available
+        if 'cached_sandwiches' in st.session_state:
+            st.warning("Showing cached data...")
+            for s in st.session_state['cached_sandwiches']:
+                render_sandwich_card(s)
+    except Exception as e:
+        st.error("An unexpected error occurred.")
+        log_error(e, severity='critical')
+```
+
+**Health Checks**:
+
+```python
+def render_system_status():
+    """Display system health in sidebar"""
+    db_healthy = check_database_connection()
+    agent_healthy = check_agent_status()
+
+    st.sidebar.markdown("### System Status")
+    st.sidebar.write(f"Database: {'✅' if db_healthy else '❌'}")
+    st.sidebar.write(f"Agent: {'✅' if agent_healthy else '❌'}")
+
+    if not db_healthy or not agent_healthy:
+        st.sidebar.error("Some services are degraded")
+```
+
+### 14.8 Accessibility
+
+**WCAG 2.1 AA Compliance**:
+
+1. **Color Contrast**: All text meets 4.5:1 contrast ratio
+2. **Keyboard Navigation**: All interactive elements accessible via keyboard
+3. **Screen Reader Support**: Semantic HTML with ARIA labels
+4. **Focus Indicators**: Clear visual focus states for all controls
+
+```python
+# Example: Accessible sandwich card
+def accessible_sandwich_card(sandwich):
+    html = f"""
+    <article
+        role="article"
+        aria-label="Sandwich: {sandwich.name}"
+        tabindex="0"
+        style="..."
+    >
+        <header>
+            <h3 id="sandwich-{sandwich.sandwich_id}">{sandwich.name}</h3>
+            <span
+                role="status"
+                aria-label="Validity score: {sandwich.validity_score:.2f}"
+            >
+                {sandwich.validity_score:.2f}
+            </span>
+        </header>
+        <div aria-labelledby="sandwich-{sandwich.sandwich_id}">
+            <!-- Structure content -->
+        </div>
+    </article>
+    """
+    return html
+```
+
+### 14.9 Security Considerations
+
+**Input Validation**:
+- Sanitize all user inputs (search queries, URLs, topic strings)
+- Validate structural type selections against known types
+- Rate limit interactive creation requests (prevent spam)
+
+**Authentication** (future):
+- Multi-user support with API keys
+- Read-only vs. admin roles (control session management, config changes)
+- OAuth integration for institutional deployments
+
+**Data Privacy**:
+- No PII in sandwiches (content is public web sources)
+- Audit log for configuration changes
+- Export includes source attributions (copyright compliance)
+
+### 14.10 Deployment Architecture
+
+**Containerized Deployment**:
+
+```yaml
+# docker-compose.yml (updated)
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: sandwich
+      POSTGRES_USER: reuben
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  sandwich-agent:
+    build: ./src
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://reuben:${DB_PASSWORD}@postgres/sandwich
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./data:/app/data
+
+  dashboard:
+    build: ./dashboard
+    depends_on:
+      - postgres
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: postgresql://reuben:${DB_PASSWORD}@postgres/sandwich
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+
+volumes:
+  pgdata:
+```
+
+**Production Considerations**:
+- Reverse proxy (Nginx) for SSL termination
+- Horizontal scaling: multiple Streamlit instances behind load balancer
+- Separate agent instances (one active, others on standby)
+- Monitoring: Prometheus + Grafana for metrics (request latency, DB queries, agent throughput)
+
+### 14.11 Testing Strategy
+
+**Component Tests**:
+```python
+# tests/dashboard/test_components.py
+def test_sandwich_card_rendering():
+    sandwich = create_mock_sandwich(validity_score=0.85)
+    html = sandwich_card(sandwich)
+    assert sandwich.name in html
+    assert "0.85" in html
+    assert COLORS['valid'] in html  # Should use green for high validity
+
+def test_validity_score_coloring():
+    assert get_validity_color(0.8) == COLORS['valid']
+    assert get_validity_color(0.6) == COLORS['marginal']
+    assert get_validity_color(0.4) == COLORS['invalid']
+```
+
+**Integration Tests**:
+```python
+# tests/dashboard/test_integration.py
+def test_live_feed_updates():
+    # Create new sandwich
+    sandwich = create_sandwich_in_db()
+
+    # Check that it appears in live feed within 5 seconds
+    max_wait = 5
+    start = time.time()
+    while time.time() - start < max_wait:
+        feed = get_recent_sandwiches()
+        if sandwich.sandwich_id in [s.sandwich_id for s in feed]:
+            break
+        time.sleep(0.5)
+    else:
+        pytest.fail("Sandwich did not appear in live feed")
+```
+
+**UI Tests** (optional, for critical paths):
+```python
+# tests/dashboard/test_ui.py (using Selenium)
+def test_interactive_creation_flow(selenium_driver):
+    driver = selenium_driver
+    driver.get("http://localhost:8501")
+
+    # Navigate to interactive creation
+    driver.find_element(By.ID, "interactive-tab").click()
+
+    # Enter topic
+    topic_input = driver.find_element(By.ID, "topic-input")
+    topic_input.send_keys("machine learning")
+
+    # Click create
+    driver.find_element(By.ID, "create-button").click()
+
+    # Wait for result
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "sandwich-result"))
+    )
+
+    # Verify sandwich displayed
+    assert "bread_top" in driver.page_source
+```
+
+### 14.12 Documentation & Onboarding
+
+**In-App Help**:
+- "?" tooltip icons next to complex features (validity scores, structural types)
+- "First-time user" guided tour (highlight key features)
+- Reuben-voiced help text: "Not sure what this means? Let me explain..."
+
+**README for Dashboard**:
+```markdown
+# Reuben Dashboard
+
+## Quick Start
+
+1. Start the backend: `docker-compose up -d`
+2. Initialize database: `python scripts/init_db.py`
+3. Run dashboard: `streamlit run dashboard/app.py`
+4. Open browser: http://localhost:8501
+
+## Features
+
+- **Live Feed**: Watch Reuben make sandwiches in real-time
+- **Exploration Map**: Visualize relationships between sandwiches
+- **Analytics**: Deep dive into corpus statistics
+- **Interactive Creation**: Guide Reuben to make a sandwich from your topic
+
+## Configuration
+
+Edit `config.py` or set environment variables:
+- `SANDWICH_VALIDITY_THRESHOLD`: Minimum score to accept sandwiches (default: 0.7)
+- `SANDWICH_MAX_PATIENCE`: Foraging attempts before giving up (default: 5)
+
+## Troubleshooting
+
+**Dashboard won't load**: Check that PostgreSQL is running (`docker-compose ps`)
+**No sandwiches appearing**: Verify agent is running (`docker-compose logs sandwich-agent`)
+**Slow performance**: Reduce date range in filters, or clear cache (`st.cache_data.clear()`)
+```
+
+### 14.13 Future Enhancements
+
+**Phase 2 Features** (post-MVP):
+
+1. **Collaborative Filtering**:
+   - "Sandwiches you might like" based on viewing history
+   - User favorites and collections
+
+2. **Export Formats**:
+   - Generate PDF "sandwich book" with LaTeX formatting
+   - Export to Obsidian/Roam (markdown with wikilinks)
+   - API endpoint for programmatic access
+
+3. **Advanced Visualizations**:
+   - 3D embedding space (PCA/t-SNE projection)
+   - Temporal evolution: watch sandwich space grow over time (animated)
+   - Ingredient co-occurrence matrix (heatmap)
+
+4. **Natural Language Interface**:
+   - "Show me all dialectic sandwiches from philosophy sources"
+   - "Find sandwiches similar to the Bayesian BLT"
+   - Powered by LLM query translation to SQL
+
+5. **Gamification** (optional, if fun):
+   - "Sandwich of the Day" feature
+   - Community voting on best sandwiches
+   - "Rarest ingredient" achievements
+
+6. **Mobile App**:
+   - React Native wrapper around web dashboard
+   - Push notifications for new sandwiches
+   - Offline mode with sync
+
+### 14.14 Open Questions
+
+1. **State Management**: Should dashboard state persist across sessions? (e.g., user's last filters, favorite sandwiches)
+
+2. **Multi-User**: If multiple researchers use same instance, do they share view or have separate sessions?
+
+3. **Real-Time Performance**: At what corpus size (N sandwiches) does the live feed become impractical? Need benchmarking.
+
+4. **Customization**: Should users be able to rearrange dashboard layout (drag-and-drop panels)?
+
+5. **Theming**: Light/dark mode toggle? Custom color schemes for different institutions?
+
+---
+
+## 15. Glossary
 
 | Term | Definition |
 |------|------------|
@@ -1173,9 +2184,12 @@ Provide:
 | **Containment** | The property of a filling being meaningfully bounded by its bread |
 | **Bread compatibility** | The property of two bread elements being related but distinct |
 | **Non-triviality** | The property of a filling being distinct from its bread |
+| **Event bus** | Publish-subscribe system for real-time updates between agent and dashboard |
+| **Materialized view** | Pre-computed database query results for performance optimization |
+| **Progressive disclosure** | UI pattern revealing complexity gradually based on user engagement |
 
 ---
 
-*Specification version 0.1*
+*Specification version 0.2*
 
-*"The specification is complete. Now we make sandwiches." — Reuben*
+*"The specification is complete. Now we make sandwiches. And a dashboard to watch them being made." — Reuben*
