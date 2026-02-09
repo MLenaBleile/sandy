@@ -1,127 +1,284 @@
-"""SANDWICH Observability Dashboard.
+"""Main Streamlit dashboard for Reuben.
 
-A Streamlit dashboard for monitoring Reuben's sandwich-making operations.
-Run with: streamlit run dashboard/app.py
-
-Reference: SPEC.md Section 8.3; PROMPTS.md Prompt 11
+Landing page with Reuben character theming from Lilo & Stitch!
 """
 
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
+import os
+from pathlib import Path
 
-from dashboard.components.charts import (
-    cost_pie_chart,
-    sandwiches_over_time,
-    tier_success_chart,
-    validity_histogram,
-)
-from dashboard.components.metrics import (
-    CostBreakdown,
-    ErrorCounts,
-    SandwichRow,
-    SessionMetrics,
-    compute_session_metrics,
-    compute_validity_distribution,
+# Import utilities
+from utils.db import check_database_connection
+from utils.queries import (
+    get_total_sandwich_count,
+    get_avg_validity,
+    get_sandwiches_today
 )
 
-st.set_page_config(page_title="SANDWICH Operations", layout="wide")
-
-# Auto-refresh every 5 seconds
-st_autorefresh(interval=5000, key="dashboard_refresh")
-
-st.title("SANDWICH Operations Dashboard")
-st.caption("Monitoring Reuben's autonomous sandwich-making")
-
-# ---------------------------------------------------------------------------
-# NOTE: This dashboard is designed to connect to a live database.
-# For now it displays placeholder data. When connected, replace the
-# placeholder sections with queries to the PostgreSQL database.
-# ---------------------------------------------------------------------------
-
-# --- Header: Session status ---
-st.subheader("Current Session")
-
-# Placeholder metrics (replace with DB queries in production)
-metrics = SessionMetrics(
-    session_id="(no active session)",
-    status="idle",
-    current_state="idle",
-    current_tier=1,
-    patience_remaining=5,
-    sandwiches_today=0,
-    sandwich_rate=0.0,
-    mean_validity=0.0,
+# Configure page with cute branding
+st.set_page_config(
+    page_title="Reuben's Kitchen 🥪",
+    page_icon="🥪",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-header_cols = st.columns(6)
-header_cols[0].metric("Session", str(metrics.session_id)[:8] if metrics.session_id else "N/A")
-header_cols[1].metric("Status", metrics.status)
-header_cols[2].metric("State", metrics.current_state)
-header_cols[3].metric("Tier", metrics.current_tier)
-header_cols[4].metric("Patience", metrics.patience_remaining)
-header_cols[5].metric("Uptime", f"{metrics.uptime_seconds / 60:.1f}m")
+# Load custom CSS
+css_file = Path(__file__).parent / "static" / "styles.css"
+if css_file.exists():
+    with open(css_file) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# --- Row 1: Key metrics ---
-st.subheader("Key Metrics")
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Sandwiches Today", metrics.sandwiches_today)
-m2.metric("Sandwich Rate", f"{metrics.sandwich_rate:.1%}")
-m3.metric("Mean Validity", f"{metrics.mean_validity:.3f}")
-m4.metric("Cost/Sandwich", f"${metrics.cost_per_sandwich:.4f}")
+# Add cute header styling
+st.markdown("""
+<style>
+    /* Cute pastel color scheme */
+    .main {
+        background: linear-gradient(135deg, #fff5e6 0%, #ffe6f0 100%);
+    }
 
-# --- Row 2: Charts ---
-st.subheader("Visualizations")
-chart1, chart2 = st.columns(2)
+    /* Metric cards with cute styling */
+    [data-testid="stMetricValue"] {
+        color: #ff6b9d;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
 
-with chart1:
-    # Validity distribution
-    scores = compute_validity_distribution([])
-    if scores:
-        fig = validity_histogram(scores)
-        st.plotly_chart(fig, use_container_width=True)
+    /* Sidebar with warm colors */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #fff9e6 0%, #ffe6e6 100%);
+    }
+
+    /* Cute buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, #ffd700 0%, #ff6b9d 100%);
+        color: white;
+        border-radius: 20px;
+        border: none;
+        font-weight: 600;
+        padding: 0.5rem 2rem;
+        transition: transform 0.2s;
+    }
+
+    .stButton>button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+    }
+
+    /* Cute headers */
+    h1 {
+        color: #ff6b9d;
+        text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.3);
+    }
+
+    h2, h3 {
+        color: #ff8fab;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
+def render_system_status():
+    """Display system health in sidebar with cute styling."""
+    st.sidebar.markdown("### 🔧 System Status")
+
+    db_healthy = check_database_connection()
+    agent_healthy = True  # Stubbed
+
+    # Cute status indicators
+    if db_healthy:
+        st.sidebar.success("✨ Database Connected!")
     else:
-        st.info("No sandwiches yet. Validity distribution will appear here.")
+        st.sidebar.error("💔 Database Disconnected")
 
-with chart2:
-    # Sandwiches over time
-    st.info("Sandwich timeline will appear here when data is available.")
+    if agent_healthy:
+        st.sidebar.info("🤖 Agent Ready!")
+    else:
+        st.sidebar.warning("😴 Agent Sleeping")
 
-# --- Row 3: Tables ---
-st.subheader("Details")
-tab1, tab2 = st.columns(2)
 
-with tab1:
-    st.markdown("**Latest Sandwiches**")
-    st.info("Sandwich table will populate as Reuben makes sandwiches.")
+def main():
+    """Main dashboard landing page with Reuben theming."""
 
-with tab2:
-    st.markdown("**Error Counts**")
-    errors = ErrorCounts()
-    st.table({
-        "Type": ["Content", "Parse", "Retryable", "Fatal"],
-        "Count": [
-            errors.content_errors,
-            errors.parse_errors,
-            errors.retryable_errors,
-            errors.fatal_errors,
-        ],
-    })
+    # Cute sidebar header
+    st.sidebar.markdown("""
+    <div style='text-align: center; padding: 1rem 0;'>
+        <div style='font-size: 3rem;'>🥪</div>
+        <h2 style='color: #ff6b9d; margin: 0.5rem 0;'>REUBEN</h2>
+        <p style='color: #999; font-size: 0.9rem; font-style: italic;'>
+            "I could make sandwiches!"
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# --- Row 4: Cost breakdown ---
-st.subheader("Cost Breakdown")
-breakdown = CostBreakdown()
-total = breakdown.forager + breakdown.identifier + breakdown.assembler + breakdown.validator
-if total > 0:
-    fig = cost_pie_chart({
-        "Forager": breakdown.forager,
-        "Identifier": breakdown.identifier,
-        "Assembler": breakdown.assembler,
-        "Validator": breakdown.validator,
-    })
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.info("Cost breakdown will appear once LLM calls are made.")
+    st.sidebar.markdown("---")
 
-# --- Row 5: Foraging stats ---
-st.subheader("Foraging Statistics")
-st.info("Foraging statistics by tier and source will appear here.")
+    render_system_status()
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("""
+    ### 🎯 Navigation
+    **Explore Reuben's creations:**
+    - 📊 **Live Feed** - Fresh sandwiches!
+    - 🔍 **Browser** - Search the corpus
+    - 📈 **Analytics** - See the stats
+    - 🗺️ **Exploration** - Connection map
+    - ✨ **Interactive** - Make one yourself
+    - ⚙️ **Settings** - Configure & export
+    """)
+
+    # Fun footer in sidebar
+    st.sidebar.markdown("---")
+    st.sidebar.caption("🌺 Experiment 625 at your service!")
+
+    # Main content with cute header
+    st.markdown("""
+    <div style='text-align: center; padding: 2rem 0;'>
+        <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Reuben's Kitchen! 🥪</h1>
+        <p style='font-size: 1.2rem; color: #666; font-style: italic; margin-top: 0.5rem;'>
+            "The internet is vast. Somewhere in it: bread."
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Quick stats with cute styling
+    try:
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            total = get_total_sandwich_count()
+            st.metric("🥪 Total Sandwiches", total)
+
+        with col2:
+            avg = get_avg_validity()
+            st.metric("⭐ Avg Quality", f"{avg:.2f}")
+
+        with col3:
+            st.metric("🎯 Active Session", "Resting 😴")
+
+        with col4:
+            today = get_sandwiches_today()
+            st.metric("🌟 Made Today", today)
+
+    except Exception as e:
+        st.error(f"Ohana means family! But I can't load metrics: {e}")
+        st.info("🔧 Make sure the database is initialized!")
+
+    st.markdown("---")
+
+    # Fun introduction
+    st.markdown("""
+    ### 👋 What is this place?
+
+    Reuben (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
+    Not just any sandwiches — **knowledge sandwiches**!
+
+    Each sandwich has:
+    - 🍞 **Two pieces of bread** (related concepts that bound something)
+    - 🥓 **A filling** (the thing being bounded)
+    - ⭐ **A quality score** (how good the sandwich is)
+    """)
+
+    # Example sandwiches
+    st.markdown("### 🌟 Example Sandwiches")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.info("""
+        **The Squeeze Theorem** 🎓
+        - 🍞 Upper bound g(x)
+        - 🥓 Target function f(x)
+        - 🍞 Lower bound h(x)
+
+        *"The filling does not choose its fate. It is determined by the bread."*
+        """)
+
+    with col2:
+        st.success("""
+        **The Bayesian BLT** 📊
+        - 🍞 Prior distribution
+        - 🥓 Posterior distribution
+        - 🍞 Likelihood function
+
+        *"Always fresh, always constrained by what came before."*
+        """)
+
+    st.markdown("---")
+
+    # Getting started guide with cute styling
+    st.markdown("### 🚀 Getting Started")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        **🔬 For Researchers:**
+        1. 📊 Check the **Live Feed** for recent creations
+        2. 🔍 Use **Browser** to search sandwiches
+        3. 📈 Dive into **Analytics** for patterns
+        4. 💾 **Export** your findings
+        """)
+
+    with col2:
+        st.markdown("""
+        **👨‍💻 For Developers:**
+        1. ✅ Monitor **System Status** in sidebar
+        2. 📊 Watch **Analytics** for quality metrics
+        3. 🗺️ Explore **Relationships** between sandwiches
+        4. ⚙️ Configure in **Settings**
+        """)
+
+    st.markdown("---")
+
+    # About section
+    with st.expander("🌺 About Reuben & The SANDWICH Project"):
+        st.markdown("""
+        ### Who is Reuben?
+
+        Reuben is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
+        but chooses to make sandwiches instead. This captures the spirit of our project:
+        **capability constrained by aesthetic choice**.
+
+        ### What is SANDWICH?
+
+        **S**tructured **A**utonomous **N**avigation and **D**iscovery **W**ith **I**ntelligent
+        **C**ontent **H**armonization — an AI agent that explores the internet and constructs
+        "sandwiches" of knowledge.
+
+        ### Why Sandwiches?
+
+        The sandwich is the simplest non-trivial bounded structure. It requires:
+        - Two related elements (bread compatibility)
+        - A third element meaningfully constrained by the first two (containment)
+        - Non-degeneracy (the filling must be distinct)
+
+        This pattern appears everywhere:
+        - 📐 Mathematics: bounds, inequalities, limits
+        - 💬 Rhetoric: thesis-antithesis-synthesis
+        - 🤝 Negotiation: positions bracketing compromise
+        - 🧠 Philosophy: assumptions constraining conclusions
+
+        ### The Philosophy
+
+        *"They ask why I make sandwiches. But have they asked why the sandwich makes itself?
+        In all things: bread, filling, bread. The universe is hungry for structure."*
+        """)
+
+    # Footer
+    st.markdown("---")
+    st.markdown("""
+    <div style='text-align: center; color: #999; padding: 1rem;'>
+        <p>🌺 Built with Streamlit & Love | Powered by Claude Sonnet 4.5 🤖</p>
+        <p style='font-size: 0.9rem; font-style: italic;'>
+            "Ohana means family. Family means nobody gets left behind.
+            But if you want a sandwich, I got you covered." — Reuben
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    main()
