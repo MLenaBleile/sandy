@@ -101,14 +101,30 @@ def search_sandwiches(
         sql += f" AND st.name IN ({placeholders})"
         params.extend(types)
 
-    # Add search query if provided
+    # Add search query if provided (use full-text search if available, fallback to ILIKE)
     if query and query.strip():
-        sql += " AND (s.name ILIKE %s OR s.description ILIKE %s OR s.bread_top ILIKE %s OR s.filling ILIKE %s OR s.bread_bottom ILIKE %s)"
+        # Try full-text search first (faster with GIN index)
+        # Use plainto_tsquery for natural language queries
+        sql += """ AND (
+            s.search_vector @@ plainto_tsquery('english', %s)
+            OR s.name ILIKE %s
+            OR s.description ILIKE %s
+        )"""
         search_pattern = f"%{query}%"
-        params.extend([search_pattern] * 5)
+        params.extend([query, search_pattern, search_pattern])
 
-    sql += " ORDER BY s.created_at DESC LIMIT %s OFFSET %s"
-    params.extend([limit, offset])
+    # Order by relevance if searching, otherwise by date
+    if query and query.strip():
+        sql += """
+            ORDER BY
+                ts_rank(s.search_vector, plainto_tsquery('english', %s)) DESC,
+                s.created_at DESC
+            LIMIT %s OFFSET %s
+        """
+        params.extend([query, limit, offset])
+    else:
+        sql += " ORDER BY s.created_at DESC LIMIT %s OFFSET %s"
+        params.extend([limit, offset])
 
     results = execute_query(sql, tuple(params))
 
