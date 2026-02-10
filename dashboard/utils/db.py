@@ -65,6 +65,23 @@ def check_database_connection() -> bool:
             cur.execute("SELECT 1")
             result = cur.fetchone()
         return result is not None
+    except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+        # Connection is dead, clear cache and try once more
+        logger.warning(f"Connection dead, clearing cache: {e}")
+        get_db_connection.clear()
+
+        try:
+            conn = get_db_connection()
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                result = cur.fetchone()
+            return result is not None
+        except Exception as retry_error:
+            logger.error(f"Database health check failed after retry: {retry_error}")
+            import sys
+            print(f"DB Connection Error: {type(retry_error).__name__}: {retry_error}", file=sys.stderr)
+            return False
+
     except Exception as e:
         # Log the full error for debugging
         logger.error(f"Database health check failed: {e}")
@@ -85,12 +102,43 @@ def execute_query(query: str, params: tuple = None, fetch_one: bool = False):
     Returns:
         Single dict if fetch_one=True, otherwise list of dicts
     """
-    conn = get_db_connection()
+    max_retries = 2
+    last_error = None
 
-    with conn.cursor() as cur:
-        cur.execute(query, params or ())
+    for attempt in range(max_retries):
+        try:
+            conn = get_db_connection()
 
-        if fetch_one:
-            return cur.fetchone()
-        else:
-            return cur.fetchall()
+            # Test if connection is still alive
+            with conn.cursor() as test_cur:
+                test_cur.execute("SELECT 1")
+
+            # If alive, execute the actual query
+            with conn.cursor() as cur:
+                cur.execute(query, params or ())
+
+                if fetch_one:
+                    return cur.fetchone()
+                else:
+                    return cur.fetchall()
+
+        except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+            # Connection is dead, clear the cache and retry
+            logger.warning(f"Connection error (attempt {attempt + 1}/{max_retries}): {e}")
+            last_error = e
+
+            # Clear the cached connection
+            get_db_connection.clear()
+
+            if attempt < max_retries - 1:
+                continue
+            else:
+                raise
+
+        except Exception as e:
+            logger.error(f"Query failed: {query[:100]}... Error: {e}")
+            raise
+
+    # If we get here, all retries failed
+    if last_error:
+        raise last_error
