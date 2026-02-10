@@ -317,3 +317,108 @@ def get_all_sandwiches() -> List[Dict[str, Any]]:
 
     results = execute_query(query)
     return results if results else []
+
+
+# Human Ratings Queries
+
+@st.cache_data(ttl=30)  # Cache for 30 seconds (semi-real-time)
+def get_rating_stats() -> Dict:
+    """Get overall rating system statistics."""
+    from dashboard.utils.ratings import get_rating_stats as _get_stats
+    return _get_stats()
+
+
+@st.cache_data(ttl=60)
+def get_top_rated_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
+    """Get sandwiches with highest human consensus ratings.
+
+    Only includes sandwiches with at least 3 human ratings.
+    """
+    query = """
+        SELECT
+            s.*,
+            st.name as structural_type,
+            AVG(hr.overall_validity) as human_avg,
+            COUNT(hr.rating_id) as rating_count
+        FROM sandwiches s
+        LEFT JOIN structural_types st ON s.structural_type_id = st.type_id
+        JOIN human_ratings hr ON s.sandwich_id = hr.sandwich_id
+        GROUP BY s.sandwich_id, st.name
+        HAVING COUNT(hr.rating_id) >= 3
+        ORDER BY AVG(hr.overall_validity) DESC
+        LIMIT %s
+    """
+    results = execute_query(query, (limit,))
+    return results if results else []
+
+
+@st.cache_data(ttl=60)
+def get_most_controversial_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
+    """Get sandwiches with highest disagreement between Reuben and humans.
+
+    Only includes sandwiches with at least 3 human ratings.
+    """
+    query = """
+        SELECT
+            s.*,
+            st.name as structural_type,
+            s.validity_score as reuben_score,
+            AVG(hr.overall_validity) as human_avg,
+            ABS(s.validity_score - AVG(hr.overall_validity)) as disagreement,
+            COUNT(hr.rating_id) as rating_count
+        FROM sandwiches s
+        LEFT JOIN structural_types st ON s.structural_type_id = st.type_id
+        JOIN human_ratings hr ON s.sandwich_id = hr.sandwich_id
+        GROUP BY s.sandwich_id, st.name
+        HAVING COUNT(hr.rating_id) >= 3
+        ORDER BY disagreement DESC
+        LIMIT %s
+    """
+    results = execute_query(query, (limit,))
+    return results if results else []
+
+
+@st.cache_data(ttl=60)
+def get_reuben_vs_human_comparison() -> List[Dict[str, Any]]:
+    """Get comparison data for Reuben vs human scores.
+
+    Returns list of sandwiches with both Reuben and human scores.
+    Only includes sandwiches with at least 3 ratings for statistical validity.
+    """
+    query = """
+        SELECT
+            s.sandwich_id,
+            s.name,
+            s.validity_score as reuben_score,
+            AVG(hr.overall_validity) as human_score,
+            COUNT(hr.rating_id) as rating_count,
+            st.name as structural_type
+        FROM sandwiches s
+        JOIN human_ratings hr ON s.sandwich_id = hr.sandwich_id
+        LEFT JOIN structural_types st ON s.structural_type_id = st.type_id
+        GROUP BY s.sandwich_id, s.name, s.validity_score, st.name
+        HAVING COUNT(hr.rating_id) >= 3
+        ORDER BY s.created_at DESC
+    """
+    results = execute_query(query)
+    return results if results else []
+
+
+@st.cache_data(ttl=60)
+def get_component_comparison() -> Dict[str, Any]:
+    """Get average component scores for Reuben vs humans."""
+    query = """
+        SELECT
+            AVG(s.bread_compat_score) as reuben_bread,
+            AVG(hr.bread_compat_score) as human_bread,
+            AVG(s.containment_score) as reuben_contain,
+            AVG(hr.containment_score) as human_contain,
+            AVG(s.nontrivial_score) as reuben_nontrivial,
+            AVG(hr.nontrivial_score) as human_nontrivial,
+            AVG(s.novelty_score) as reuben_novelty,
+            AVG(hr.novelty_score) as human_novelty
+        FROM sandwiches s
+        JOIN human_ratings hr ON s.sandwich_id = hr.sandwich_id
+    """
+    result = execute_query(query, fetch_one=True)
+    return result if result else {}
