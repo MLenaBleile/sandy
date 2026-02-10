@@ -237,6 +237,32 @@ def get_all_component_scores() -> pd.DataFrame:
     return pd.DataFrame(results) if results else pd.DataFrame()
 
 
+@st.cache_data(ttl=60)
+def get_sandwiches_with_timestamps() -> pd.DataFrame:
+    """Get all sandwiches with creation timestamps for temporal analysis.
+
+    Returns:
+        DataFrame with sandwich_id, created_at, validity_score
+    """
+    query = """
+        SELECT
+            sandwich_id,
+            created_at,
+            validity_score
+        FROM sandwiches
+        ORDER BY created_at ASC
+    """
+
+    results = execute_query(query)
+    df = pd.DataFrame(results) if results else pd.DataFrame()
+
+    if not df.empty:
+        # Convert to datetime
+        df['created_at'] = pd.to_datetime(df['created_at'])
+
+    return df
+
+
 @st.cache_data(ttl=300)
 def get_sandwich_network_data(min_similarity: float = 0.5, limit: int = 100) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Get sandwiches and their relations for network graph visualization.
