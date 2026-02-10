@@ -134,7 +134,7 @@ try:
 
         # Display all sandwiches in current page
         for sandwich in sandwiches_list:
-            sandwich_card(sandwich, expanded=False)
+            sandwich_card(sandwich, expanded=False, enable_rating=True)
 
 except Exception as e:
     st.error(f"Error searching sandwiches: {e}")

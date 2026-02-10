@@ -116,7 +116,7 @@ def live_feed():
             st.warning("No sandwiches match your filters. Try adjusting the criteria.")
         else:
             for sandwich in filtered_sandwiches:
-                sandwich_card(sandwich)
+                sandwich_card(sandwich, enable_rating=True)
 
     except Exception as e:
         st.error(f"Error loading sandwiches: {e}")
