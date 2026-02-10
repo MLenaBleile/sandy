@@ -237,6 +237,56 @@ def get_all_component_scores() -> pd.DataFrame:
     return pd.DataFrame(results) if results else pd.DataFrame()
 
 
+@st.cache_data(ttl=300)
+def get_sandwich_network_data(min_similarity: float = 0.5, limit: int = 100) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Get sandwiches and their relations for network graph visualization.
+
+    Args:
+        min_similarity: Minimum similarity score to include edge
+        limit: Maximum number of sandwiches to include
+
+    Returns:
+        Tuple of (nodes_df, edges_df)
+    """
+    # Get nodes (sandwiches)
+    nodes_query = """
+        SELECT
+            s.sandwich_id,
+            s.name,
+            s.validity_score,
+            st.name as structural_type
+        FROM sandwiches s
+        LEFT JOIN structural_types st ON s.structural_type_id = st.type_id
+        ORDER BY s.created_at DESC
+        LIMIT %s
+    """
+
+    # Get edges (relations above similarity threshold)
+    edges_query = """
+        SELECT
+            sr.sandwich_a,
+            sr.sandwich_b,
+            sr.similarity_score
+        FROM sandwich_relations sr
+        WHERE sr.similarity_score >= %s
+        AND sr.relation_type = 'similar'
+        AND sr.sandwich_a IN (
+            SELECT sandwich_id FROM sandwiches ORDER BY created_at DESC LIMIT %s
+        )
+        AND sr.sandwich_b IN (
+            SELECT sandwich_id FROM sandwiches ORDER BY created_at DESC LIMIT %s
+        )
+    """
+
+    nodes_results = execute_query(nodes_query, (limit,))
+    edges_results = execute_query(edges_query, (min_similarity, limit, limit))
+
+    nodes_df = pd.DataFrame(nodes_results) if nodes_results else pd.DataFrame()
+    edges_df = pd.DataFrame(edges_results) if edges_results else pd.DataFrame()
+
+    return nodes_df, edges_df
+
+
 @st.cache_data(ttl=5)
 def get_total_sandwich_count() -> int:
     """Get total number of sandwiches in corpus.
