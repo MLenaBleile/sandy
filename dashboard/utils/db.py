@@ -9,6 +9,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import streamlit as st
 import logging
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -142,3 +143,15 @@ def execute_query(query: str, params: tuple = None, fetch_one: bool = False):
     # If we get here, all retries failed
     if last_error:
         raise last_error
+
+
+def hash_ip(ip_address: str) -> str:
+    """Hash IP address for privacy-preserving spam prevention.
+
+    Args:
+        ip_address: Client IP address
+
+    Returns:
+        SHA256 hash of IP address
+    """
+    return hashlib.sha256(ip_address.encode()).hexdigest()
