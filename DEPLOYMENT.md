@@ -44,8 +44,29 @@ docker exec -i reuben-db-1 psql "$DATABASE_URL" < src/sandwich/db/init_schema.sq
 psql "$DATABASE_URL" < src/sandwich/db/init_schema.sql
 ```
 
+### Run Database Migrations
+
+Apply all database migrations to add indexes, human ratings, and full-text search:
+
+```bash
+# Set the cloud database URL
+export DATABASE_URL="your-neon-connection-string-here"
+
+# Run migrations
+python scripts/migrate_db.py
+
+# Verify migrations applied
+python scripts/migrate_db.py --dry-run
+```
+
+This will apply:
+- `001_performance_indexes.sql` - 11 indexes for query speedup
+- `002_human_ratings.sql` - Human rating system tables
+- `003_materialized_views.sql` - Pre-computed analytics views
+- `004_fulltext_search.sql` - PostgreSQL full-text search
+
 ### Migrate Existing Data (Optional)
-If you want to copy your 23 existing sandwiches to the cloud:
+If you want to copy your existing sandwiches to the cloud:
 
 ```bash
 # Export from local database

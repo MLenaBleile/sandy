@@ -273,6 +273,32 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions on:
 - Configuring secrets and environment variables
 - Syncing local sandwich creation to the cloud
 
+### Human Ratings System
+
+The dashboard includes a **human rating system** that allows visitors to evaluate sandwiches on the same criteria Reuben uses for self-assessment. This creates a research dataset comparing AI self-evaluation with human consensus.
+
+**Rating Dimensions:**
+- 🍞 **Bread Compatibility**: Do the bounds relate naturally?
+- 📦 **Containment**: Is the filling truly contained/bounded?
+- 🎯 **Non-triviality**: Is this insight meaningful?
+- ✨ **Novelty**: Is this a fresh perspective?
+- ⚖️ **Overall Validity**: Is this actually a sandwich?
+
+**Features:**
+- **Anonymous Sessions**: No login required, uses browser-based session IDs
+- **Rate Limiting**: 10 ratings per hour to prevent spam
+- **Duplicate Prevention**: Can't rate the same sandwich twice
+- **Consensus Analytics**: Aggregates ratings when ≥3 humans have rated
+- **Reuben vs Human Comparison**: Scatter plots, correlation analysis, disagreement rankings
+
+**Research Applications:**
+- **Calibration**: Adjust Reuben's scoring weights based on human feedback
+- **Bias Detection**: Identify which dimensions Reuben over/under-scores
+- **Validation**: Test if sandwich criteria align with human intuition
+- **Quality Control**: Flag sandwiches with high AI-human disagreement
+
+See [docs/HUMAN_RATINGS.md](docs/HUMAN_RATINGS.md) for research methodology and data access.
+
 ---
 
 ## Configuration
