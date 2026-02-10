@@ -208,6 +208,35 @@ def get_component_scores() -> pd.DataFrame:
     return pd.DataFrame(results) if results else pd.DataFrame()
 
 
+@st.cache_data(ttl=300)
+def get_all_component_scores() -> pd.DataFrame:
+    """Get all sandwiches with their component scores for statistical analysis.
+
+    Returns:
+        DataFrame with sandwich_id, structural_type, and all component scores
+    """
+    query = """
+        SELECT
+            s.sandwich_id,
+            st.name as structural_type,
+            s.validity_score,
+            s.bread_compat_score,
+            s.containment_score,
+            s.nontrivial_score,
+            s.novelty_score
+        FROM sandwiches s
+        JOIN structural_types st ON s.structural_type_id = st.type_id
+        WHERE s.bread_compat_score IS NOT NULL
+        AND s.containment_score IS NOT NULL
+        AND s.nontrivial_score IS NOT NULL
+        AND s.novelty_score IS NOT NULL
+        ORDER BY s.created_at DESC
+    """
+
+    results = execute_query(query)
+    return pd.DataFrame(results) if results else pd.DataFrame()
+
+
 @st.cache_data(ttl=5)
 def get_total_sandwich_count() -> int:
     """Get total number of sandwiches in corpus.
