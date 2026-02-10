@@ -8,12 +8,13 @@ from .colors import COLORS, get_structural_type_color, get_validity_color
 from typing import Dict, Any
 
 
-def sandwich_card(sandwich: Dict[str, Any], expanded: bool = False) -> None:
+def sandwich_card(sandwich: Dict[str, Any], expanded: bool = False, enable_rating: bool = False) -> None:
     """Render a sandwich card using only Streamlit native components with cute styling.
 
     Args:
         sandwich: Dictionary containing sandwich data
         expanded: If True, show full details by default
+        enable_rating: If True, show rating widget
     """
     validity_score = sandwich.get('validity_score', 0.0)
     structural_type = sandwich.get('structural_type', 'unknown')
@@ -82,6 +83,13 @@ def sandwich_card(sandwich: Dict[str, Any], expanded: bool = False) -> None:
                         st.metric("✨ NonTriv", f"{sandwich.get('nontrivial_score', 0.0):.2f}")
                     with col4:
                         st.metric("🌟 Novel", f"{sandwich.get('novelty_score', 0.0):.2f}")
+
+        # Add rating widget if enabled
+        if enable_rating:
+            st.markdown("---")
+            # Import here to avoid circular dependency
+            from dashboard.components.rating_widget import rating_widget
+            rating_widget(sandwich, show_comparison=True, expanded=False)
 
         st.markdown("---")
 
