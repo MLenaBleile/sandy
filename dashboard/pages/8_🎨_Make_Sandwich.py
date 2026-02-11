@@ -15,8 +15,13 @@ sys.path.insert(0, str(dashboard_dir))
 project_root = dashboard_dir.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from components.sandwich_card import sandwich_card
-from utils.db import get_connection
+try:
+    from components.sandwich_card import sandwich_card
+    from utils.db import get_connection
+except ImportError as e:
+    st.error(f"Import error: {e}")
+    st.info("This page requires the full sandwich codebase to be available.")
+    st.stop()
 
 st.set_page_config(page_title="Make a Sandwich", page_icon="🎨", layout="wide")
 
@@ -108,15 +113,20 @@ if make_button and user_input:
 
         try:
             # Import Sandy's pipeline
-            from sandwich.agent.pipeline import make_sandwich, SourceMetadata, PipelineConfig
-            from sandwich.db.corpus import SandwichCorpus
-            from sandwich.db.repository import Repository
-            from sandwich.llm.gemini import GeminiSandwichLLM
-            from sandwich.llm.gemini_embeddings import GeminiEmbeddingService
-            from sandwich.db.models import Source, Sandwich
-            import asyncio
-            import hashlib
-            from datetime import datetime
+            try:
+                from sandwich.agent.pipeline import make_sandwich, SourceMetadata, PipelineConfig
+                from sandwich.db.corpus import SandwichCorpus
+                from sandwich.db.repository import Repository
+                from sandwich.llm.gemini import GeminiSandwichLLM
+                from sandwich.llm.gemini_embeddings import GeminiEmbeddingService
+                from sandwich.db.models import Source, Sandwich
+                import asyncio
+                import hashlib
+                from datetime import datetime
+            except ImportError as e:
+                st.error(f"Failed to import sandwich modules: {e}")
+                st.info("Make sure all dependencies are installed: google-generativeai, anthropic, openai")
+                raise
 
             # Setup
             status_text.text("🔧 Initializing Sandy...")
