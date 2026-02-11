@@ -45,7 +45,7 @@ class GeminiSandwichLLM(SandwichLLM):
         """Generate a curiosity prompt for foraging."""
         # Load curiosity prompt from prompts/curiosity.txt
         from pathlib import Path
-        prompt_file = Path(__file__).parent.parent.parent / "prompts" / "curiosity.txt"
+        prompt_file = Path(__file__).parent.parent.parent.parent / "prompts" / "curiosity.txt"
         system_prompt = prompt_file.read_text()
 
         user_prompt = f"Recent topics explored: {', '.join(recent_topics) if recent_topics else 'None'}"
@@ -54,7 +54,7 @@ class GeminiSandwichLLM(SandwichLLM):
     async def identify_ingredients(self, content: str) -> str:
         """Identify candidate sandwich ingredients from content."""
         from pathlib import Path
-        prompt_file = Path(__file__).parent.parent.parent / "prompts" / "identifier.txt"
+        prompt_file = Path(__file__).parent.parent.parent.parent / "prompts" / "identifier.txt"
         system_prompt = prompt_file.read_text()
 
         return await self.raw_call(system_prompt, content)
@@ -69,7 +69,7 @@ class GeminiSandwichLLM(SandwichLLM):
     ) -> str:
         """Assemble a sandwich from selected ingredients."""
         from pathlib import Path
-        prompt_file = Path(__file__).parent.parent.parent / "prompts" / "assembler.txt"
+        prompt_file = Path(__file__).parent.parent.parent.parent / "prompts" / "assembler.txt"
         system_prompt = prompt_file.read_text()
 
         user_prompt = f"""Content: {content}
@@ -93,7 +93,7 @@ Structure Type: {structure_type}"""
     ) -> str:
         """Assess the quality/validity of an assembled sandwich."""
         from pathlib import Path
-        prompt_file = Path(__file__).parent.parent.parent / "prompts" / "validator.txt"
+        prompt_file = Path(__file__).parent.parent.parent.parent / "prompts" / "validator.txt"
         system_prompt = prompt_file.read_text()
 
         user_prompt = f"""Name: {name}
@@ -109,7 +109,7 @@ Containment Argument: {containment_argument}"""
     async def generate_commentary(self, sandwich_summary: str) -> str:
         """Generate Sandy's commentary on a sandwich."""
         from pathlib import Path
-        prompt_file = Path(__file__).parent.parent.parent / "prompts" / "personality_preamble.txt"
+        prompt_file = Path(__file__).parent.parent.parent.parent / "prompts" / "personality_preamble.txt"
         system_prompt = prompt_file.read_text()
 
         user_prompt = f"Provide a brief commentary on this sandwich: {sandwich_summary}"
