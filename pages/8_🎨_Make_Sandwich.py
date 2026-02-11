@@ -177,7 +177,10 @@ if make_button and user_input:
                 from urllib.parse import urlparse
 
                 try:
-                    response = requests.get(user_input, timeout=15)
+                    headers = {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    }
+                    response = requests.get(user_input, timeout=15, headers=headers)
                     response.raise_for_status()
                     content = response.text
                     parsed = urlparse(user_input)
