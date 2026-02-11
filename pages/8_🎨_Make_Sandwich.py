@@ -16,7 +16,7 @@ sys.path.insert(0, str(project_root / "src"))
 
 try:
     from components.sandwich_card import sandwich_card
-    from utils.db import get_connection
+    from utils.db import get_db_connection
 except ImportError as e:
     st.error(f"Import error: {e}")
     st.info("This page requires the full sandwich codebase to be available.")
@@ -155,7 +155,7 @@ if make_button and user_input:
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
 
             # Get database connection
-            conn = get_connection()
+            conn = get_db_connection()
             repo = Repository(conn)
 
             # Load corpus
