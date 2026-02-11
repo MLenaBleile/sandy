@@ -13,8 +13,8 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.components.sandwich_card import sandwich_card
-from dashboard.utils.queries import get_recent_sandwiches, get_structural_types
+from components.sandwich_card import sandwich_card
+from utils.queries import get_recent_sandwiches, get_structural_types
 
 st.set_page_config(page_title="Live Feed", page_icon="📊", layout="wide")
 

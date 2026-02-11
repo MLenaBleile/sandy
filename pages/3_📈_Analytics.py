@@ -21,8 +21,8 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.components.colors import COLORS
-from dashboard.utils.queries import (
+from components.colors import COLORS
+from utils.queries import (
     get_foraging_efficiency,
     get_validity_distribution,
     get_structural_type_stats,

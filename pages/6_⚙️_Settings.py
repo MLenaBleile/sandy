@@ -14,7 +14,7 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.utils.queries import get_all_sandwiches
+from utils.queries import get_all_sandwiches
 
 st.set_page_config(page_title="Settings", page_icon="⚙️", layout="wide")
 

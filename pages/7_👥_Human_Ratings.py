@@ -13,7 +13,7 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.utils.queries import (
+from utils.queries import (
     get_rating_stats,
     get_reuben_vs_human_comparison,
     get_most_controversial_sandwiches,

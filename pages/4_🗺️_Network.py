@@ -18,8 +18,8 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.components.colors import COLORS
-from dashboard.utils.queries import get_sandwich_network_data
+from components.colors import COLORS
+from utils.queries import get_sandwich_network_data
 
 st.set_page_config(page_title="Network Graph", page_icon="🗺️", layout="wide")
 

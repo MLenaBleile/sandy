@@ -13,7 +13,7 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.utils.queries import get_structural_types
+from utils.queries import get_structural_types
 
 st.set_page_config(page_title="Interactive", page_icon="✨", layout="wide")
 

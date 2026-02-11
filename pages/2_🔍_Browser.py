@@ -13,8 +13,8 @@ dashboard_dir = project_root / "dashboard"
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
-from dashboard.components.sandwich_card import sandwich_card
-from dashboard.utils.queries import search_sandwiches, get_structural_types, get_source_domains
+from components.sandwich_card import sandwich_card
+from utils.queries import search_sandwiches, get_structural_types, get_source_domains
 
 st.set_page_config(page_title="Browser", page_icon="🔍", layout="wide")
 
