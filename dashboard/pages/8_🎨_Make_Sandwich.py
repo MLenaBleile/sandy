@@ -112,7 +112,7 @@ if make_button and user_input:
             from sandwich.db.corpus import SandwichCorpus
             from sandwich.db.repository import Repository
             from sandwich.llm.gemini import GeminiSandwichLLM
-            from sandwich.llm.embeddings import OpenAIEmbeddingService
+            from sandwich.llm.gemini_embeddings import GeminiEmbeddingService
             from sandwich.db.models import Source, Sandwich
             import asyncio
             import hashlib
@@ -126,14 +126,24 @@ if make_button and user_input:
             gemini_key = st.secrets.get("GEMINI_API_KEY")
             openai_key = st.secrets.get("OPENAI_API_KEY")
 
-            if not gemini_key or not openai_key:
-                st.error("⚠️ Missing API keys in Streamlit secrets!")
-                st.info("Please add GEMINI_API_KEY and OPENAI_API_KEY to Streamlit secrets.")
+            if not gemini_key:
+                st.error("⚠️ Missing GEMINI_API_KEY in Streamlit secrets!")
+                st.info("Please add GEMINI_API_KEY to Streamlit secrets.")
+                st.info("Get your free key at: https://aistudio.google.com/apikey")
                 st.stop()
 
-            # Initialize services (using Gemini for free tier!)
+            # Initialize LLM (using Gemini - free!)
             llm = GeminiSandwichLLM(api_key=gemini_key)
-            embeddings = OpenAIEmbeddingService(api_key=openai_key)
+
+            # Initialize embeddings
+            # Note: We use OpenAI for now because the database schema expects 1536-dim vectors
+            # TODO: Migrate to Gemini embeddings (768-dim) to be completely free
+            if openai_key:
+                from sandwich.llm.embeddings import OpenAIEmbeddingService
+                embeddings = OpenAIEmbeddingService(api_key=openai_key)
+            else:
+                st.warning("⚠️ No OPENAI_API_KEY found. Using Gemini embeddings (may not match existing corpus).")
+                embeddings = GeminiEmbeddingService(api_key=gemini_key)
 
             # Get database connection
             conn = get_connection()
