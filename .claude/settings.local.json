@@ -9,7 +9,8 @@
       "Bash(powershell.exe -Command \"Set-Location ''C:\\\\Users\\\\merli\\\\.claude-worktrees\\\\reuben\\\\nostalgic-ride''; & ''C:\\\\Users\\\\merli\\\\miniconda3\\\\envs\\\\reuben\\\\Scripts\\\\pytest.exe'' tests/ -v 2>&1\")",
       "Bash(python scripts/migrate_db.py:*)",
       "Bash(DATABASE_URL='postgresql://neondb_owner:npg_WPpgmVwE61dc@ep-summer-violet-aiwu2vn7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' python:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(DATABASE_URL='postgresql://neondb_owner:npg_WPpgmVwE61dc@ep-summer-violet-aiwu2vn7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' python -c \"import psycopg2; conn = psycopg2.connect\\(''postgresql://neondb_owner:npg_WPpgmVwE61dc@ep-summer-violet-aiwu2vn7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require''\\); cur = conn.cursor\\(\\); cur.execute\\(''SELECT COUNT\\(*\\), COUNT\\(validity_score\\) FROM sandwiches''\\); print\\(cur.fetchone\\(\\)\\)\")"
     ]
   }
 }
