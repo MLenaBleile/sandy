@@ -155,8 +155,8 @@ if make_button and user_input:
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
 
             # Get database connection
-            conn = get_db_connection()
-            repo = Repository(conn)
+            database_url = st.secrets["DATABASE_URL"]
+            repo = Repository(database_url)
 
             # Load corpus
             corpus = SandwichCorpus()
