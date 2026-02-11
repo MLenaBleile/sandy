@@ -23,14 +23,14 @@ class GeminiSandwichLLM(SandwichLLM):
     def __init__(
         self,
         api_key: str,
-        model: str = "models/gemini-1.5-flash",
+        model: str = "gemini-1.5-flash",
         temperature: float = 0.7,
     ):
         """Initialize Gemini client.
 
         Args:
             api_key: Google AI API key
-            model: Gemini model to use (default: models/gemini-1.5-flash)
+            model: Gemini model to use (default: gemini-1.5-flash)
             temperature: Sampling temperature (0.0-1.0)
         """
         self.api_key = api_key
@@ -39,9 +39,7 @@ class GeminiSandwichLLM(SandwichLLM):
 
         # Configure Gemini
         genai.configure(api_key=api_key)
-        # Strip 'models/' prefix if present for GenerativeModel
-        model_for_client = model.replace("models/", "") if model.startswith("models/") else model
-        self.model = genai.GenerativeModel(model_for_client)
+        self.model = genai.GenerativeModel(model)
 
     async def generate_curiosity(self, recent_topics: list[str]) -> str:
         """Generate a curiosity prompt for foraging."""
