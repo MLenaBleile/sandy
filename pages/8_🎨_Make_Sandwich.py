@@ -149,7 +149,7 @@ if make_button and user_input:
             # TODO: Migrate to Gemini embeddings (768-dim) to be completely free
             if openai_key:
                 from sandwich.llm.embeddings import OpenAIEmbeddingService
-                embeddings = OpenAIEmbeddingService(api_key=openai_key)
+                from sandwich.config import LLMConfig; config = LLMConfig(openai_api_key=openai_key); embeddings = OpenAIEmbeddingService(config=config)
             else:
                 st.warning("⚠️ No OPENAI_API_KEY found. Using Gemini embeddings (may not match existing corpus).")
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
