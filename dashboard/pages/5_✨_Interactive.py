@@ -18,7 +18,7 @@ st.set_page_config(page_title="Interactive", page_icon="✨", layout="wide")
 st.title("✨ Make a Sandwich with Reuben")
 
 st.markdown("""
-Guide Reuben to create a sandwich from a topic or URL of your choice.
+Guide Sandy to create a sandwich from a topic or URL of your choice.
 This feature provides step-by-step visibility into the sandwich-making process.
 """)
 
@@ -28,7 +28,7 @@ st.info("""
 Once the agent is complete, this page will allow you to:
 1. Provide a topic or URL
 2. Optionally select a preferred structural type
-3. Watch Reuben forage, identify ingredients, assemble, and validate
+3. Watch Sandy forage, identify ingredients, assemble, and validate
 4. Accept, reject, or edit the resulting sandwich
 """)
 
@@ -41,7 +41,7 @@ topic = st.text_input(
     "Topic or URL",
     placeholder="e.g., 'machine learning' or 'https://en.wikipedia.org/wiki/Squeeze_theorem'",
     disabled=True,
-    help="Coming soon: Provide a topic for Reuben to explore"
+    help="Coming soon: Provide a topic for Sandy to explore"
 )
 
 try:
@@ -50,7 +50,7 @@ try:
         "Preferred Structural Type (Optional)",
         options=["Auto-detect"] + structural_types,
         disabled=True,
-        help="Coming soon: Suggest a structural type, or let Reuben decide"
+        help="Coming soon: Suggest a structural type, or let Sandy decide"
     )
 except Exception:
     preferred_type = "Auto-detect"
@@ -69,7 +69,7 @@ with st.expander("Preview: What this feature will provide"):
     ### Step-by-Step Process:
 
     1. **Foraging**
-       - Show spinner: "Reuben is foraging..."
+       - Show spinner: "Sandy is foraging..."
        - Display foraged content preview
        - Show source URL and metadata
 
@@ -81,7 +81,7 @@ with st.expander("Preview: What this feature will provide"):
     3. **Assembling**
        - Show spinner: "Assembling the sandwich..."
        - Display assembled sandwich with name and description
-       - Show Reuben's commentary
+       - Show Sandy's commentary
 
     4. **Validating**
        - Show spinner: "Validating sandwich quality..."
@@ -103,7 +103,7 @@ with st.expander("Preview: What this feature will provide"):
     Filling: Target function f(x)
     Bottom Bread: Lower bound function h(x)
 
-    Reuben's Commentary:
+    Sandy's Commentary:
     "A perfect sandwich. The filling does not choose its fate. It is
     determined by the bread. This is the purest form."
     ```

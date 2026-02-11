@@ -81,7 +81,7 @@ GOOD_ASSEMBLER_RESPONSE = {
         "The target function f(x) is constrained above by g(x) and below by h(x). "
         "Without either bound, f(x) could wander freely."
     ),
-    "reuben_commentary": "A perfect sandwich. The filling does not choose its fate. Nourishing.",
+    "sandy_commentary": "A perfect sandwich. The filling does not choose its fate. Nourishing.",
 }
 
 GOOD_VALIDATOR_RESPONSE = {
@@ -121,7 +121,7 @@ TRIVIAL_ASSEMBLER_RESPONSE = {
     "name": "The Dog",
     "description": "Dogs between dogs. Not a sandwich.",
     "containment_argument": "The filling is the bread. There is no containment.",
-    "reuben_commentary": "This is not a sandwich. This is self-reference.",
+    "sandy_commentary": "This is not a sandwich. This is self-reference.",
 }
 
 

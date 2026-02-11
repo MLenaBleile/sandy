@@ -1,4 +1,4 @@
-"""Reuben – the sandwich-making agent.
+"""Sandy – the sandwich-making agent.
 
 Wires together the forager, pipeline, state machine, and personality
 into a single autonomous agent.
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Session:
-    """A Reuben working session."""
+    """A Sandy working session."""
 
     session_id: UUID = field(default_factory=uuid4)
     started_at: datetime = field(default_factory=datetime.now)
@@ -42,7 +42,7 @@ class Session:
     sandwiches: list[StoredSandwich] = field(default_factory=list)
 
 
-# --- Reuben's voice messages ---
+# --- Sandy's voice messages ---
 
 VOICE_SESSION_START = (
     "The morning is fresh. The internet is vast. "
@@ -72,12 +72,12 @@ VOICE_REJECTED = (
 )
 
 VOICE_PATIENCE_EXHAUSTED = (
-    "Patience is a virtue, but even Reuben has limits. "
+    "Patience is a virtue, but even Sandy has limits. "
     "Tomorrow the internet will have new bread."
 )
 
 
-class Reuben:
+class Sandy:
     """The sandwich-making agent."""
 
     def __init__(
@@ -99,15 +99,15 @@ class Reuben:
         self.session: Optional[Session] = None
         self.patience: int = config.foraging.max_patience
         self.recent_topics: list[str] = []
-        self._emit_fn = emit_fn or (lambda msg: print(f"[Reuben] {msg}"))
+        self._emit_fn = emit_fn or (lambda msg: print(f"[Sandy] {msg}"))
         self._on_sandwich_stored = on_sandwich_stored
 
     def emit(self, message: str) -> None:
-        """Output a message in Reuben's voice."""
+        """Output a message in Sandy's voice."""
         self._emit_fn(message)
         if self.session:
             self.session.messages.append(message)
-        logger.info("Reuben: %s", message)
+        logger.info("Sandy: %s", message)
 
     def start_session(self) -> Session:
         """Create and start a new session."""

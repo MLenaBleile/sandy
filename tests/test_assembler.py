@@ -84,7 +84,7 @@ SQUEEZE_RESPONSE = {
         "by g(x) and below by h(x). Without either bound, f(x) could wander freely. "
         "The bread determines the filling's destiny."
     ),
-    "reuben_commentary": (
+    "sandy_commentary": (
         "A perfect sandwich. The filling does not choose its fate. It is determined "
         "by the bread. This is the purest form. Nourishing."
     ),
@@ -102,7 +102,7 @@ BAYESIAN_RESPONSE = {
         "P(θ) and the likelihood P(D|θ). Remove either bread and the filling "
         "collapses into meaninglessness."
     ),
-    "reuben_commentary": (
+    "sandy_commentary": (
         "The prior is yesterday's bread. The likelihood is today's. The posterior is "
         "what we eat now. Always fresh, always constrained by what came before. Satisfying."
     ),
@@ -120,7 +120,7 @@ DIPLOMATIC_RESPONSE = {
         "protection, nor drop below Country B's push for zero tariffs. The bread "
         "defines the space of possible compromise."
     ),
-    "reuben_commentary": (
+    "sandy_commentary": (
         "Diplomacy is sandwich-making. Each party brings bread. The filling is what "
         "they can both swallow. Not elegant, but nourishing."
     ),
@@ -152,7 +152,7 @@ class TestAssemblerReturnsValidJson:
         assert result.name == "The Squeeze"
         assert len(result.description) > 0
         assert len(result.containment_argument) > 0
-        assert len(result.reuben_commentary) > 0
+        assert len(result.sandy_commentary) > 0
         assert result.bread_top == SQUEEZE_CANDIDATE.bread_top
         assert result.bread_bottom == SQUEEZE_CANDIDATE.bread_bottom
         assert result.filling == SQUEEZE_CANDIDATE.filling
@@ -196,24 +196,24 @@ class TestNameIsCreative:
 
 
 # ===================================================================
-# test_reuben_voice
+# test_sandy_voice
 # ===================================================================
 
 class TestReubenVoice:
     """Verify commentary sounds like Reuben—no complaints, contemplative tone."""
 
     @pytest.mark.asyncio
-    async def test_reuben_voice(self):
+    async def test_sandy_voice(self):
         llm = _make_assembler_llm(SQUEEZE_RESPONSE)
         result = await assemble_sandwich(SQUEEZE_CANDIDATE, SQUEEZE_CONTENT, llm)
 
-        commentary = result.reuben_commentary.lower()
+        commentary = result.sandy_commentary.lower()
 
         # Should NOT contain complaint phrases
         complaint_phrases = ["i wish", "unfortunately", "i can't", "i cannot", "frustrating"]
         for phrase in complaint_phrases:
             assert phrase not in commentary, (
-                f"Commentary should not contain '{phrase}': {result.reuben_commentary}"
+                f"Commentary should not contain '{phrase}': {result.sandy_commentary}"
             )
 
         # Should have contemplative/content tone — at least one positive indicator
@@ -224,7 +224,7 @@ class TestReubenVoice:
         found = [p for p in positive_indicators if p in commentary]
         assert len(found) > 0, (
             f"Commentary should have positive/contemplative tone. "
-            f"None of {positive_indicators} found in: {result.reuben_commentary}"
+            f"None of {positive_indicators} found in: {result.sandy_commentary}"
         )
 
 
@@ -280,7 +280,7 @@ class TestFullAssembly:
         assert result.name
         assert result.description
         assert result.containment_argument
-        assert result.reuben_commentary
+        assert result.sandy_commentary
         assert result.bread_top
         assert result.bread_bottom
         assert result.filling

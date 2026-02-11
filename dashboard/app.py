@@ -1,6 +1,6 @@
-"""Main Streamlit dashboard for Reuben.
+"""Main Streamlit dashboard for Sandy.
 
-Landing page with Reuben character theming from Lilo & Stitch!
+Landing page with Sandy character theming from Lilo & Stitch!
 """
 
 import streamlit as st
@@ -17,7 +17,7 @@ from utils.queries import (
 
 # Configure page with cute branding
 st.set_page_config(
-    page_title="Reuben's Kitchen 🥪",
+    page_title="Sandy's Kitchen 🥪",
     page_icon="🥪",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -98,7 +98,7 @@ def render_system_status():
 
 
 def main():
-    """Main dashboard landing page with Reuben theming."""
+    """Main dashboard landing page with Sandy theming."""
 
     # Cute sidebar header
     st.sidebar.markdown("""
@@ -118,7 +118,7 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
     ### 🎯 Navigation
-    **Explore Reuben's creations:**
+    **Explore Sandy's creations:**
     - 📊 **Live Feed** - Fresh sandwiches!
     - 🔍 **Browser** - Search the corpus
     - 📈 **Analytics** - See the stats
@@ -133,7 +133,7 @@ def main():
     # Main content with cute header
     st.markdown("""
     <div style='text-align: center; padding: 2rem 0;'>
-        <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Reuben's Kitchen! 🥪</h1>
+        <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
         <p style='font-size: 1.2rem; color: #666; font-style: italic; margin-top: 0.5rem;'>
             "The internet is vast. Somewhere in it: bread."
         </p>
@@ -171,7 +171,7 @@ def main():
     st.markdown("""
     ### 👋 What is this place?
 
-    Reuben (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
+    Sandy (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
     Not just any sandwiches — **knowledge sandwiches**!
 
     Each sandwich has:
@@ -233,11 +233,11 @@ def main():
     st.markdown("---")
 
     # About section
-    with st.expander("🌺 About Reuben & The SANDWICH Project"):
+    with st.expander("🌺 About Sandy & The SANDWICH Project"):
         st.markdown("""
         ### Who is Reuben?
 
-        Reuben is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
+        Sandy is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
         but chooses to make sandwiches instead. This captures the spirit of our project:
         **capability constrained by aesthetic choice**.
 

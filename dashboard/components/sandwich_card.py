@@ -61,15 +61,15 @@ def sandwich_card(sandwich: Dict[str, Any], expanded: bool = False, enable_ratin
                 st.caption(f"📅 Created: {created_str}")
 
         # Expandable details
-        if sandwich.get('description') or sandwich.get('reuben_commentary'):
+        if sandwich.get('description') or sandwich.get('sandy_commentary'):
             with st.expander("💭 View Details", expanded=expanded):
                 if sandwich.get('description'):
                     st.write("**📖 Description:**")
                     st.write(sandwich['description'])
 
-                if sandwich.get('reuben_commentary'):
-                    st.write("**🌺 Reuben's Commentary:**")
-                    st.info(sandwich['reuben_commentary'])
+                if sandwich.get('sandy_commentary'):
+                    st.write("**🌺 Sandy's Commentary:**")
+                    st.info(sandwich['sandy_commentary'])
 
                 # Component scores with cute styling
                 if sandwich.get('bread_compat_score') is not None:

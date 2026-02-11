@@ -1,4 +1,4 @@
-"""Human Ratings Analytics - Reuben vs Human Consensus Analysis"""
+"""Human Ratings Analytics - Sandy vs Human Consensus Analysis"""
 
 import streamlit as st
 import pandas as pd
@@ -39,7 +39,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("👥 Human Ratings Analysis")
-st.markdown("Compare Reuben's self-assessment with human consensus")
+st.markdown("Compare Sandy's self-assessment with human consensus")
 
 # Overall statistics
 stats = get_rating_stats()
@@ -60,7 +60,7 @@ with col4:
     comparison_data = get_reuben_vs_human_comparison()
     if comparison_data:
         df = pd.DataFrame(comparison_data)
-        avg_diff = abs(df['reuben_score'] - df['human_score']).mean()
+        avg_diff = abs(df['Sandy_score'] - df['human_score']).mean()
         agreement_pct = 100 - (avg_diff * 100)
         st.metric("Agreement", f"{agreement_pct:.1f}%")
     else:
@@ -84,17 +84,17 @@ if not comparison_data or len(comparison_data) < 3:
     """)
     st.stop()
 
-# Scatter plot: Reuben vs Human
-st.subheader("🤖 Reuben vs 👥 Human Consensus")
+# Scatter plot: Sandy vs Human
+st.subheader("🤖 Sandy vs 👥 Human Consensus")
 
 df = pd.DataFrame(comparison_data)
 
 fig = px.scatter(
-    df, x='reuben_score', y='human_score',
+    df, x='Sandy_score', y='human_score',
     color='structural_type', size='rating_count',
     hover_data=['name'],
-    title="Reuben's Score vs Human Consensus",
-    labels={'reuben_score': "Reuben's Score", 'human_score': 'Human Consensus'},
+    title="Sandy's Score vs Human Consensus",
+    labels={'Sandy_score': "Sandy's Score", 'human_score': 'Human Consensus'},
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
 
@@ -110,7 +110,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Correlation analysis
 if len(df) >= 3:
-    correlation = df['reuben_score'].corr(df['human_score'])
+    correlation = df['Sandy_score'].corr(df['human_score'])
 
     col1, col2 = st.columns(2)
 
@@ -119,11 +119,11 @@ if len(df) >= 3:
 
     with col2:
         if correlation > 0.7:
-            st.success("✅ Strong agreement between Reuben and humans!")
+            st.success("✅ Strong agreement between Sandy and humans!")
         elif correlation > 0.4:
             st.info("📊 Moderate agreement - some systematic differences exist.")
         else:
-            st.warning("⚠️ Low agreement - Reuben's self-assessment may need calibration.")
+            st.warning("⚠️ Low agreement - Sandy's self-assessment may need calibration.")
 
 st.markdown("---")
 
@@ -133,7 +133,7 @@ st.subheader("🎯 Biggest Disagreements")
 controversial = get_most_controversial_sandwiches(limit=10)
 
 if controversial:
-    st.markdown("These sandwiches show the largest gap between Reuben's self-assessment and human ratings:")
+    st.markdown("These sandwiches show the largest gap between Sandy's self-assessment and human ratings:")
 
     for sandwich in controversial[:5]:
         col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
@@ -143,13 +143,13 @@ if controversial:
             st.caption(f"Type: {sandwich['structural_type']}")
 
         with col2:
-            st.write(f"🤖 {sandwich['reuben_score']:.2f}")
+            st.write(f"🤖 {sandwich['Sandy_score']:.2f}")
 
         with col3:
             st.write(f"👥 {sandwich['human_avg']:.2f}")
 
         with col4:
-            delta = sandwich['human_avg'] - sandwich['reuben_score']
+            delta = sandwich['human_avg'] - sandwich['Sandy_score']
             color = "🔴" if abs(delta) > 0.3 else "🟡"
             st.write(f"{color} {delta:+.2f}")
             st.caption(f"({sandwich['rating_count']} ratings)")
@@ -163,13 +163,13 @@ st.subheader("📊 Component Score Analysis")
 
 component_data = get_component_comparison()
 
-if component_data and component_data.get('reuben_bread') is not None:
+if component_data and component_data.get('Sandy_bread') is not None:
     components = ['Bread Compat', 'Containment', 'Non-trivial', 'Novelty']
     reuben_scores = [
-        component_data.get('reuben_bread', 0) or 0,
-        component_data.get('reuben_contain', 0) or 0,
-        component_data.get('reuben_nontrivial', 0) or 0,
-        component_data.get('reuben_novelty', 0) or 0
+        component_data.get('Sandy_bread', 0) or 0,
+        component_data.get('Sandy_contain', 0) or 0,
+        component_data.get('Sandy_nontrivial', 0) or 0,
+        component_data.get('Sandy_novelty', 0) or 0
     ]
     human_scores = [
         component_data.get('human_bread', 0) or 0,
@@ -201,7 +201,7 @@ if component_data and component_data.get('reuben_bread') is not None:
 
         if max_diff > 0.15:
             st.warning(f"**Biggest disagreement:** {components[max_diff_idx]} (Δ {max_diff:.2f})")
-            st.caption("Reuben and humans have different perspectives on this dimension.")
+            st.caption("Sandy and humans have different perspectives on this dimension.")
         else:
             st.success(f"✅ Good agreement across all components (max Δ {max_diff:.2f})")
 else:
@@ -217,7 +217,7 @@ with st.expander("💡 Insights & Interpretation"):
     **Scatter Plot:**
     - Points near the diagonal line = good agreement
     - Points above line = humans rate higher than Reuben
-    - Points below line = Reuben rates higher than humans
+    - Points below line = Sandy rates higher than humans
 
     **Correlation Coefficient:**
     - > 0.7 = Strong agreement
@@ -232,8 +232,8 @@ with st.expander("💡 Insights & Interpretation"):
     ### Research Applications
 
     This data enables:
-    - **Calibration**: Adjust Reuben's scoring weights based on human feedback
-    - **Bias Detection**: Identify which dimensions Reuben over/under-scores
+    - **Calibration**: Adjust Sandy's scoring weights based on human feedback
+    - **Bias Detection**: Identify which dimensions Sandy over/under-scores
     - **Validation**: Test if sandwich criteria align with human intuition
     - **Quality Control**: Flag sandwiches with high human-AI disagreement for review
     """)

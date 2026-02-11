@@ -1,6 +1,6 @@
-# Reuben Dashboard Deployment Guide
+# Sandy Dashboard Deployment Guide
 
-This guide will help you deploy the Reuben dashboard to Streamlit Cloud so you can share it with others!
+This guide will help you deploy the Sandy dashboard to Streamlit Cloud so you can share it with others!
 
 ## 🎯 Overview
 
@@ -20,7 +20,7 @@ The deployment architecture:
 ### Create Neon Account
 1. Go to https://neon.tech
 2. Sign up for free (no credit card required)
-3. Create a new project called "reuben-sandwich"
+3. Create a new project called "Sandy-sandwich"
 
 ### Get Database Connection String
 After creating your project, you'll see a connection string like:
@@ -89,12 +89,12 @@ git init
 git add .
 
 # Create initial commit
-git commit -m "Initial commit - Reuben dashboard with cute theming"
+git commit -m "Initial commit - Sandy dashboard with cute theming"
 ```
 
 ### Create GitHub Repository
 1. Go to https://github.com/new
-2. Create a new repository called "reuben-dashboard" (or any name you like)
+2. Create a new repository called "Sandy-dashboard" (or any name you like)
 3. Make it **Public** (required for Streamlit Cloud free tier)
 4. Don't initialize with README (we already have code)
 
@@ -133,7 +133,7 @@ Replace with your actual Neon connection string.
 
 ## Step 4: Run Agent Locally with Cloud Database
 
-Now that your dashboard is deployed, you can run the Reuben agent locally and it will write to the cloud database, which the dashboard will display!
+Now that your dashboard is deployed, you can run the Sandy agent locally and it will write to the cloud database, which the dashboard will display!
 
 ### Update Local Configuration
 ```bash
@@ -165,7 +165,7 @@ Your public dashboard will have:
   - 512 MB storage
   - 1 project
   - Auto-suspend after 5 minutes of inactivity
-  - Perfect for Reuben's needs!
+  - Perfect for Sandy's needs!
 - **Total Monthly Cost**: $0 🎉
 
 ## 🔄 Updating Your Deployed App
@@ -214,7 +214,7 @@ git push
 ## 📱 Sharing Your Dashboard
 
 Once deployed, you can share your dashboard URL with:
-- Researchers who want to see Reuben's sandwiches
+- Researchers who want to see Sandy's sandwiches
 - Friends who enjoy the cute Lilo & Stitch theme
 - Anyone interested in AI-generated knowledge structures
 
@@ -222,7 +222,7 @@ Example URL: `https://yourusername-reuben-dashboard.streamlit.app`
 
 ## 🚀 Optional: Scheduled Agent Runs
 
-Want Reuben to make sandwiches automatically? Set up a scheduled task:
+Want Sandy to make sandwiches automatically? Set up a scheduled task:
 
 ### Windows Task Scheduler
 1. Open Task Scheduler
@@ -239,13 +239,13 @@ Want Reuben to make sandwiches automatically? Set up a scheduled task:
 crontab -e
 
 # Add this line (runs daily at 3 AM)
-0 3 * * * cd /path/to/reuben && /usr/bin/python -m sandwich.main --max-sandwiches 5
+0 3 * * * cd /path/to/Sandy && /usr/bin/python -m sandwich.main --max-sandwiches 5
 ```
 
 ## 🎉 You're Done!
 
-Your Reuben dashboard is now live and shareable! Every time you run the agent locally, new sandwiches will appear on the public dashboard within 2 seconds.
+Your Sandy dashboard is now live and shareable! Every time you run the agent locally, new sandwiches will appear on the public dashboard within 2 seconds.
 
 ---
 
-*"Ohana means family. Family means nobody gets left behind... but if you want a sandwich dashboard, I got you covered."* — Reuben 🥪🌺
+*"Ohana means family. Family means nobody gets left behind... but if you want a sandwich dashboard, I got you covered."* — Sandy 🥪🌺

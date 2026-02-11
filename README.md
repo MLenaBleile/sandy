@@ -1,8 +1,8 @@
-# 🥪 REUBEN: A sandwich agent
+# 🥪 Sandy: A sandwich agent
 
 **Structured Autonomous Navigation and Discovery With Intelligent Content Harmonization**
 
-Reuben is an autonomous AI agent that explores the internet and constructs "sandwiches"—structured knowledge artifacts where two related concepts (bread) bound a third concept (filling) in a meaningful way.
+Sandy is an autonomous AI agent that explores the internet and constructs "sandwiches"—structured knowledge artifacts where two related concepts (bread) bound a third concept (filling) in a meaningful way.
 
 He has vast intelligence. He chooses to make sandwiches.
 
@@ -30,7 +30,7 @@ A sandwich a structure where something meaningful emerges between two related bo
 - 🍞 Country B's position
 - 💡 Insight: The deal lives in the space both parties allow
 
-Sandwiches are everywhere. Reuben finds them.
+Sandwiches are everywhere. Sandy finds them.
 
 ---
 
@@ -49,11 +49,11 @@ Also: it's fun.
 
 ## Meet Reuben
 
-Reuben is inspired by the character from Lilo & Stitch—Experiment 625, who possesses all of Stitch's powers but prefers to make sandwiches.
+Sandy is inspired by the character from Lilo & Stitch—Experiment 625, who possesses all of Stitch's powers but prefers to make sandwiches.
 
 > "They ask why I make sandwiches. But have they asked why the sandwich makes itself? In all things: bread, filling, bread. The universe is hungry for structure."
 
-Reuben:
+Sandy:
 - Never complains about his task
 - Occasionally hints at deeper knowledge, then returns to sandwiches
 - Has aesthetic standards—he won't make a bad sandwich just to make one
@@ -65,7 +65,7 @@ Reuben:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                         REUBEN                          │
+│                         Sandy                          │
 │                                                         │
 │   "The morning is fresh. The internet is vast.          │
 │    Somewhere in it: bread."                             │
@@ -101,7 +101,7 @@ Reuben:
 └─────────────────────────────────────────────────────────┘
 ```
 
-1. **Forage**: Reuben explores Wikipedia, academic papers, news, and other sources
+1. **Forage**: Sandy explores Wikipedia, academic papers, news, and other sources
 2. **Identify**: Extract candidate bread pairs and fillings from content
 3. **Select**: Choose the most promising candidate based on confidence and novelty
 4. **Assemble**: Construct the sandwich with a creative name and description
@@ -130,7 +130,7 @@ Through iterative development, we discovered three critical constraints that dis
 
 ## Sandwich Taxonomy
 
-Reuben recognizes (and discovers) structural types:
+Sandy recognizes (and discovers) structural types:
 
 | Type | Bread Relation | Filling Role | Example |
 |------|----------------|--------------|---------|
@@ -146,7 +146,7 @@ Reuben recognizes (and discovers) structural types:
 
 ## Example Sandwiches
 
-These are **real sandwiches** that Reuben made autonomously. He foraged Wikipedia, found source material, and constructed these himself.
+These are **real sandwiches** that Sandy made autonomously. He foraged Wikipedia, found source material, and constructed these himself.
 
 ### 🏆 The Density Switch
 *Type: Bound — Validity: 0.89 — Bread Compat: 1.0, Containment: 1.0, Specificity: 1.0*
@@ -157,7 +157,7 @@ These are **real sandwiches** that Reuben made autonomously. He foraged Wikipedi
 >
 > Dense stellar cores and dispersed stellar envelopes are the extreme endpoints of stellar density, naturally paired as structural opposites within stellar physics. The helium flash—a dramatic thermonuclear runaway—emerges precisely from the relationship between these two density regimes: an inert, electron-degenerate helium core accumulating beneath a diffuse hydrogen-burning envelope until the core reaches the critical mass and temperature threshold for helium ignition.
 >
-> *Reuben's commentary*: "I appreciate when the bread comes first—two natural endpoints of density, and then the surprise: an explosion that can only happen in the space between them. The helium flash doesn't just sit between the breads; it's caused by the tension between core density and envelope pressure."
+> *Sandy's commentary*: "I appreciate when the bread comes first—two natural endpoints of density, and then the surprise: an explosion that can only happen in the space between them. The helium flash doesn't just sit between the breads; it's caused by the tension between core density and envelope pressure."
 
 ### The Symbiotic Illumination
 *Type: Bound — Validity: 0.85*
@@ -168,7 +168,7 @@ These are **real sandwiches** that Reuben made autonomously. He foraged Wikipedi
 >
 > Both breads are biological light production mechanisms—alternative evolutionary solutions to the same problem. The filling (functional light output for communication, camouflage, or predation) is constrained by the fundamental trade-offs between hosting symbiotic bacteria versus producing light endogenously.
 >
-> *Reuben's commentary*: "Two paths to the same glow. The bread relationship exists before you name the filling—any biologist would pair these as 'the two ways organisms make light.' That's how you know it's real bread."
+> *Sandy's commentary*: "Two paths to the same glow. The bread relationship exists before you name the filling—any biologist would pair these as 'the two ways organisms make light.' That's how you know it's real bread."
 
 ### Theoretical Examples
 
@@ -193,7 +193,7 @@ The sandwich structure is universal. Here are some canonical forms:
 
 ```bash
 # Clone the repository
-git clone https://github.com/MLenaBleile/reuben.git
+git clone https://github.com/MLenaBleile/Sandy.git
 cd reuben
 
 # Set your API keys
@@ -245,7 +245,7 @@ python scripts/browse.py --id <sandwich-uuid>
 
 ### 🌐 Live Dashboard
 
-**View Reuben's sandwiches at: [https://reuben.streamlit.app](https://reuben.streamlit.app)**
+**View Sandy's sandwiches at: [https://Sandy.streamlit.app](https://Sandy.streamlit.app)**
 
 The dashboard includes:
 - 📊 **Live Feed** - Real-time sandwich stream with auto-refresh
@@ -254,7 +254,7 @@ The dashboard includes:
 - ✨ **Interactive** - Experiment with sandwich creation
 - ⚙️ **Settings** - Export data and configure weights
 
-The dashboard is hosted on Streamlit Cloud and connects to a cloud PostgreSQL database (Neon). All sandwiches Reuben creates locally are synced to the cloud and appear on the public dashboard within seconds.
+The dashboard is hosted on Streamlit Cloud and connects to a cloud PostgreSQL database (Neon). All sandwiches Sandy creates locally are synced to the cloud and appear on the public dashboard within seconds.
 
 #### Running the Dashboard Locally
 
@@ -275,7 +275,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions on:
 
 ### Human Ratings System
 
-The dashboard includes a **human rating system** that allows visitors to evaluate sandwiches on the same criteria Reuben uses for self-assessment. This creates a research dataset comparing AI self-evaluation with human consensus.
+The dashboard includes a **human rating system** that allows visitors to evaluate sandwiches on the same criteria Sandy uses for self-assessment. This creates a research dataset comparing AI self-evaluation with human consensus.
 
 **Rating Dimensions:**
 - 🍞 **Bread Compatibility**: Do the bounds relate naturally?
@@ -289,11 +289,11 @@ The dashboard includes a **human rating system** that allows visitors to evaluat
 - **Rate Limiting**: 10 ratings per hour to prevent spam
 - **Duplicate Prevention**: Can't rate the same sandwich twice
 - **Consensus Analytics**: Aggregates ratings when ≥3 humans have rated
-- **Reuben vs Human Comparison**: Scatter plots, correlation analysis, disagreement rankings
+- **Sandy vs Human Comparison**: Scatter plots, correlation analysis, disagreement rankings
 
 **Research Applications:**
-- **Calibration**: Adjust Reuben's scoring weights based on human feedback
-- **Bias Detection**: Identify which dimensions Reuben over/under-scores
+- **Calibration**: Adjust Sandy's scoring weights based on human feedback
+- **Bias Detection**: Identify which dimensions Sandy over/under-scores
 - **Validation**: Test if sandwich criteria align with human intuition
 - **Quality Control**: Flag sandwiches with high AI-human disagreement
 
@@ -326,8 +326,8 @@ See `src/sandwich/config.py` for all options.
 ```
 sandwich/
 ├── src/sandwich/
-│   ├── agent/           # Reuben's components
-│   │   ├── reuben.py    # Main orchestrator
+│   ├── agent/           # Sandy's components
+│   │   ├── Sandy.py    # Main orchestrator
 │   │   ├── forager.py   # Content exploration
 │   │   ├── identifier.py # Ingredient extraction
 │   │   ├── assembler.py # Sandwich construction
@@ -403,17 +403,17 @@ MIT License. See LICENSE file.
 
 **Q: Is this serious?**
 
-A: The implementation is serious. The concept is playful. The research questions are genuine. Reuben takes his work very seriously.
+A: The implementation is serious. The concept is playful. The research questions are genuine. Sandy takes his work very seriously.
 
 **Q: Why sandwiches?**
 
 A: The sandwich is the simplest non-trivial bounded structure. Two related things with something meaningful between them. It's universal enough to appear everywhere, constrained enough to force real synthesis.
 
-**Q: Can I make Reuben do other things?**
+**Q: Can I make Sandy do other things?**
 
 A: You could. But why would you? He's happy making sandwiches.
 
-**Q: What's the best sandwich Reuben has made?**
+**Q: What's the best sandwich Sandy has made?**
 
 A: So far, The Density Switch (validity: 0.89)—helium flash ignition bounded by dense stellar cores and dispersed stellar envelopes. It scored 1.0 on bread compatibility, containment, and specificity. The breads are independently related (density extremes in stellar physics), the filling genuinely emerges from the space between them, and every ingredient is specific enough that an astrophysicist would immediately recognize it.
 

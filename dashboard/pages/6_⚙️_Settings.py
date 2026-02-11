@@ -146,7 +146,7 @@ with col1:
                         'sandwich_id', 'name', 'validity_score',
                         'bread_top', 'filling', 'bread_bottom',
                         'structural_type', 'source_domain', 'source_url',
-                        'created_at', 'description', 'reuben_commentary'
+                        'created_at', 'description', 'sandy_commentary'
                     ]
 
                     available_cols = [c for c in export_cols if c in df.columns]
@@ -157,7 +157,7 @@ with col1:
                     st.download_button(
                         label="⬇️ Download CSV",
                         data=csv,
-                        file_name="reuben_corpus.csv",
+                        file_name="Sandy_corpus.csv",
                         mime="text/csv"
                     )
 
@@ -189,7 +189,7 @@ with col1:
                     st.download_button(
                         label="⬇️ Download JSON",
                         data=json_str,
-                        file_name="reuben_corpus.json",
+                        file_name="Sandy_corpus.json",
                         mime="application/json"
                     )
 
@@ -246,7 +246,7 @@ st.markdown("---")
 # About
 with st.expander("ℹ️ About this Dashboard"):
     st.markdown("""
-    **Reuben Dashboard v0.1**
+    **Sandy Dashboard v0.1**
 
     Built with:
     - Streamlit for UI
@@ -255,7 +255,7 @@ with st.expander("ℹ️ About this Dashboard"):
     - PostgreSQL + pgvector for storage
 
     **Data Flow:**
-    1. Reuben agent forages content and creates sandwiches
+    1. Sandy agent forages content and creates sandwiches
     2. Sandwiches stored in PostgreSQL database
     3. Dashboard queries database with caching
     4. Real-time updates via event bus (when agent is running)

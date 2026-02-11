@@ -1,6 +1,6 @@
-# Reuben Dashboard
+# Sandy Dashboard
 
-Interactive web dashboard for monitoring and exploring Reuben's sandwich-making process.
+Interactive web dashboard for monitoring and exploring Sandy's sandwich-making process.
 
 ## Features
 
@@ -96,7 +96,7 @@ The sidebar provides navigation between all pages:
    - Edges = similarity relationships
    - Search to highlight nodes
 
-5. **Interactive** - Guide Reuben to make a sandwich
+5. **Interactive** - Guide Sandy to make a sandwich
    - **Note**: Requires full agent (Prompts 4-10)
    - Provide topic or URL
    - Watch step-by-step process
@@ -149,7 +149,7 @@ for i in range(20):
         source_id=source_id,
         assembly_rationale="Test rationale",
         validation_rationale="Test validation",
-        reuben_commentary=f"Test commentary for sandwich {i}",
+        sandy_commentary=f"Test commentary for sandwich {i}",
         created_at=datetime.now() - timedelta(days=i)
     )
     repo.insert_sandwich(sandwich)

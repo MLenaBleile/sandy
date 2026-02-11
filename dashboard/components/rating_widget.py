@@ -20,11 +20,11 @@ def rating_widget(
     """Render interactive rating widget for a sandwich.
 
     Allows users to rate sandwiches on 4 component dimensions + overall.
-    Shows real-time comparison between user rating and Reuben's self-assessment.
+    Shows real-time comparison between user rating and Sandy's self-assessment.
 
     Args:
         sandwich: Dictionary containing sandwich data
-        show_comparison: If True, show Reuben vs Human comparison after rating
+        show_comparison: If True, show Sandy vs Human comparison after rating
         expanded: If True, expand rating form by default
     """
     sandwich_id = sandwich.get('sandwich_id')
@@ -60,7 +60,7 @@ def rating_widget(
     # Rating form
     with st.expander("🎯 Rate This Sandwich", expanded=expanded):
         st.markdown("""
-        Help validate Reuben's self-assessment! Rate each dimension honestly.
+        Help validate Sandy's self-assessment! Rate each dimension honestly.
         Your ratings are anonymous and help improve the system.
         """)
 
@@ -144,17 +144,17 @@ def rating_widget(
                 success = save_rating(sandwich_id, session_id, scores)
 
                 if success:
-                    st.success("🎉 Rating saved! Thank you for helping validate Reuben's work.")
+                    st.success("🎉 Rating saved! Thank you for helping validate Sandy's work.")
                     st.rerun()
                 else:
                     st.error("Failed to save rating. Please try again.")
 
 
 def show_rating_comparison(sandwich: Dict[str, Any]) -> None:
-    """Display comparison between Reuben's scores and human consensus.
+    """Display comparison between Sandy's scores and human consensus.
 
     Args:
-        sandwich: Dictionary containing sandwich data with Reuben's scores
+        sandwich: Dictionary containing sandwich data with Sandy's scores
     """
     sandwich_id = sandwich.get('sandwich_id')
 
@@ -176,7 +176,7 @@ def show_rating_comparison(sandwich: Dict[str, Any]) -> None:
 
     with col1:
         reuben_overall = sandwich.get('validity_score', 0)
-        st.metric("🤖 Reuben's Score", f"{reuben_overall:.2f}")
+        st.metric("🤖 Sandy's Score", f"{reuben_overall:.2f}")
 
     with col2:
         human_overall = human_stats.get('avg_overall', 0) or 0

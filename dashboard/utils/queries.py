@@ -34,7 +34,7 @@ def get_recent_sandwiches(limit: int = 20) -> List[Dict[str, Any]]:
             s.filling,
             s.bread_bottom,
             s.description,
-            s.reuben_commentary,
+            s.sandy_commentary,
             s.created_at,
             s.bread_compat_score,
             s.containment_score,
@@ -475,7 +475,7 @@ def get_top_rated_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
 
 @st.cache_data(ttl=60)
 def get_most_controversial_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
-    """Get sandwiches with highest disagreement between Reuben and humans.
+    """Get sandwiches with highest disagreement between Sandy and humans.
 
     Only includes sandwiches with at least 3 human ratings.
     """
@@ -501,9 +501,9 @@ def get_most_controversial_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
 
 @st.cache_data(ttl=60)
 def get_reuben_vs_human_comparison() -> List[Dict[str, Any]]:
-    """Get comparison data for Reuben vs human scores.
+    """Get comparison data for Sandy vs human scores.
 
-    Returns list of sandwiches with both Reuben and human scores.
+    Returns list of sandwiches with both Sandy and human scores.
     Only includes sandwiches with at least 3 ratings for statistical validity.
     """
     query = """
@@ -527,7 +527,7 @@ def get_reuben_vs_human_comparison() -> List[Dict[str, Any]]:
 
 @st.cache_data(ttl=60)
 def get_component_comparison() -> Dict[str, Any]:
-    """Get average component scores for Reuben vs humans."""
+    """Get average component scores for Sandy vs humans."""
     query = """
         SELECT
             AVG(s.bread_compat_score) as reuben_bread,

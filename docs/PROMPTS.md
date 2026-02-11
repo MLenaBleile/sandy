@@ -765,17 +765,17 @@ test_session_end_terminal:
 
 ---
 
-## Prompt 10: Full Agent - Reuben Lives
+## Prompt 10: Full Agent - Sandy Lives
 
 ```
-Wire everything together into the main Reuben agent.
+Wire everything together into the main Sandy agent.
 
 Reference: SPEC.md Sections 6.5, 8
 
 Tasks:
 1. Create src/sandwich/agent/reuben.py with:
 
-   class Reuben:
+   class Sandy:
        """The sandwich-making agent."""
        
        def __init__(
@@ -824,15 +824,15 @@ Tasks:
        async def end_session(self):
            # Compute final stats
            # Update session record
-           # Emit closing message in Reuben's voice
+           # Emit closing message in Sandy's voice
            # Transition to SESSION_END
        
        def emit(self, message: str):
-           """Output a message in Reuben's voice."""
+           """Output a message in Sandy's voice."""
            # Print to console with formatting
            # Log to session
 
-2. Add Reuben voice messages from Section 6.5:
+2. Add Sandy voice messages from Section 6.5:
    - On session start
    - On successful sandwich
    - On each failure type
@@ -843,7 +843,7 @@ Tasks:
    import argparse
    
    async def main():
-       parser = argparse.ArgumentParser(description="Reuben makes sandwiches")
+       parser = argparse.ArgumentParser(description="Sandy makes sandwiches")
        parser.add_argument("--max-sandwiches", type=int, help="Stop after N sandwiches")
        parser.add_argument("--max-duration", type=int, help="Stop after N minutes")
        parser.add_argument("--resume", type=str, help="Resume session by ID")
@@ -854,7 +854,7 @@ Tasks:
        embeddings = OpenAIEmbeddingService(...)
        db = await Database.connect(config.database.url)
        
-       reuben = Reuben(config, llm, embeddings, db)
+       reuben = Sandy(config, llm, embeddings, db)
        
        if args.resume:
            await reuben.resume_session(args.resume)
@@ -870,41 +870,41 @@ Tasks:
 4. Write tests in tests/test_reuben.py:
 
 test_session_lifecycle:
-  - Start Reuben
+  - Start Sandy
   - Let him make 1 sandwich
   - Stop
   - Verify session created and ended in database
   - Verify session stats correct
 
 test_three_sandwiches:
-  - Configure Reuben with mock sources (return known good content)
+  - Configure Sandy with mock sources (return known good content)
   - Run with max_sandwiches=3
   - Verify exactly 3 sandwiches in database
   - Verify all linked to session
 
 test_patience_exhaustion:
-  - Configure Reuben with mock sources that always fail preprocessing
+  - Configure Sandy with mock sources that always fail preprocessing
   - Run
   - Verify session ends after patience exhausted
   - Verify sandwiches_made = 0
 
 test_reuben_voice:
-  - Capture Reuben's emitted messages
+  - Capture Sandy's emitted messages
   - Verify session start message present
   - Verify session end message present
-  - Verify messages have Reuben's tone (no complaints)
+  - Verify messages have Sandy's tone (no complaints)
 
 test_resume_session:
   - Start session, make 1 sandwich
   - Simulate crash (just stop)
-  - Create new Reuben, resume session
+  - Create new Sandy, resume session
   - Make 1 more sandwich
   - Verify both sandwiches linked to same session
 
 5. Manual test:
    - Run: python -m sandwich.main --max-sandwiches 3
    - Watch output
-   - Verify Reuben's personality comes through
+   - Verify Sandy's personality comes through
    - Verify sandwiches are sensible
    - Check database has all records
 ```
@@ -972,7 +972,7 @@ Tasks:
    - Expose on port 8501
 
 5. Test:
-   - Start Reuben in one terminal: python -m sandwich.main
+   - Start Sandy in one terminal: python -m sandwich.main
    - Open dashboard: streamlit run dashboard/app.py
    - Verify metrics update as sandwiches are made
    - Verify charts are readable
@@ -1093,14 +1093,14 @@ After completing all prompts, verify:
 - [ ] `python scripts/seed_taxonomy.py` populates structural types
 - [ ] Validator correctly separates good/bad sandwiches
 - [ ] `python -m sandwich.main --max-sandwiches 5` produces 5 sandwiches
-- [ ] All sandwiches have Reuben's voice in commentary
+- [ ] All sandwiches have Sandy's voice in commentary
 - [ ] Dashboard shows real-time metrics
 - [ ] Crash recovery works (kill and resume)
 - [ ] Cost tracking is accurate
 - [ ] Clustering produces sensible groupings
 - [ ] Ingredient reuse is detected
 
-If all checks pass: **Reuben is alive. Let him make sandwiches.**
+If all checks pass: **Sandy is alive. Let him make sandwiches.**
 
 ---
 
@@ -1278,14 +1278,14 @@ Tasks:
     # Click node to show detail
 
 12. Implement Interactive Creation page in dashboard/pages/5_✨_Interactive.py:
-    st.title("✨ Make a Sandwich with Reuben")
+    st.title("✨ Make a Sandwich with Sandy")
 
     topic = st.text_input("Topic or URL")
     structural_type = st.selectbox("Preferred type (optional)",
                                     get_structural_types() + [None])
 
     if st.button("Make me a sandwich"):
-        with st.spinner("Reuben is foraging..."):
+        with st.spinner("Sandy is foraging..."):
             # Run pipeline in directed mode
             # Show progress at each stage
             # Display result with Accept/Reject buttons
@@ -1302,7 +1302,7 @@ Tasks:
     import streamlit as st
 
     st.set_page_config(
-        page_title="Reuben Dashboard",
+        page_title="Sandy Dashboard",
         page_icon="🥪",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -1325,7 +1325,7 @@ Tasks:
     st.sidebar.write(f"Agent: {'✅' if agent_healthy else '❌'}")
 
     # Main landing page
-    st.title("Welcome to Reuben's Kitchen")
+    st.title("Welcome to Sandy's Kitchen")
     st.markdown("""
     *"The internet is vast. Somewhere in it: bread."*
 
@@ -1334,7 +1334,7 @@ Tasks:
     - **Browser**: Search and explore the corpus
     - **Analytics**: Deep dive into statistics
     - **Exploration**: Visualize sandwich relationships
-    - **Interactive**: Guide Reuben to make a sandwich
+    - **Interactive**: Guide Sandy to make a sandwich
     - **Settings**: Configure the agent
     """)
 
@@ -1447,7 +1447,7 @@ test_query_caching:
     # - Navigation between pages works
     # - Analytics charts render
     # - System status shows green
-    # - Reuben's personality visible in commentary
+    # - Sandy's personality visible in commentary
 
 21. Performance verification:
     - Load 100+ sandwiches into database
@@ -1472,4 +1472,4 @@ Acceptance criteria:
 
 ---
 
-*"The prompts are complete. The path is clear. Now we build." — Not Reuben, but in his spirit*
+*"The prompts are complete. The path is clear. Now we build." — Not Sandy, but in his spirit*

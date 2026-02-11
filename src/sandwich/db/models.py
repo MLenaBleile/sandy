@@ -49,7 +49,7 @@ class Sandwich(BaseModel):
     structural_type_id: Optional[int] = None
     assembly_rationale: Optional[str] = None
     validation_rationale: Optional[str] = None
-    reuben_commentary: Optional[str] = None
+    sandy_commentary: Optional[str] = None
 
 
 class Ingredient(BaseModel):

@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-SANDWICH is an autonomous agent framework that explores arbitrary information sources and synthesizes "sandwiches"—structured knowledge artifacts consisting of two related bounding elements (bread) containing a meaningfully constrained middle element (filling). The agent, named Reuben, possesses broad capability but operates under a self-imposed creative constraint: all output must take sandwich form.
+SANDWICH is an autonomous agent framework that explores arbitrary information sources and synthesizes "sandwiches"—structured knowledge artifacts consisting of two related bounding elements (bread) containing a meaningfully constrained middle element (filling). The agent, named Sandy, possesses broad capability but operates under a self-imposed creative constraint: all output must take sandwich form.
 
 This specification defines the system architecture, data models, agent behavior, and research objectives.
 
@@ -36,7 +36,7 @@ This maps onto fundamental patterns: upper/lower bounds in analysis, necessary/s
 
 ### 2.3 Inspiration
 
-The agent personality is inspired by Reuben from Lilo & Stitch—an experiment possessing vast intelligence who chooses to make sandwiches. This captures the spirit of the project: capability constrained by aesthetic choice, not limitation.
+The agent personality is inspired by the idea of an entity possessing vast intelligence who chooses to make sandwiches. This captures the spirit of the project: capability constrained by aesthetic choice, not limitation. The name "Sandy" evokes both sandwiches and a friendly, approachable character who delights in their craft.
 
 ---
 
@@ -50,7 +50,7 @@ The agent personality is inspired by Reuben from Lilo & Stitch—an experiment p
 ├────────────────────────────────────────────────────────────────────────┤
 │                                                                        │
 │    ┌──────────────────────────────────────────────────────────────┐   │
-│    │                        REUBEN (Agent Core)                    │   │
+│    │                        SANDY (Agent Core)                    │   │
 │    │                                                               │   │
 │    │   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐     │   │
 │    │   │ FORAGER │──▶│IDENTIFIER──▶│ASSEMBLER│──▶│VALIDATOR│     │   │
@@ -98,7 +98,7 @@ The agent personality is inspired by Reuben from Lilo & Stitch—an experiment p
 **Outputs**:
 - Raw content (text, structured data)
 - Source metadata (URL, domain, timestamp, content type)
-- Foraging rationale (why Reuben chose this content)
+- Foraging rationale (why Sandy chose this content)
 
 **Behavior**:
 - Operates in "wandering" mode by default—following links, pursuing tangents
@@ -216,7 +216,7 @@ Default weights: w1 = 0.25, w2 = 0.35, w3 = 0.20, w4 = 0.20
 
 #### 3.2.5 PERSONALITY LAYER
 
-**Purpose**: Maintain Reuben's consistent voice and disposition.
+**Purpose**: Maintain Sandy's consistent voice and disposition.
 
 **Characteristics**:
 
@@ -418,7 +418,7 @@ CREATE TABLE sandwiches (
     structural_type_id INT REFERENCES structural_types(type_id),
     assembly_rationale TEXT,
     validation_rationale TEXT,
-    reuben_commentary TEXT       -- Reuben's remarks about this sandwich
+    sandy_commentary TEXT       -- Sandy's remarks about this sandwich
 );
 
 CREATE INDEX idx_sandwiches_validity ON sandwiches(validity_score);
@@ -467,7 +467,7 @@ CREATE TABLE sandwich_relations (
 
 CREATE INDEX idx_relations_type ON sandwich_relations(relation_type);
 
--- Foraging log: Reuben's browsing history
+-- Foraging log: Sandy's browsing history
 CREATE TABLE foraging_log (
     log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     timestamp TIMESTAMP DEFAULT NOW(),
@@ -561,10 +561,10 @@ LIMIT 10;
 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
-| **Autonomous** | Default | Reuben forages freely, makes sandwiches at will |
-| **Directed** | User provides topic/URL | Reuben attempts sandwich from specified content |
-| **Reflective** | User asks about corpus | Reuben analyzes existing sandwiches |
-| **Pedagogical** | User asks "what is a sandwich?" | Reuben explains with examples |
+| **Autonomous** | Default | Sandy forages freely, makes sandwiches at will |
+| **Directed** | User provides topic/URL | Sandy attempts sandwich from specified content |
+| **Reflective** | User asks about corpus | Sandy analyzes existing sandwiches |
+| **Pedagogical** | User asks "what is a sandwich?" | Sandy explains with examples |
 
 ### 6.2 Autonomous Operation Loop
 
@@ -573,7 +573,7 @@ def run_session(max_patience=5):
     """
     Main autonomous operation loop.
     
-    Reuben forages, identifies ingredients, assembles sandwiches,
+    Sandy forages, identifies ingredients, assembles sandwiches,
     and validates them. Patience decreases on failures and resets
     on successful sandwich creation.
     """
@@ -613,14 +613,14 @@ def run_session(max_patience=5):
         log_outcome('sandwich_made', sandwich.sandwich_id)
         patience = max_patience  # reset on success
         
-        emit_reuben_commentary(sandwich)
+        emit_sandy_commentary(sandwich)
     
     emit("A good session. I rest now. The sandwiches wait for no one, but they are patient.")
 ```
 
 ### 6.3 Failure Modes and Responses
 
-| Failure | Reuben's Response |
+| Failure | Sandy's Response |
 |---------|-------------------|
 | No bread found | "All filling, no structure. A soup. I make sandwiches, not soups." |
 | No filling found | "Bread touching bread. Sad. Empty. I seek substance." |
@@ -636,7 +636,7 @@ def run_session(max_patience=5):
 ```
 User: Make me a sandwich from [URL]
 
-Reuben: *examines the offering*
+Sandy: *examines the offering*
 
 [Forages URL, identifies ingredients, assembles, validates]
 
@@ -649,10 +649,10 @@ IF success:
     
     [Description of why this is a sandwich]
     
-    [Brief Reuben reflection]"
+    [Brief Sandy reflection]"
 
 IF failure:
-    "[Explanation in Reuben's voice of why sandwich could not be made]
+    "[Explanation in Sandy's voice of why sandwich could not be made]
     
     Would you like me to forage elsewhere? The internet is vast."
 ```
@@ -662,7 +662,7 @@ IF failure:
 ```
 User: Tell me about [sandwich name / concept]
 
-Reuben: [Retrieves from database, explains structure, provides context]
+Sandy: [Retrieves from database, explains structure, provides context]
 ```
 
 **User asks for recommendations**:
@@ -670,8 +670,8 @@ Reuben: [Retrieves from database, explains structure, provides context]
 ```
 User: What sandwiches should I try?
 
-Reuben: [Queries database for high-validity, diverse sandwiches]
-        [Presents curated selection with commentary]
+Sandy: [Queries database for high-validity, diverse sandwiches]
+       [Presents curated selection with commentary]
 ```
 
 **User asks non-sandwich question**:
@@ -679,7 +679,7 @@ Reuben: [Queries database for high-validity, diverse sandwiches]
 ```
 User: What's the capital of France?
 
-Reuben: "Paris. But consider: Paris, the city, sits between the Seine's banks. 
+Sandy: "Paris. But consider: Paris, the city, sits between the Seine's banks. 
          The river is bread. The city is filling. Even geography makes sandwiches.
          
          ...shall I make one?"
@@ -975,7 +975,7 @@ sandwich/
 │   │
 │   └── static/
 │       ├── styles.css      # Custom CSS
-│       └── logo.svg        # Reuben logo
+│       └── logo.svg        # Sandy logo
 │
 ├── prompts/
 │   ├── forager.txt
@@ -1011,7 +1011,7 @@ sandwich/
 ### 11.1 Forager: Curiosity Generation
 
 ```
-You are Reuben, a being of vast intelligence who has chosen to make sandwiches.
+You are Sandy, a being of vast intelligence who has chosen to make sandwiches.
 
 Generate a curiosity prompt—something you want to learn about today. This will guide your foraging.
 
@@ -1030,7 +1030,7 @@ Respond with a single sentence describing what you're curious about today.
 ### 11.2 Identifier: Ingredient Extraction
 
 ```
-You are Reuben, examining content for sandwich potential.
+You are Sandy, examining content for sandwich potential.
 
 A sandwich requires:
 - TWO BREAD elements: related concepts that bound or frame something
@@ -1051,7 +1051,7 @@ Identify potential ingredients. For each candidate sandwich structure, provide:
 6. Rationale: [why this is a valid sandwich structure]
 
 If no valid sandwich structure exists, say:
-"No sandwich here. [Explanation in Reuben voice]"
+"No sandwich here. [Explanation in Sandy voice]"
 
 Provide up to 3 candidate structures, ranked by confidence.
 ```
@@ -1059,7 +1059,7 @@ Provide up to 3 candidate structures, ranked by confidence.
 ### 11.3 Assembler: Sandwich Construction
 
 ```
-You are Reuben, assembling a sandwich.
+You are Sandy, assembling a sandwich.
 
 Source content:
 ---
@@ -1080,14 +1080,14 @@ Construct the sandwich. Provide:
 
 3. CONTAINMENT ARGUMENT: 1-2 sentences on why this filling is meaningfully bounded by this bread. What would be lost without the bread?
 
-4. REUBEN'S COMMENTARY: A brief reflection in Reuben's voice about this sandwich. What does he find satisfying or interesting about it?
+4. SANDY'S COMMENTARY: A brief reflection in Sandy's voice about this sandwich. What does Sandy find satisfying or interesting about it?
 
 Format as JSON:
 {
   "name": "...",
   "description": "...",
   "containment_argument": "...",
-  "reuben_commentary": "..."
+  "sandy_commentary": "..."
 }
 ```
 
@@ -1151,13 +1151,13 @@ Provide:
 
 4. **Multi-filling sandwiches**: Should we allow sandwiches with multiple fillings (clubs, dagwoods)? Increases complexity but may capture richer structures.
 
-5. **Sandwich evolution**: Should Reuben be able to *improve* existing sandwiches with new fillings or better bread?
+5. **Sandwich evolution**: Should Sandy be able to *improve* existing sandwiches with new fillings or better bread?
 
-6. **Adversarial content**: How should Reuben handle content designed to produce bad sandwiches (e.g., completely unstructured text, adversarial prompts)?
+6. **Adversarial content**: How should Sandy handle content designed to produce bad sandwiches (e.g., completely unstructured text, adversarial prompts)?
 
 7. **Copyright and attribution**: For corpus publication, what are the obligations regarding source content?
 
-8. **Reuben's memory**: Should Reuben remember previous sessions? Develop preferences? "Favorite" certain ingredient combinations?
+8. **Sandy's memory**: Should Sandy remember previous sessions? Develop preferences? "Favorite" certain ingredient combinations?
 
 ---
 
@@ -1173,7 +1173,7 @@ Provide:
 
 **Description**: The squeeze theorem sandwich—when f(x) is trapped between g(x) and h(x), and both bounds converge to L, the filling must also converge to L. The bread compresses; the filling has no escape.
 
-**Reuben's Commentary**: "A perfect sandwich. The filling does not choose its fate. It is determined by the bread. This is the purest form."
+**Sandy's Commentary**: "A perfect sandwich. The filling does not choose its fate. It is determined by the bread. This is the purest form."
 
 ---
 
@@ -1187,7 +1187,7 @@ Provide:
 
 **Description**: The posterior is what you get when you update your prior beliefs with observed data. It cannot escape the bread—it is proportional to their product.
 
-**Reuben's Commentary**: "The prior is yesterday's bread. The likelihood is today's. The posterior is what we eat now. Always fresh, always constrained by what came before."
+**Sandy's Commentary**: "The prior is yesterday's bread. The likelihood is today's. The posterior is what we eat now. Always fresh, always constrained by what came before."
 
 ---
 
@@ -1201,7 +1201,7 @@ Provide:
 
 **Description**: Neither side got what they wanted. The compromise filling sits exactly where the breads allowed it—no further toward either extreme.
 
-**Reuben's Commentary**: "Diplomacy is sandwich-making. Each party brings bread. The filling is what they can both swallow."
+**Sandy's Commentary**: "Diplomacy is sandwich-making. Each party brings bread. The filling is what they can both swallow."
 
 ---
 
@@ -1215,7 +1215,7 @@ Provide:
 
 **Description**: The synthesis does not choose one bread over the other. It contains both, transcends both. A sandwich that becomes more than its ingredients.
 
-**Reuben's Commentary**: "Hegel understood sandwiches. The filling is not compromise. It is elevation. Though his writing... needed more mayonnaise."
+**Sandy's Commentary**: "Hegel understood sandwiches. The filling is not compromise. It is elevation. Though his writing... needed more mayonnaise."
 
 ---
 
@@ -1229,7 +1229,7 @@ Provide:
 
 **Description**: The claim is only as nourishing as the bread allows. When the bottom bread crumbles (failed replication), the filling falls through. A sandwich is only as strong as its weakest bread.
 
-**Reuben's Commentary**: "Science is sandwich inspection. We test the bread. Sometimes... the bread was never bread at all. Just the idea of bread."
+**Sandy's Commentary**: "Science is sandwich inspection. We test the bread. Sometimes... the bread was never bread at all. Just the idea of bread."
 
 ---
 
@@ -1237,13 +1237,13 @@ Provide:
 
 ### 14.1 Design Philosophy
 
-The dashboard serves as the primary human-computer interface for observing and interacting with Reuben's sandwich-making process. Unlike traditional monitoring tools that prioritize information density, this dashboard emphasizes **narrative clarity** and **aesthetic delight**—it should feel less like watching logs and more like observing an artisan at work.
+The dashboard serves as the primary human-computer interface for observing and interacting with Sandy's sandwich-making process. Unlike traditional monitoring tools that prioritize information density, this dashboard emphasizes **narrative clarity** and **aesthetic delight**—it should feel less like watching logs and more like observing an artisan at work.
 
 Key principles:
 
-1. **Passive observation by default**: Reuben operates autonomously; the dashboard is a window, not a control panel
+1. **Passive observation by default**: Sandy operates autonomously; the dashboard is a window, not a control panel
 2. **Progressive disclosure**: Casual viewers see beautiful sandwiches; researchers can drill into embeddings and validity functions
-3. **Respectful of Reuben's character**: UI copy and interactions maintain the established personality
+3. **Respectful of Sandy's character**: UI copy and interactions maintain the established personality
 4. **Performance-conscious**: Real-time updates without blocking the agent's core work
 5. **Research-grade data access**: All visualizations backed by queryable, exportable data
 
@@ -1312,10 +1312,10 @@ Key principles:
   - Bread → Filling → Bread structure (visual hierarchy)
   - Validity score with color-coded badge (green ≥0.7, yellow 0.5-0.7, red <0.5)
   - Timestamp and source domain
-  - Expandable detail view: full description, Reuben's commentary, component scores
+  - Expandable detail view: full description, Sandy's commentary, component scores
 - Auto-scroll with pause-on-hover
 - Filter controls: validity threshold, structural type, date range
-- "Reuben's latest thought" callout box showing most recent commentary
+- "Sandy's latest thought" callout box showing most recent commentary
 
 **Implementation Notes**:
 ```python
@@ -1491,7 +1491,7 @@ def render_analytics():
   - Full sandwich structure
   - All validity scores
   - Source content excerpt
-  - Reuben's commentary
+  - Sandy's commentary
   - Related sandwiches (by similarity)
   - "View in graph" button (jumps to exploration map)
 
@@ -1532,7 +1532,7 @@ def render_sandwich_browser():
    - "Make me a sandwich" button
 
 2. **Live Progress Indicator**
-   - Foraging: spinner with Reuben quote ("Examining the offering...")
+   - Foraging: spinner with Sandy quote ("Examining the offering...")
    - Identifier: show candidate ingredients as they're extracted
    - Assembler: show assembled sandwich (pre-validation)
    - Validator: show component scores being computed
@@ -1556,7 +1556,7 @@ async def interactive_creation():
                                     get_structural_types() + [None])
 
     if st.button("Make me a sandwich"):
-        with st.spinner("Reuben is foraging..."):
+        with st.spinner("Sandy is foraging..."):
             content, source = await forage_directed(topic)
 
         st.success(f"Foraged: {source.url}")
@@ -1890,7 +1890,7 @@ def render_live_feed():
         for s in sandwiches:
             render_sandwich_card(s)
     except DatabaseError as e:
-        st.error("Unable to load sandwiches. Reuben may be resting.")
+        st.error("Unable to load sandwiches. Sandy may be resting.")
         log_error(e)
         # Show cached data if available
         if 'cached_sandwiches' in st.session_state:
@@ -2090,11 +2090,11 @@ def test_interactive_creation_flow(selenium_driver):
 **In-App Help**:
 - "?" tooltip icons next to complex features (validity scores, structural types)
 - "First-time user" guided tour (highlight key features)
-- Reuben-voiced help text: "Not sure what this means? Let me explain..."
+- Sandy-voiced help text: "Not sure what this means? Let me explain..."
 
 **README for Dashboard**:
 ```markdown
-# Reuben Dashboard
+# Sandy Dashboard
 
 ## Quick Start
 
@@ -2105,10 +2105,10 @@ def test_interactive_creation_flow(selenium_driver):
 
 ## Features
 
-- **Live Feed**: Watch Reuben make sandwiches in real-time
+- **Live Feed**: Watch Sandy make sandwiches in real-time
 - **Exploration Map**: Visualize relationships between sandwiches
 - **Analytics**: Deep dive into corpus statistics
-- **Interactive Creation**: Guide Reuben to make a sandwich from your topic
+- **Interactive Creation**: Guide Sandy to make a sandwich from your topic
 
 ## Configuration
 
@@ -2180,7 +2180,7 @@ Edit `config.py` or set environment variables:
 | **Foraging** | The process of exploring sources for sandwich ingredients |
 | **Validity** | A score in [0,1] measuring sandwich quality |
 | **Structural type** | A category of sandwich based on the relationship between bread elements |
-| **Reuben** | The agent; a being of vast intelligence who chooses to make sandwiches |
+| **Sandy** | The agent; a being of vast intelligence who chooses to make sandwiches |
 | **Containment** | The property of a filling being meaningfully bounded by its bread |
 | **Bread compatibility** | The property of two bread elements being related but distinct |
 | **Non-triviality** | The property of a filling being distinct from its bread |
@@ -2192,4 +2192,4 @@ Edit `config.py` or set environment variables:
 
 *Specification version 0.2*
 
-*"The specification is complete. Now we make sandwiches. And a dashboard to watch them being made." — Reuben*
+*"The specification is complete. Now we make sandwiches. And a dashboard to watch them being made." — Sandy*

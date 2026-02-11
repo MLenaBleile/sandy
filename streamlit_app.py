@@ -1,4 +1,4 @@
-"""Streamlit Cloud entry point for Reuben Dashboard.
+"""Streamlit Cloud entry point for Sandy Dashboard.
 
 This file serves as the main entry point when deploying to Streamlit Cloud.
 It properly sets up paths and imports the dashboard module.
@@ -36,7 +36,7 @@ from dashboard.utils.queries import (
 
 # Configure page with cute branding
 st.set_page_config(
-    page_title="Reuben's Kitchen 🥪",
+    page_title="Sandy's Kitchen 🥪",
     page_icon="🥪",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -134,7 +134,7 @@ render_system_status()
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 ### 🎯 Navigation
-**Explore Reuben's creations:**
+**Explore Sandy's creations:**
 - 📊 **Live Feed** - Fresh sandwiches!
 - 🔍 **Browser** - Search the corpus
 - 📈 **Analytics** - See the stats
@@ -149,7 +149,7 @@ st.sidebar.caption("🌺 Experiment 625 at your service!")
 # Main content with cute header
 st.markdown("""
 <div style='text-align: center; padding: 2rem 0;'>
-    <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Reuben's Kitchen! 🥪</h1>
+    <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
     <p style='font-size: 1.2rem; color: #666; font-style: italic; margin-top: 0.5rem;'>
         "The internet is vast. Somewhere in it: bread."
     </p>
@@ -187,7 +187,7 @@ st.markdown("---")
 st.markdown("""
 ### 👋 What is this place?
 
-Reuben (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
+Sandy (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
 Not just any sandwiches — **knowledge sandwiches**!
 
 Each sandwich has:
@@ -249,11 +249,11 @@ with col2:
 st.markdown("---")
 
 # About section
-with st.expander("🌺 About Reuben & The SANDWICH Project"):
+with st.expander("🌺 About Sandy & The SANDWICH Project"):
     st.markdown("""
     ### Who is Reuben?
 
-    Reuben is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
+    Sandy is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
     but chooses to make sandwiches instead. This captures the spirit of our project:
     **capability constrained by aesthetic choice**.
 

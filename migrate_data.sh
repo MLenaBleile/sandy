@@ -27,7 +27,7 @@ echo ""
 
 # Step 2: Export data from local database
 echo "📦 Step 2: Exporting data from local Docker database..."
-docker exec reuben-db-1 pg_dump -U sandwich -d sandwich \
+docker exec nostalgic-ride-db-1 pg_dump -U sandwich -d sandwich \
     --data-only \
     -t sandwiches \
     -t sources \

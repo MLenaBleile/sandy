@@ -1,7 +1,7 @@
 """Sandwich assembler – constructs a complete sandwich from selected ingredients.
 
 Takes a candidate structure and source content, then uses the LLM to produce
-a named, described sandwich with Reuben's commentary.
+a named, described sandwich with Sandy's commentary.
 
 Reference: SPEC.md Section 3.2.5, 14.4; PROMPTS.md Prompt 6
 """
@@ -29,7 +29,7 @@ class AssembledSandwich:
     name: str
     description: str
     containment_argument: str
-    reuben_commentary: str
+    sandy_commentary: str
     bread_top: str
     bread_bottom: str
     filling: str
@@ -84,7 +84,7 @@ async def assemble_sandwich(
         "Your previous response could not be parsed. "
         "Please respond ONLY with a valid JSON object with exactly these keys: "
         '"name" (string), "description" (string), "containment_argument" (string), '
-        '"reuben_commentary" (string). No other text.'
+        '"sandy_commentary" (string). No other text.'
     )
 
     async def _retry_call(rp: str) -> str:
@@ -95,7 +95,7 @@ async def assemble_sandwich(
 
     parsed = await parse_with_recovery(
         raw_response,
-        required_fields=["name", "description", "containment_argument", "reuben_commentary"],
+        required_fields=["name", "description", "containment_argument", "sandy_commentary"],
         llm_call=_retry_call,
         retry_prompt=retry_prompt,
     )
@@ -104,7 +104,7 @@ async def assemble_sandwich(
         name=str(parsed["name"]).strip(),
         description=str(parsed["description"]).strip(),
         containment_argument=str(parsed["containment_argument"]).strip(),
-        reuben_commentary=str(parsed["reuben_commentary"]).strip(),
+        sandy_commentary=str(parsed["sandy_commentary"]).strip(),
         bread_top=candidate.bread_top,
         bread_bottom=candidate.bread_bottom,
         filling=candidate.filling,

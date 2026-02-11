@@ -123,7 +123,7 @@ async def identify_ingredients(
 
     async def _retry_call(rp: str) -> str:
         return await llm.raw_call(
-            system_prompt="You are Reuben, examining content for sandwich potential.",
+            system_prompt="You are Sandy, examining content for sandwich potential.",
             user_prompt=rp,
         )
 

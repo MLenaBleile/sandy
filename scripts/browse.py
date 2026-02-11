@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Browse Reuben's sandwiches from the database.
+"""Browse Sandy's sandwiches from the database.
 
 Usage:
     python scripts/browse.py              # List all sandwiches
@@ -151,9 +151,9 @@ def print_sandwich_detail(s, ingredients):
         print(f"\n  Validator's Rationale:")
         print(f"    {s['validation_rationale']}")
 
-    if s.get('reuben_commentary'):
-        print(f"\n  Reuben's Commentary:")
-        print(f"    {s['reuben_commentary']}")
+    if s.get('sandy_commentary'):
+        print(f"\n  Sandy's Commentary:")
+        print(f"    {s['sandy_commentary']}")
 
     if ingredients:
         print(f"\n  Ingredients:")
@@ -164,7 +164,7 @@ def print_sandwich_detail(s, ingredients):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Browse Reuben's sandwiches")
+    parser = argparse.ArgumentParser(description="Browse Sandy's sandwiches")
     parser.add_argument("--detail", action="store_true", help="Show full details for all sandwiches")
     parser.add_argument("--best", action="store_true", help="Show top 5 by validity score")
     parser.add_argument("--stats", action="store_true", help="Show corpus statistics")
@@ -215,7 +215,7 @@ def main():
 
     sandwiches = list_sandwiches(conn, limit=args.limit)
     if not sandwiches:
-        print("No sandwiches in the database yet. Run Reuben first!")
+        print("No sandwiches in the database yet. Run Sandy first!")
         conn.close()
         return 0
 

@@ -1,11 +1,11 @@
-# 🚀 Reuben Dashboard - Quick Deployment Checklist
+# 🚀 Sandy Dashboard - Quick Deployment Checklist
 
 Follow these steps in order to deploy your dashboard!
 
 ## ✅ Step 1: Cloud Database Setup (5 minutes)
 
 - [ ] Go to https://neon.tech and sign up (free, no credit card)
-- [ ] Create new project: "reuben-sandwich"
+- [ ] Create new project: "Sandy-sandwich"
 - [ ] Copy connection string (looks like: `postgresql://user:pass@ep-xxx.neon.tech/reuben?sslmode=require`)
 - [ ] Save connection string somewhere safe
 
@@ -35,7 +35,7 @@ docker run --rm -i postgres:15 psql "$DATABASE_URL" < src/sandwich/db/init_schem
 - [ ] Commit and push:
   ```bash
   git add .
-  git commit -m "Reuben dashboard with cute theming 🥪"
+  git commit -m "Sandy dashboard with cute theming 🥪"
   git push -u origin main
   ```
 
@@ -57,7 +57,7 @@ docker run --rm -i postgres:15 psql "$DATABASE_URL" < src/sandwich/db/init_schem
 ## ✅ Step 5: Test Your Deployment (1 minute)
 
 - [ ] Dashboard URL will be: `https://YOUR_USERNAME-reuben-dashboard.streamlit.app`
-- [ ] Check that the page loads with cute Reuben theming
+- [ ] Check that the page loads with cute Sandy theming
 - [ ] Verify existing sandwiches appear (if you migrated data)
 - [ ] Check all pages work (Live Feed, Browser, Analytics, etc.)
 
@@ -83,7 +83,7 @@ https://YOUR_USERNAME-reuben-dashboard.streamlit.app
 ```
 
 Share this URL with anyone! They can:
-- ✨ View all Reuben's sandwiches
+- ✨ View all Sandy's sandwiches
 - 📊 See live updates when you run the agent
 - 🗺️ Explore the network graph
 - 📈 View analytics and metrics
@@ -114,4 +114,4 @@ See the full deployment guide: `DEPLOYMENT.md`
 
 ---
 
-*"I could make sandwiches... and now everyone can see them!"* — Reuben 🥪✨
+*"I could make sandwiches... and now everyone can see them!"* — Sandy 🥪✨

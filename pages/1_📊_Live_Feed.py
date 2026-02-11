@@ -38,7 +38,7 @@ st.title("🥪 Live Sandwich Feed")
 
 st.markdown("""
 <p style='font-size: 1.1rem; color: #666; font-style: italic;'>
-    Watch Reuben make sandwiches in real-time! Auto-refreshes every 2 seconds. ✨
+    Watch Sandy make sandwiches in real-time! Auto-refreshes every 2 seconds. ✨
 </p>
 """, unsafe_allow_html=True)
 
@@ -126,13 +126,13 @@ def live_feed():
 # Render the live feed
 live_feed()
 
-# Reuben's latest thought (if available)
+# Sandy's latest thought (if available)
 try:
     recent = get_recent_sandwiches(limit=1)
-    if recent and recent[0].get('reuben_commentary'):
+    if recent and recent[0].get('sandy_commentary'):
         st.markdown("---")
         with st.container():
-            st.markdown("### 💭 Reuben's Latest Thought")
+            st.markdown("### 💭 Sandy's Latest Thought")
             st.markdown("""
             <div style='background: linear-gradient(135deg, #fffbf0 0%, #fff5f8 100%);
                         padding: 1rem;
@@ -142,7 +142,7 @@ try:
                         color: #666;'>
                 "{}"
             </div>
-            """.format(recent[0]['reuben_commentary']), unsafe_allow_html=True)
+            """.format(recent[0]['sandy_commentary']), unsafe_allow_html=True)
 except Exception:
     pass  # Silently skip if no commentary available
 

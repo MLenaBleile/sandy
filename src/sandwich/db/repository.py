@@ -116,7 +116,7 @@ class Repository:
                     specificity_score, nontrivial_score, novelty_score,
                     bread_top, bread_bottom, filling,
                     source_id, structural_type_id,
-                    assembly_rationale, validation_rationale, reuben_commentary
+                    assembly_rationale, validation_rationale, sandy_commentary
                 ) VALUES (
                     %s, %s, %s, %s,
                     %s, %s, %s,
@@ -145,7 +145,7 @@ class Repository:
                     s.structural_type_id,
                     s.assembly_rationale,
                     s.validation_rationale,
-                    s.reuben_commentary,
+                    s.sandy_commentary,
                 ),
             )
             result = cur.fetchone()[0]

@@ -190,7 +190,7 @@ class TestGoodSandwiches:
 
     @pytest.mark.asyncio
     async def test_regulatory_reuben(self):
-        """The Regulatory Reuben: practices between safety and budget."""
+        """The Regulatory Sandy: practices between safety and budget."""
         bread_top = "Minimum safety standards required by law"
         filling = "Actual company safety practices"
         bread_bottom = "Maximum cost constraints from budget"

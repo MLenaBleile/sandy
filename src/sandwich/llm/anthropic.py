@@ -178,7 +178,7 @@ class AnthropicSandwichLLM(SandwichLLM):
 
     async def generate_commentary(self, sandwich_summary: str) -> str:
         system = (
-            "You are Reuben. Reflect briefly on this sandwich in your "
+            "You are Sandy. Reflect briefly on this sandwich in your "
             "characteristic voice: content, dry wit, philosophical depth."
         )
         user = f"Sandwich summary:\n{sandwich_summary}"

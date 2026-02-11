@@ -91,13 +91,13 @@ class SandwichLLM(ABC):
 
     @abstractmethod
     async def generate_commentary(self, sandwich_summary: str) -> str:
-        """Generate Reuben's commentary on a sandwich.
+        """Generate Sandy's commentary on a sandwich.
 
         Args:
             sandwich_summary: Brief summary of the sandwich.
 
         Returns:
-            Commentary text in Reuben's voice.
+            Commentary text in Sandy's voice.
         """
         ...
 

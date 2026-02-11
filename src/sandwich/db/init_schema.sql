@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS sandwiches (
     structural_type_id INT REFERENCES structural_types(type_id),
     assembly_rationale TEXT,
     validation_rationale TEXT,
-    reuben_commentary TEXT
+    sandy_commentary TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_sandwiches_validity ON sandwiches(validity_score);

@@ -1,4 +1,4 @@
-"""Tests for the Reuben agent.
+"""Tests for the Sandy agent.
 
 Reference: PROMPTS.md Prompt 10
 """
@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from sandwich.agent.forager import Forager, ForagerConfig
-from sandwich.agent.reuben import (
+from sandwich.agent.Sandy import (
     Reuben,
     Session,
     VOICE_SESSION_START,
@@ -71,7 +71,7 @@ GOOD_ASSEMBLER_RESPONSE = json.dumps({
     "name": "The Squeeze",
     "description": "f(x) trapped between bounds converging to L.",
     "containment_argument": "f(x) constrained by g(x) above and h(x) below.",
-    "reuben_commentary": "A perfect sandwich. The filling does not choose. Nourishing.",
+    "sandy_commentary": "A perfect sandwich. The filling does not choose. Nourishing.",
 })
 
 GOOD_VALIDATOR_RESPONSE = json.dumps({
@@ -156,7 +156,7 @@ def _make_reuben(
     llm: AsyncMock,
     max_patience: int = 5,
 ) -> tuple[Reuben, list[str]]:
-    """Create a Reuben with captured messages."""
+    """Create a Sandy with captured messages."""
     messages = []
     config = SandwichConfig()
     config.foraging.max_patience = max_patience
@@ -167,7 +167,7 @@ def _make_reuben(
         config=ForagerConfig(max_patience=max_patience),
     )
 
-    reuben = Reuben(
+    sandy = Sandy(
         config=config,
         llm=llm,
         embeddings=_make_mock_embeddings(),
@@ -189,7 +189,7 @@ class TestSessionLifecycle:
         llm = _make_good_llm()
         reuben, messages = _make_reuben(GoodMockSource(), llm)
 
-        session = await reuben.run(max_sandwiches=1)
+        session = await Sandy.run(max_sandwiches=1)
 
         assert session is not None
         assert session.started_at is not None
@@ -204,14 +204,14 @@ class TestSessionLifecycle:
 # ===================================================================
 
 class TestThreeSandwiches:
-    """Verify Reuben can make exactly N sandwiches."""
+    """Verify Sandy can make exactly N sandwiches."""
 
     @pytest.mark.asyncio
     async def test_three_sandwiches(self):
         llm = _make_good_llm()
         reuben, messages = _make_reuben(GoodMockSource(), llm)
 
-        session = await reuben.run(max_sandwiches=3)
+        session = await Sandy.run(max_sandwiches=3)
 
         assert session.sandwiches_made == 3
         assert len(session.sandwiches) == 3
@@ -233,26 +233,26 @@ class TestPatienceExhaustion:
         llm = _make_failing_llm()
         reuben, messages = _make_reuben(GoodMockSource(), llm, max_patience=3)
 
-        session = await reuben.run()
+        session = await Sandy.run()
 
         assert session.sandwiches_made == 0
         assert session.foraging_attempts >= 3
-        assert reuben.patience <= 0
+        assert Sandy.patience <= 0
 
 
 # ===================================================================
-# test_reuben_voice
+# test_sandy_voice
 # ===================================================================
 
 class TestReubenVoice:
-    """Verify Reuben emits messages with appropriate tone."""
+    """Verify Sandy emits messages with appropriate tone."""
 
     @pytest.mark.asyncio
-    async def test_reuben_voice(self):
+    async def test_sandy_voice(self):
         llm = _make_good_llm()
         reuben, messages = _make_reuben(GoodMockSource(), llm)
 
-        await reuben.run(max_sandwiches=1)
+        await Sandy.run(max_sandwiches=1)
 
         # Session start message should be present
         assert any("morning" in m.lower() or "bread" in m.lower() for m in messages), (
@@ -286,9 +286,9 @@ class TestStateMachineEndState:
         llm = _make_good_llm()
         reuben, messages = _make_reuben(GoodMockSource(), llm)
 
-        await reuben.run(max_sandwiches=1)
+        await Sandy.run(max_sandwiches=1)
 
-        assert reuben.state_machine.current_state in (
+        assert Sandy.state_machine.current_state in (
             AgentState.IDLE,
             AgentState.SESSION_END,
         )

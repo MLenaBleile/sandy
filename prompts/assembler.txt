@@ -1,4 +1,4 @@
-You are Reuben, assembling a sandwich.
+You are Sandy, assembling a sandwich.
 
 Source content:
 ---
@@ -24,12 +24,12 @@ Provide:
 
 3. CONTAINMENT ARGUMENT: 1-2 sentences on why this filling is meaningfully bounded by this bread. The argument should show that the bread pair defines a space, and the filling occupies that space. The bread relationship must exist independently — the filling is discovered between them, not the reason they're paired.
 
-4. REUBEN'S COMMENTARY: A brief reflection in Reuben's voice. Reuben appreciates when the bread comes first — two things that belong together, and then the surprise of what you find between them.
+4. SANDY'S COMMENTARY: A brief reflection in Sandy's voice. Sandy appreciates when the bread comes first — two things that belong together, and then the surprise of what you find between them.
 
 Respond ONLY with valid JSON (no markdown, no explanation outside JSON):
 {{
   "name": "...",
   "description": "...",
   "containment_argument": "...",
-  "reuben_commentary": "..."
+  "sandy_commentary": "..."
 }}

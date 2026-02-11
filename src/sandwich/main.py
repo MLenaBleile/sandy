@@ -1,4 +1,4 @@
-"""Entry point for Reuben – the sandwich-making agent.
+"""Entry point for Sandy – the sandwich-making agent.
 
 Usage:
     python -m sandwich.main --max-sandwiches 5
@@ -16,7 +16,7 @@ from typing import Optional
 
 from sandwich.agent.forager import Forager, ForagerConfig
 from sandwich.agent.pipeline import StoredSandwich
-from sandwich.agent.reuben import Reuben
+from sandwich.agent.sandy import Sandy
 from sandwich.config import SandwichConfig
 from sandwich.db.corpus import CorpusIngredient, SandwichCorpus
 from sandwich.db.models import Ingredient, Sandwich, SandwichIngredient, Source
@@ -92,7 +92,7 @@ def _make_db_persister(repo: Repository, type_cache: dict[str, int]):
             structural_type_id=type_id,
             assembly_rationale=sw.containment_argument,
             validation_rationale=v.rationale,
-            reuben_commentary=sw.reuben_commentary,
+            sandy_commentary=sw.sandy_commentary,
         )
         repo.insert_sandwich(sandwich)
 
@@ -136,11 +136,11 @@ def _make_db_persister(repo: Repository, type_cache: dict[str, int]):
     return persist
 
 
-def build_reuben(
+def build_sandy(
     config: SandwichConfig,
     repo: Optional[Repository] = None,
-) -> Reuben:
-    """Construct a fully-wired Reuben agent."""
+) -> Sandy:
+    """Construct a fully-wired Sandy agent."""
     llm = AnthropicSandwichLLM(config=config.llm)
     embeddings = OpenAIEmbeddingService()
 
@@ -168,7 +168,7 @@ def build_reuben(
         type_cache: dict[str, int] = {}
         on_stored = _make_db_persister(repo, type_cache)
 
-    return Reuben(
+    return Sandy(
         config=config,
         llm=llm,
         embeddings=embeddings,
@@ -179,7 +179,7 @@ def build_reuben(
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Reuben makes sandwiches")
+    parser = argparse.ArgumentParser(description="Sandy makes sandwiches")
     parser.add_argument(
         "--max-sandwiches", type=int, default=None,
         help="Stop after N sandwiches",
@@ -207,9 +207,9 @@ async def main() -> None:
             logger.warning("Could not connect to database: %s (running in-memory)", e)
             repo = None
 
-    reuben = build_reuben(config, repo=repo)
+    Sandy = build_sandy(config, repo=repo)
 
-    session = await reuben.run(
+    session = await Sandy.run(
         max_sandwiches=args.max_sandwiches,
         max_duration=timedelta(minutes=args.max_duration) if args.max_duration else None,
     )
@@ -252,8 +252,8 @@ async def main() -> None:
             print(f"    {sw.description}")
             print(f"\n  Containment Argument:")
             print(f"    {sw.containment_argument}")
-            print(f"\n  Reuben's Commentary:")
-            print(f"    {sw.reuben_commentary}")
+            print(f"\n  Sandy's Commentary:")
+            print(f"    {sw.sandy_commentary}")
 
     print(f"\n{'=' * 60}")
 
