@@ -7,12 +7,11 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# Add parent directory to path to import dashboard modules
-dashboard_dir = Path(__file__).parent.parent
+# Add project root and dashboard to path
+project_root = Path(__file__).parent.parent
+dashboard_dir = project_root / "dashboard"
+sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
-
-# Add project root to import sandwich modules
-project_root = dashboard_dir.parent
 sys.path.insert(0, str(project_root / "src"))
 
 try:
