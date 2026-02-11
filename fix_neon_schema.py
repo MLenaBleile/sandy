@@ -90,12 +90,23 @@ try:
     local_cur = local_conn.cursor(cursor_factory=RealDictCursor)
     neon_cur = neon_conn.cursor()
 
+    # Backup human ratings before clearing data (they only exist in Neon, not local)
+    print("   Backing up human ratings...")
+    neon_cur.execute("SELECT * FROM human_ratings")
+    human_ratings_backup = neon_cur.fetchall()
+    print(f"   Backed up {len(human_ratings_backup)} human ratings")
+
+    # Delete in correct order (respecting foreign keys)
+    print("   Clearing existing data...")
+    neon_cur.execute("DELETE FROM sandwiches")
+    neon_cur.execute("DELETE FROM sources")
+    neon_cur.execute("DELETE FROM structural_types")
+
     # Migrate structural_types
     print("   Copying structural_types...")
     local_cur.execute("SELECT type_id, name, description FROM structural_types ORDER BY type_id")
     types = local_cur.fetchall()
 
-    neon_cur.execute("DELETE FROM structural_types")
     for t in types:
         neon_cur.execute(
             "INSERT INTO structural_types (type_id, name, description) VALUES (%s, %s, %s) ON CONFLICT (type_id) DO NOTHING",
@@ -108,7 +119,6 @@ try:
     local_cur.execute("SELECT source_id, url, fetched_at FROM sources ORDER BY source_id")
     sources = local_cur.fetchall()
 
-    neon_cur.execute("DELETE FROM sources")
     for s in sources:
         neon_cur.execute(
             "INSERT INTO sources (source_id, url, fetched_at) VALUES (%s, %s, %s) ON CONFLICT (source_id) DO NOTHING",
@@ -121,6 +131,8 @@ try:
     local_cur.execute("""
         SELECT sandwich_id, name, description, source_id, structural_type_id,
                assembly_rationale, sandy_commentary, specificity_score,
+               validity_score, bread_compat_score, containment_score,
+               nontrivial_score, novelty_score,
                created_at, sandwich_embedding, bread_top, bread_bottom, filling
         FROM sandwiches ORDER BY created_at
     """)
@@ -133,25 +145,60 @@ try:
             INSERT INTO sandwiches (
                 sandwich_id, name, description, source_id, structural_type_id,
                 assembly_rationale, sandy_commentary, specificity_score,
+                validity_score, bread_compat_score, containment_score,
+                nontrivial_score, novelty_score,
                 created_at, sandwich_embedding, bread_top, bread_bottom, filling
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (sandwich_id) DO NOTHING
         """, (
             sw['sandwich_id'], sw['name'], sw['description'], sw['source_id'],
             sw['structural_type_id'], sw['assembly_rationale'],
-            sw['sandy_commentary'],
-            sw['specificity_score'], sw['created_at'], sw['sandwich_embedding'],
+            sw['sandy_commentary'], sw['specificity_score'],
+            sw['validity_score'], sw['bread_compat_score'], sw['containment_score'],
+            sw['nontrivial_score'], sw['novelty_score'],
+            sw['created_at'], sw['sandwich_embedding'],
             sw['bread_top'], sw['bread_bottom'], sw['filling']
         ))
 
     print(f"   OK Copied {len(sandwiches)} sandwiches")
+
+    # Restore human ratings
+    print("   Restoring human ratings...")
+    ratings_restored = 0
+    ratings_orphaned = 0
+
+    if human_ratings_backup:
+        # Get list of valid sandwich IDs
+        neon_cur.execute("SELECT sandwich_id FROM sandwiches")
+        valid_sandwich_ids = {row[0] for row in neon_cur.fetchall()}
+
+        for rating in human_ratings_backup:
+            # Only restore if the sandwich still exists
+            if rating[1] in valid_sandwich_ids:  # rating[1] is sandwich_id
+                neon_cur.execute("""
+                    INSERT INTO human_ratings (
+                        rating_id, sandwich_id, session_id, bread_compat_score,
+                        containment_score, nontrivial_score, novelty_score,
+                        overall_validity, created_at, user_agent, ip_hash
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (rating_id) DO NOTHING
+                """, rating)
+                ratings_restored += 1
+            else:
+                ratings_orphaned += 1
+
+        print(f"   OK Restored {ratings_restored} human ratings")
+        if ratings_orphaned > 0:
+            print(f"   WARNING: {ratings_orphaned} ratings skipped (sandwiches no longer exist)")
 
     neon_conn.commit()
 
     # Verify
     neon_cur.execute("SELECT COUNT(*) FROM sandwiches")
     count = neon_cur.fetchone()[0]
-    print(f"\nOK Migration verified: {count} sandwiches in Neon")
+    neon_cur.execute("SELECT COUNT(*) FROM human_ratings")
+    ratings_count = neon_cur.fetchone()[0]
+    print(f"\nOK Migration verified: {count} sandwiches, {ratings_count} human ratings in Neon")
 
     local_cur.close()
     local_conn.close()
