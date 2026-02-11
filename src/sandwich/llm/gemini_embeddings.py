@@ -36,7 +36,7 @@ class GeminiEmbeddingService(EmbeddingService):
         # Configure Gemini
         genai.configure(api_key=api_key)
 
-    async def embed(self, text: str) -> List[float]:
+    async def embed_single(self, text: str) -> List[float]:
         """Generate embedding for a single text.
 
         Args:
