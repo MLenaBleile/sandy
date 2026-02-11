@@ -23,14 +23,14 @@ class GeminiSandwichLLM(SandwichLLM):
     def __init__(
         self,
         api_key: str,
-        model: str = "gemini-2.0-flash-exp",
+        model: str = "gemini-1.5-flash",
         temperature: float = 0.7,
     ):
         """Initialize Gemini client.
 
         Args:
             api_key: Google AI API key
-            model: Gemini model to use (default: gemini-2.0-flash-exp)
+            model: Gemini model to use (default: gemini-1.5-flash)
             temperature: Sampling temperature (0.0-1.0)
         """
         self.api_key = api_key
