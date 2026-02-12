@@ -1,6 +1,6 @@
 """Google Gemini LLM client for sandwich-making.
 
-Uses Gemini 2.0 Flash for cost-effective sandwich generation.
+Uses Gemini 2.5 Flash for cost-effective sandwich generation.
 """
 
 import logging
@@ -17,20 +17,20 @@ logger = logging.getLogger(__name__)
 class GeminiSandwichLLM(SandwichLLM):
     """Gemini implementation of the SandwichLLM interface.
 
-    Uses Gemini 2.0 Flash for cost-effective, fast generation.
+    Uses Gemini 2.5 Flash for cost-effective, fast generation.
     """
 
     def __init__(
         self,
         api_key: str,
-        model: str = "gemini-1.5-flash",
+        model: str = "gemini-2.5-flash",
         temperature: float = 0.7,
     ):
         """Initialize Gemini client.
 
         Args:
             api_key: Google AI API key
-            model: Gemini model to use (default: gemini-1.5-flash)
+            model: Gemini model to use (default: gemini-2.5-flash)
             temperature: Sampling temperature (0.0-1.0)
         """
         self.api_key = api_key
