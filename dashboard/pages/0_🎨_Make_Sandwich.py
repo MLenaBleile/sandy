@@ -210,6 +210,9 @@ if make_button and (user_input or uploaded_file):
                     try:
                         import pdfplumber
 
+                        # Reset file cursor in case Streamlit already read it
+                        uploaded_file.seek(0)
+
                         pdf_text_parts = []
                         with pdfplumber.open(uploaded_file) as pdf:
                             for page in pdf.pages:
@@ -252,6 +255,7 @@ if make_button and (user_input or uploaded_file):
                     try:
                         import pandas as pd
 
+                        uploaded_file.seek(0)
                         df = pd.read_csv(uploaded_file)
 
                         if df.empty:
@@ -347,41 +351,72 @@ if make_button and (user_input or uploaded_file):
 
             elif user_input and user_input.strip():
                 # --- PLAIN TEXT → WEB SEARCH ---
+                import requests as _requests
+                from bs4 import BeautifulSoup as _BS
+                from urllib.parse import urlparse as _urlparse
+
                 update_sandy("fetch", 20, get_error_commentary("search_start"))
 
                 try:
-                    from sandwich.sources.web_search import WebSearchSource
+                    _headers = {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    }
 
-                    async def _do_search():
-                        ws = WebSearchSource()
-                        try:
-                            return await ws.fetch(user_input.strip())
-                        finally:
-                            await ws.close()
+                    # Step 1: Search DuckDuckGo HTML interface
+                    search_resp = _requests.post(
+                        "https://html.duckduckgo.com/html/",
+                        data={"q": user_input.strip()},
+                        headers=_headers,
+                        timeout=15,
+                    )
+                    search_resp.raise_for_status()
 
-                    search_result = asyncio.run(_do_search())
+                    soup = _BS(search_resp.text, "html.parser")
+                    # DuckDuckGo result links — try multiple selectors
+                    result_links = (
+                        soup.select("a.result__a")
+                        or soup.select("a.result-link")
+                        or soup.select(".result a[href^='http']")
+                    )
 
-                    if search_result.content and not search_result.metadata.get("error"):
-                        # Successfully found content via search
-                        update_sandy("fetch", 25, get_error_commentary("search_found"))
-                        content = search_result.content
-                        source_url = search_result.url
-                        source_domain = None
-                        if source_url:
-                            from urllib.parse import urlparse
-                            source_domain = urlparse(source_url).netloc
-                        source_metadata = SourceMetadata(
-                            url=source_url,
-                            domain=source_domain,
-                            content_type='html',
-                        )
-                    else:
-                        # Search failed or returned empty
+                    if not result_links:
+                        # Fallback: try finding any external links in results
+                        result_links = [
+                            a for a in soup.select("a[href^='http']")
+                            if 'duckduckgo' not in (a.get('href', ''))
+                        ]
+
+                    search_url = None
+                    search_title = None
+                    for link in result_links[:5]:
+                        href = link.get("href", "")
+                        if href and href.startswith("http") and "duckduckgo" not in href:
+                            search_url = href
+                            search_title = link.get_text(strip=True)
+                            break
+
+                    if not search_url:
                         msg = get_error_commentary("search_failed")
                         update_sandy("fetch", 20, msg)
                         st.warning(msg)
                         st.session_state.making_sandwich = False
                         st.stop()
+
+                    # Step 2: Fetch the search result page
+                    update_sandy("fetch", 25, get_error_commentary("search_found"))
+
+                    page_resp = _requests.get(
+                        search_url, headers=_headers, timeout=15
+                    )
+                    page_resp.raise_for_status()
+
+                    content = page_resp.text
+                    parsed = _urlparse(search_url)
+                    source_metadata = SourceMetadata(
+                        url=search_url,
+                        domain=parsed.netloc,
+                        content_type='html',
+                    )
 
                 except Exception as e:
                     msg = get_error_commentary("search_failed")
