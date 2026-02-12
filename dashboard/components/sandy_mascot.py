@@ -220,6 +220,93 @@ SANDY_COMMENTARY = {
         "Filing this masterpiece away for posterity.",
         "Done! Fresh out of the oven. Well, the algorithm.",
     ],
+    # --- Error commentary (used by get_error_commentary) ---
+    "error_too_short": [
+        "That's barely a crumb! I need more material to work with.",
+        "Not enough to spread on a single slice. Try something with more content!",
+        "I've seen longer fortune cookies. Need more substance for a proper sandwich!",
+    ],
+    "error_boilerplate": [
+        "It's all cookie banners and subscribe buttons. No real content left!",
+        "After peeling off the web junk, there was nothing underneath. Like an onion made entirely of skin.",
+        "The page was 99% ads and 1% content. Even I can't make a sandwich out of thin air!",
+    ],
+    "error_non_english": [
+        "Interesting language! But I only make sandwiches in English for now. Sorry!",
+        "My bread only rises in English, unfortunately. Try an English-language source!",
+        "That's not in English — my recipe book only covers one language right now!",
+    ],
+    "error_low_quality": [
+        "The quality of this content is... let's just say my standards are higher.",
+        "I tried, I really did. But this content doesn't have the right texture for a sandwich.",
+        "Not every ingredient makes the cut. This one didn't pass my quality inspection!",
+    ],
+    "error_no_candidates": [
+        "All filling, no structure. I looked everywhere but couldn't find any bread in there!",
+        "It's like a soup — lots of stuff, but nothing to hold it together as a sandwich.",
+        "I scoured the content but couldn't find any bounding concepts. No bread, no sandwich!",
+        "The content is interesting, but there aren't any sandwich-shaped structures hiding in it.",
+    ],
+    "error_none_viable": [
+        "I found some candidates, but none passed the taste test. Too bland!",
+        "Close, but no sandwich. The candidates didn't have enough structural integrity.",
+        "I had some ideas, but honestly? They'd fall apart. I have standards!",
+    ],
+    "error_rejected": [
+        "I assembled one, but it didn't pass quality control. I'm a perfectionist.",
+        "Almost had it! But my validator said 'nope.' Better luck with the next source!",
+        "The sandwich was technically a sandwich, but it wasn't a *good* sandwich. I let it go.",
+    ],
+    "error_url_connection": [
+        "Hmm, the door's locked on this one. Can't reach the server!",
+        "The internet gremlins are blocking me. The site might be down!",
+        "I knocked, but nobody answered. Try again in a moment?",
+    ],
+    "error_url_timeout": [
+        "Still waiting... still waiting... nope, the page took too long to respond!",
+        "That URL is slower than a snail on a sandwich. Timed out!",
+        "I don't have all day — well, I do, but the connection timed out anyway!",
+    ],
+    "error_url_http": [
+        "Got a {status_code} error from the server. Might be a broken link!",
+        "The website said '{status_code}.' That's web-speak for 'go away.'",
+        "This URL returned an error ({status_code}). Maybe double-check the address?",
+    ],
+    "error_url_ssl": [
+        "The security certificate on this site looks fishy. Can't connect safely!",
+        "SSL error — the secure connection couldn't be established.",
+        "This site's security papers aren't in order. Can't safely fetch it!",
+    ],
+    "search_start": [
+        "That doesn't look like a URL. Let me search for it!",
+        "No URL? No problem! Sandy's got DuckDuckGo on speed dial.",
+        "Let me look that up for you. One web search, coming right up!",
+    ],
+    "search_found": [
+        "Found something! Let me grab the content from this page...",
+        "Ooh, this search result looks promising. Fetching it now!",
+        "The search turned up gold! Let me read through it...",
+    ],
+    "search_failed": [
+        "My search came up empty. Try a different phrase or paste a direct URL!",
+        "DuckDuckGo couldn't find anything useful. Maybe try rephrasing?",
+        "No search results I could use. Try a URL instead!",
+    ],
+    "upload_pdf": [
+        "Ooh, a PDF! Let me read through this document...",
+        "PDF detected! Time to extract some sandwich material.",
+        "Reading your PDF now. I love a good document to chew on!",
+    ],
+    "upload_csv": [
+        "A CSV file! Let me turn this data into something delicious...",
+        "Spreadsheet time! Data can make surprisingly good sandwiches.",
+        "CSV detected. Let me digest these rows and columns...",
+    ],
+    "upload_empty": [
+        "This file seems empty. I can't make a sandwich from nothing!",
+        "The file didn't have any content I could work with. Try another?",
+        "Nothing to extract here. It's like opening a lunchbox and finding... air.",
+    ],
 }
 
 
@@ -236,3 +323,25 @@ def get_commentary(stage: str, index: int = 0) -> str:
     import random
     lines = SANDY_COMMENTARY.get(stage, SANDY_COMMENTARY["init"])
     return lines[index % len(lines)]
+
+
+def get_error_commentary(error_type: str, **kwargs) -> str:
+    """Get a random Sandy commentary line for an error scenario.
+
+    Args:
+        error_type: Key from SANDY_COMMENTARY (e.g., 'error_too_short').
+        **kwargs: Format variables (e.g., status_code=404).
+
+    Returns:
+        A formatted commentary string.
+    """
+    import random
+    lines = SANDY_COMMENTARY.get(
+        error_type,
+        SANDY_COMMENTARY.get("error_no_candidates", ["Something went wrong!"]),
+    )
+    line = random.choice(lines)
+    try:
+        return line.format(**kwargs)
+    except (KeyError, IndexError):
+        return line

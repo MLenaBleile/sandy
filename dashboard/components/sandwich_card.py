@@ -17,7 +17,7 @@ def sandwich_card(sandwich: Dict[str, Any], expanded: bool = False, enable_ratin
         enable_rating: If True, show rating widget
     """
     validity_score = sandwich.get('validity_score', 0.0)
-    structural_type = sandwich.get('structural_type', 'unknown')
+    structural_type = sandwich.get('structural_type') or 'unknown'
 
     validity_color = get_validity_color(validity_score)
     type_color = get_structural_type_color(structural_type)

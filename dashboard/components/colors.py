@@ -43,7 +43,7 @@ def get_structural_type_color(structural_type: str) -> str:
     Returns:
         Hex color code, defaults to accent color if type not found
     """
-    return COLORS.get(structural_type.lower(), COLORS['accent'])
+    return COLORS.get((structural_type or 'unknown').lower(), COLORS['accent'])
 
 
 def get_validity_color(validity_score: float) -> str:

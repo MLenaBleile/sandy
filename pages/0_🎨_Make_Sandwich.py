@@ -1,6 +1,6 @@
 """Interactive Sandwich Maker - Chat with Sandy!
 
-Let Sandy make sandwiches from your URLs or topics in real-time.
+Let Sandy make sandwiches from your URLs, topics, or uploaded files in real-time.
 """
 
 import streamlit as st
@@ -17,7 +17,9 @@ sys.path.insert(0, str(project_root / "src"))
 
 try:
     from components.sandwich_card import sandwich_card
-    from components.sandy_mascot import render_sandy, render_sandy_speaking, get_commentary
+    from components.sandy_mascot import (
+        render_sandy, render_sandy_speaking, get_commentary, get_error_commentary,
+    )
     from utils.db import get_db_connection
 except ImportError as e:
     st.error(f"Import error: {e}")
@@ -63,7 +65,7 @@ st.title("🎨 Make a Sandwich with Sandy!")
 
 st.markdown("""
 <p style='font-size: 1.2rem; color: #666; font-style: italic;'>
-    Give Sandy a URL or topic, and watch as a conceptual sandwich gets created in real-time! ✨
+    Give Sandy a URL, topic, or file — and watch as a conceptual sandwich gets created in real-time! ✨
 </p>
 """, unsafe_allow_html=True)
 
@@ -91,14 +93,28 @@ with col2:
 # Help text
 st.markdown("""
 <p style='font-size: 0.9rem; color: #888;'>
-    💡 <b>Tips:</b> Give Sandy a URL to analyze, or just a topic/concept and Sandy will think about it!
+    💡 <b>Tips:</b> Paste a URL, type a topic (Sandy will search for it!), or upload a file below.
 </p>
 """, unsafe_allow_html=True)
+
+# File upload section
+st.markdown("""
+<p style='font-size: 0.9rem; color: #aaa; text-align: center; margin: 4px 0;'>
+    — or upload a file —
+</p>
+""", unsafe_allow_html=True)
+
+uploaded_file = st.file_uploader(
+    "Upload a PDF or CSV file",
+    type=["pdf", "csv"],
+    label_visibility="collapsed",
+    help="Sandy can extract sandwich material from PDFs and CSV files!",
+)
 
 st.markdown("---")
 
 # Handle sandwich making
-if make_button and user_input:
+if make_button and (user_input or uploaded_file):
     st.session_state.making_sandwich = True
     st.session_state.sandwich_made = None
 
@@ -154,7 +170,9 @@ if make_button and user_input:
             # Initialize embeddings
             if openai_key:
                 from sandwich.llm.embeddings import OpenAIEmbeddingService
-                from sandwich.config import LLMConfig; config = LLMConfig(openai_api_key=openai_key); embeddings = OpenAIEmbeddingService(config=config)
+                from sandwich.config import LLMConfig
+                config = LLMConfig(openai_api_key=openai_key)
+                embeddings = OpenAIEmbeddingService(config=config)
             else:
                 st.warning("⚠️ No OPENAI_API_KEY found. Using Gemini embeddings (may not match existing corpus).")
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
@@ -177,33 +195,207 @@ if make_button and user_input:
             # Stage: Fetch content
             update_sandy("fetch", 20)
 
-            if user_input.startswith(('http://', 'https://')):
+            # ============================================================
+            # Input routing: file upload → URL → web search
+            # ============================================================
+            content = None
+            source_metadata = None
+
+            if uploaded_file is not None:
+                # --- FILE UPLOAD ---
+                file_ext = uploaded_file.name.rsplit(".", 1)[-1].lower() if "." in uploaded_file.name else ""
+
+                if file_ext == "pdf":
+                    update_sandy("fetch", 20, get_error_commentary("upload_pdf"))
+                    try:
+                        import pdfplumber
+
+                        pdf_text_parts = []
+                        with pdfplumber.open(uploaded_file) as pdf:
+                            for page in pdf.pages:
+                                page_text = page.extract_text()
+                                if page_text:
+                                    pdf_text_parts.append(page_text)
+
+                        content = "\n\n".join(pdf_text_parts)
+
+                        if not content.strip():
+                            msg = get_error_commentary("upload_empty")
+                            update_sandy("fetch", 20, msg)
+                            st.warning(msg)
+                            st.session_state.making_sandwich = False
+                            st.stop()
+
+                        # Truncate to 10K chars (matching WebSearchSource limit)
+                        content = content[:10000]
+
+                        source_metadata = SourceMetadata(
+                            url=None,
+                            domain=f"upload:{uploaded_file.name}",
+                            content_type='text',
+                        )
+                    except ImportError:
+                        st.error("PDF support requires pdfplumber. Install it with: pip install pdfplumber")
+                        st.session_state.making_sandwich = False
+                        st.stop()
+                    except Exception as e:
+                        msg = "I couldn't read that PDF. It might be corrupted or image-only."
+                        update_sandy("fetch", 20, msg)
+                        st.warning(msg)
+                        with st.expander("Technical details"):
+                            st.code(str(e))
+                        st.session_state.making_sandwich = False
+                        st.stop()
+
+                elif file_ext == "csv":
+                    update_sandy("fetch", 20, get_error_commentary("upload_csv"))
+                    try:
+                        import pandas as pd
+
+                        df = pd.read_csv(uploaded_file)
+
+                        if df.empty:
+                            msg = get_error_commentary("upload_empty")
+                            update_sandy("fetch", 20, msg)
+                            st.warning(msg)
+                            st.session_state.making_sandwich = False
+                            st.stop()
+
+                        # Convert CSV to a text representation
+                        lines = [f"CSV Data: {uploaded_file.name}"]
+                        lines.append(f"Columns: {', '.join(df.columns.tolist())}")
+                        lines.append(f"Total rows: {len(df)}")
+                        lines.append("")
+
+                        text_repr = df.to_string(index=False, max_rows=200)
+                        content = "\n".join(lines) + "\n" + text_repr
+
+                        # Truncate to 10K chars
+                        content = content[:10000]
+
+                        source_metadata = SourceMetadata(
+                            url=None,
+                            domain=f"upload:{uploaded_file.name}",
+                            content_type='text',
+                        )
+                    except Exception as e:
+                        msg = "I couldn't read that CSV file. Check if it's properly formatted?"
+                        update_sandy("fetch", 20, msg)
+                        st.warning(msg)
+                        with st.expander("Technical details"):
+                            st.code(str(e))
+                        st.session_state.making_sandwich = False
+                        st.stop()
+                else:
+                    st.warning(f"Unsupported file type: .{file_ext}. Try PDF or CSV!")
+                    st.session_state.making_sandwich = False
+                    st.stop()
+
+            elif user_input and user_input.strip().startswith(('http://', 'https://')):
+                # --- URL FETCH ---
                 import requests
+                from requests.exceptions import ConnectionError as ReqConnectionError
+                from requests.exceptions import Timeout, HTTPError, SSLError
                 from urllib.parse import urlparse
 
                 try:
                     headers = {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
                     }
-                    response = requests.get(user_input, timeout=15, headers=headers)
+                    response = requests.get(user_input.strip(), timeout=15, headers=headers)
                     response.raise_for_status()
                     content = response.text
-                    parsed = urlparse(user_input)
+                    parsed = urlparse(user_input.strip())
                     source_metadata = SourceMetadata(
-                        url=user_input,
+                        url=user_input.strip(),
                         domain=parsed.netloc,
-                        content_type='html'
+                        content_type='html',
                     )
-                except Exception as e:
-                    st.error(f"Failed to fetch URL: {e}")
+                except Timeout:
+                    msg = get_error_commentary("error_url_timeout")
+                    update_sandy("fetch", 20, msg)
+                    st.warning(msg)
+                    st.session_state.making_sandwich = False
                     st.stop()
+                except SSLError:
+                    msg = get_error_commentary("error_url_ssl")
+                    update_sandy("fetch", 20, msg)
+                    st.warning(msg)
+                    st.session_state.making_sandwich = False
+                    st.stop()
+                except HTTPError as e:
+                    status_code = e.response.status_code if e.response is not None else "unknown"
+                    msg = get_error_commentary("error_url_http", status_code=status_code)
+                    update_sandy("fetch", 20, msg)
+                    st.warning(msg)
+                    st.session_state.making_sandwich = False
+                    st.stop()
+                except ReqConnectionError:
+                    msg = get_error_commentary("error_url_connection")
+                    update_sandy("fetch", 20, msg)
+                    st.warning(msg)
+                    st.session_state.making_sandwich = False
+                    st.stop()
+                except Exception as e:
+                    msg = get_error_commentary("error_url_connection")
+                    update_sandy("fetch", 20, msg)
+                    st.warning(f"{msg}")
+                    with st.expander("Technical details"):
+                        st.code(str(e))
+                    st.session_state.making_sandwich = False
+                    st.stop()
+
+            elif user_input and user_input.strip():
+                # --- PLAIN TEXT → WEB SEARCH ---
+                update_sandy("fetch", 20, get_error_commentary("search_start"))
+
+                try:
+                    from sandwich.sources.web_search import WebSearchSource
+
+                    async def _do_search():
+                        ws = WebSearchSource()
+                        try:
+                            return await ws.fetch(user_input.strip())
+                        finally:
+                            await ws.close()
+
+                    search_result = asyncio.run(_do_search())
+
+                    if search_result.content and not search_result.metadata.get("error"):
+                        # Successfully found content via search
+                        update_sandy("fetch", 25, get_error_commentary("search_found"))
+                        content = search_result.content
+                        source_url = search_result.url
+                        source_domain = None
+                        if source_url:
+                            from urllib.parse import urlparse
+                            source_domain = urlparse(source_url).netloc
+                        source_metadata = SourceMetadata(
+                            url=source_url,
+                            domain=source_domain,
+                            content_type='html',
+                        )
+                    else:
+                        # Search failed or returned empty
+                        msg = get_error_commentary("search_failed")
+                        update_sandy("fetch", 20, msg)
+                        st.warning(msg)
+                        st.session_state.making_sandwich = False
+                        st.stop()
+
+                except Exception as e:
+                    msg = get_error_commentary("search_failed")
+                    update_sandy("fetch", 20, msg)
+                    st.warning(msg)
+                    with st.expander("Technical details"):
+                        st.code(str(e))
+                    st.session_state.making_sandwich = False
+                    st.stop()
+
             else:
-                content = user_input
-                source_metadata = SourceMetadata(
-                    url=None,
-                    domain=None,
-                    content_type='text'
-                )
+                st.warning("Please enter a URL, topic, or upload a file!")
+                st.session_state.making_sandwich = False
+                st.stop()
 
             update_sandy("fetch", 30, "Got the ingredients. Now let me find the bread...")
 
@@ -275,9 +467,37 @@ if make_button and user_input:
             outcome = pipeline_result["outcome"]
 
             if not stored_sandwich:
-                update_sandy("identify", 50, f"Hmm, couldn't make a sandwich: {outcome.detail}")
-                st.warning(f"😕 Sandy couldn't make a sandwich: {outcome.detail}")
-                st.info(f"Stage: {outcome.stage}, Outcome: {outcome.outcome}")
+                # Map pipeline stage+outcome to Sandy error commentary
+                _preprocess_map = {
+                    "too_short": "error_too_short",
+                    "boilerplate": "error_boilerplate",
+                    "non_english": "error_non_english",
+                    "low_quality": "error_low_quality",
+                }
+                _stage_map = {
+                    ("preprocessing", "skipped"): _preprocess_map,
+                    ("identification", "no_candidates"): "error_no_candidates",
+                    ("selection", "none_viable"): "error_none_viable",
+                    ("validation", "rejected"): "error_rejected",
+                }
+
+                stage_key = (outcome.stage, outcome.outcome)
+                error_type = _stage_map.get(stage_key, "error_no_candidates")
+
+                # For preprocessing, further refine by skip reason in detail
+                if isinstance(error_type, dict):
+                    error_type = error_type.get(outcome.detail, "error_low_quality")
+
+                msg = get_error_commentary(error_type)
+                update_sandy("identify", 50, msg)
+                st.warning(msg)
+
+                with st.expander("🔧 Technical details"):
+                    st.text(f"Stage: {outcome.stage}")
+                    st.text(f"Outcome: {outcome.outcome}")
+                    st.text(f"Detail: {outcome.detail}")
+
+                st.session_state.making_sandwich = False
                 st.stop()
 
             # Stage: Save
@@ -369,9 +589,12 @@ if make_button and user_input:
             progress_bar.empty()
 
         except Exception as e:
-            st.error(f"❌ Error creating sandwich: {e}")
-            import traceback
-            st.code(traceback.format_exc())
+            msg = "Yikes! Something unexpected went wrong in my kitchen."
+            update_sandy("identify", 0, msg)
+            st.warning(msg)
+            with st.expander("🔧 Technical details (for debugging)"):
+                import traceback
+                st.code(traceback.format_exc())
             st.session_state.making_sandwich = False
 
 # Display created sandwich

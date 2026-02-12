@@ -23,3 +23,4 @@ lxml>=4.9.0  # Required by readability
 pydantic>=2.0.0  # Data validation
 pydantic-settings>=2.0.0  # Settings management
 lingua-language-detector>=2.0.0  # Language detection for preprocessing
+pdfplumber>=0.10.0  # PDF text extraction for file uploads
