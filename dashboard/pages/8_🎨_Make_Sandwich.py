@@ -273,9 +273,12 @@ if make_button and user_input:
             repo.insert_sandwich(sandwich)
 
             # Store embeddings
-            repo.insert_sandwich_embeddings(
+            repo.update_sandwich_embeddings(
                 stored_sandwich.sandwich_id,
-                stored_sandwich.embeddings.full
+                bread_top_emb=stored_sandwich.embeddings.bread_top,
+                bread_bottom_emb=stored_sandwich.embeddings.bread_bottom,
+                filling_emb=stored_sandwich.embeddings.filling,
+                sandwich_emb=stored_sandwich.embeddings.full,
             )
 
             progress_bar.progress(100)
