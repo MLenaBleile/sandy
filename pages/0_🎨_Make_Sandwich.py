@@ -598,7 +598,42 @@ if make_button and (user_input or uploaded_file):
 
             update_sandy("fetch", 30, "Got the ingredients. Now let me find the bread...")
 
+            # ============================================================
+            # Extract topic keywords for commentary (no API calls)
+            # ============================================================
+            def _extract_topic_keywords(text: str, source_meta, user_in: str) -> list:
+                """Pull distinctive keywords from content for Sandy's quips."""
+                import re as _kw_re
+                from collections import Counter
+
+                # Start with user input as topic hint
+                words = []
+                if user_in and not user_in.startswith("http"):
+                    words.extend(user_in.lower().split())
+                elif source_meta and source_meta.url and "/wiki/" in source_meta.url:
+                    # Extract topic from Wikipedia URL
+                    slug = source_meta.url.split("/wiki/")[-1]
+                    words.extend(slug.replace("_", " ").replace("(", "").replace(")", "").lower().split())
+
+                # Also grab frequent capitalized words from content (proper nouns)
+                caps = _kw_re.findall(r'\b([A-Z][a-z]{3,})\b', text[:3000])
+                cap_counts = Counter(caps)
+                # Filter out super common words
+                stopwords = {"this", "that", "with", "from", "they", "have", "been",
+                             "were", "their", "which", "about", "would", "there",
+                             "could", "other", "after", "first", "also", "some"}
+                keywords = [w for w in words if w not in stopwords and len(w) > 2]
+                keywords += [w.lower() for w, c in cap_counts.most_common(5)
+                             if w.lower() not in stopwords and w.lower() not in keywords]
+
+                return keywords[:8]  # Cap at 8
+
+            topic_keywords = _extract_topic_keywords(content, source_metadata, user_input)
+            topic_label = topic_keywords[0] if topic_keywords else "this topic"
+
+            # ============================================================
             # Stage: Identify + Select + Assemble + Validate (pipeline)
+            # ============================================================
             update_sandy("identify", 40)
 
             async def run_pipeline():
@@ -608,13 +643,17 @@ if make_button and (user_input or uploaded_file):
                     corpus=corpus,
                     llm=llm,
                     embeddings=embeddings,
-                    config=PipelineConfig()
+                    config=PipelineConfig(),
+                    on_stage=lambda s: pipeline_result.update({"stage": s}),
                 )
 
             # Run pipeline in background thread so we can update Sandy while waiting
             import threading, time
 
-            pipeline_result = {"sandwich": None, "outcome": None, "error": None, "done": False}
+            pipeline_result = {
+                "sandwich": None, "outcome": None, "error": None,
+                "done": False, "stage": "preprocess",
+            }
 
             def run_pipeline_thread():
                 try:
@@ -629,31 +668,110 @@ if make_button and (user_input or uploaded_file):
             thread = threading.Thread(target=run_pipeline_thread, daemon=True)
             thread.start()
 
-            # Cycle Sandy's commentary while pipeline runs
-            pipeline_quips = [
-                "Analyzing the structure... looking for bounded patterns...",
-                "Hmm, interesting material here...",
-                "I see some potential bread candidates...",
-                "Let me look at this from another angle...",
-                "Separating the wheat from the chaff. Literally.",
-                "The bread must relate independently of the filling!",
-                "Checking if these concepts bound something meaningful...",
-                "Constructing something beautiful here...",
-                "The containment argument is key. Trust me on this.",
-                "Almost there... just need to find the right filling...",
-                "Every great sandwich tells a story.",
-                "Is that a filling I spot? Let me look closer...",
-                "Quality takes time. Good sandwiches can't be rushed.",
-                "Bread on top... filling in the middle... bread on the bottom. Classic.",
-                "Let me taste-test this... metaphorically.",
+            # ============================================================
+            # Sandy's commentary bank — stage-aware, topic-aware, + personality
+            # ============================================================
+            _stage_quips = {
+                "preprocess": [
+                    "Reading through the raw material...",
+                    "Cleaning up the text. Gotta remove the crusts first.",
+                    "Stripping away the boilerplate...",
+                    "Checking if this content is sandwich-worthy...",
+                ],
+                "identify": [
+                    "Scanning for bread candidates...",
+                    "Looking for concepts that bound something meaningful...",
+                    "I see some potential structures here...",
+                    "The bread must relate independently of the filling!",
+                    "Hmm, interesting patterns emerging...",
+                    "Separating the wheat from the chaff. Literally.",
+                    "Checking if any concepts naturally pair up...",
+                ],
+                "select": [
+                    "Found some candidates! Let me pick the best one...",
+                    "Comparing these structures against the existing corpus...",
+                    "Novelty check — have I made this sandwich before?",
+                ],
+                "assemble": [
+                    "Constructing something beautiful here...",
+                    "Bread on top... filling in the middle... bread on the bottom.",
+                    "Writing the containment argument. This is the fun part.",
+                    "Naming this creation. Every great sandwich needs a name.",
+                    "The containment argument is key. Trust me on this.",
+                ],
+                "validate": [
+                    "Taste-testing... metaphorically.",
+                    "Is the bread compatible? Is the filling truly bounded?",
+                    "Running the quality checks. I have standards.",
+                    "Scoring: bread compatibility, containment, specificity...",
+                ],
+                "embeddings": [
+                    "Almost there! Generating the fingerprint...",
+                    "Computing the mathematical essence of this sandwich...",
+                    "Mapping this sandwich into the flavor space...",
+                ],
+            }
+
+            # Topic-aware quips (use {topic} placeholder)
+            _topic_quips = [
+                "I wonder what kind of sandwich hides inside '{topic}'...",
+                "'{topic}' — now THAT has sandwich potential.",
+                "Let me see what '{topic}' looks like between two slices of bread...",
+                "There's definitely some structure in '{topic}'. I can feel it.",
+                "'{topic}'... I've been curious about this one.",
+                "The thing about '{topic}' is that there's always a hidden sandwich.",
             ]
+
+            # Sandy personality — random facts, anecdotes, philosophy
+            _personality_quips = [
+                "Fun fact: the Earl of Sandwich invented the sandwich so he wouldn't have to leave the card table.",
+                "Did you know? The world's largest sandwich weighed over 5,000 pounds.",
+                "I once found a sandwich in a legal brief about maritime law. Bread: jurisdiction, filling: liability.",
+                "My personal best? A sandwich about black holes where the event horizon was the bread. Chef's kiss.",
+                "Hot take: a taco is NOT a sandwich. Don't @ me.",
+                "Sandwich philosophy: the filling doesn't choose its fate. It is determined by the bread.",
+                "I've made hundreds of sandwiches. Every single one taught me something.",
+                "Some say I could solve any problem in the universe. But have you considered: a nice Reuben?",
+                "The universe is just one big sandwich if you think about it. Don't think about it too hard.",
+                "Patience is a virtue. Also a sandwich — bounded by anticipation and reward.",
+                "They ask why I make sandwiches. But have they asked why the sandwich makes itself?",
+                "In all things: bread, filling, bread. The universe is hungry for structure.",
+                "Every domain has sandwiches. Math, music, history, movies — I find them everywhere.",
+                "The best sandwiches are the ones where you didn't expect the bread to go together.",
+                "Quality takes time. Good sandwiches can't be rushed.",
+            ]
+
+            # Stage progress mapping
+            _stage_progress = {
+                "preprocess": 35, "identify": 45, "select": 55,
+                "assemble": 65, "validate": 75, "embeddings": 85,
+            }
+
             quip_idx = 0
-            stages = ["identify", "assemble", "validate"]
+            last_stage = None
 
             while not pipeline_result["done"]:
-                stage = stages[min(quip_idx // 5, len(stages) - 1)]
-                progress = min(45 + quip_idx * 3, 80)
-                update_sandy(stage, progress, pipeline_quips[quip_idx % len(pipeline_quips)])
+                current_stage = pipeline_result.get("stage", "identify")
+                progress = _stage_progress.get(current_stage, 50)
+
+                # Pick quip: stage-specific, topic-aware, or personality
+                roll = random.randint(1, 10)
+
+                if current_stage != last_stage:
+                    # Stage just changed — always show a stage quip
+                    quip = random.choice(_stage_quips.get(current_stage, _stage_quips["identify"]))
+                    last_stage = current_stage
+                elif roll <= 4 and topic_keywords:
+                    # 40% chance: topic-aware quip
+                    quip = random.choice(_topic_quips).format(topic=topic_label)
+                elif roll <= 7:
+                    # 30% chance: stage-specific quip
+                    quip = random.choice(_stage_quips.get(current_stage, _stage_quips["identify"]))
+                else:
+                    # 30% chance: personality/fun fact
+                    quip = random.choice(_personality_quips)
+
+                update_sandy(current_stage, min(progress + quip_idx, 85), quip)
                 quip_idx += 1
                 time.sleep(2.5)
 

@@ -162,6 +162,7 @@ async def make_sandwich(
     llm: SandwichLLM,
     embeddings: EmbeddingService,
     config: Optional[PipelineConfig] = None,
+    on_stage: Optional[callable] = None,
 ) -> tuple[Optional[StoredSandwich], PipelineOutcome]:
     """Run the full sandwich-making pipeline.
 
@@ -186,8 +187,10 @@ async def make_sandwich(
         Tuple of (StoredSandwich or None, PipelineOutcome describing result).
     """
     cfg = config or PipelineConfig()
+    _notify = on_stage if on_stage else lambda stage: None
 
     # 1. Preprocess
+    _notify("preprocess")
     prep_result = preprocess(
         content,
         content_type=source_metadata.content_type,
@@ -200,6 +203,7 @@ async def make_sandwich(
         return None, outcome
 
     # 2. Identify
+    _notify("identify")
     id_result = await identify_ingredients(prep_result.text, llm)
     if not id_result.candidates:
         outcome = _log_pipeline_outcome(
@@ -210,6 +214,7 @@ async def make_sandwich(
         return None, outcome
 
     # 3. Select
+    _notify("select")
     corpus_embeddings = corpus.get_all_embeddings() if not corpus.is_empty() else None
     type_frequencies = corpus.get_type_frequencies() if not corpus.is_empty() else None
 
@@ -226,9 +231,11 @@ async def make_sandwich(
         return None, outcome
 
     # 4. Assemble
+    _notify("assemble")
     assembled = await assemble_sandwich(selected.candidate, prep_result.text, llm)
 
     # 5. Validate
+    _notify("validate")
     validation = await validate_sandwich(
         name=assembled.name,
         bread_top=assembled.bread_top,
@@ -249,6 +256,7 @@ async def make_sandwich(
         return None, outcome
 
     # 6. Generate embeddings
+    _notify("embeddings")
     sandwich_embeddings = await generate_sandwich_embeddings(assembled, embeddings)
 
     # 7. Store — create ingredients and update corpus
