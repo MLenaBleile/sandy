@@ -66,6 +66,7 @@ SANDY_SVG_ANIMATED = """
   .sandy-container {{
     animation: sandy-bob 3s ease-in-out infinite;
     display: inline-block;
+    flex-shrink: 0;
   }}
   .sandy-eyes {{
     animation: sandy-blink 4s ease-in-out infinite;
@@ -114,6 +115,7 @@ SANDY_SVG_ANIMATED = """
     gap: 16px;
     justify-content: center;
     padding: 1rem 0;
+    min-height: 160px;
   }}
 </style>
 <div class="sandy-thinking">
