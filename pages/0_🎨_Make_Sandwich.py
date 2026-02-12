@@ -19,6 +19,7 @@ try:
     from components.sandwich_card import sandwich_card
     from components.sandy_mascot import (
         render_sandy, render_sandy_speaking, get_commentary, get_error_commentary,
+        render_sandy_animated, render_speech_bubble,
     )
     from utils.db import get_db_connection
 except ImportError as e:
@@ -215,16 +216,20 @@ if make_button and (user_input or uploaded_file):
     progress_container = st.container()
 
     with progress_container:
-        # Sandy mascot + speech bubble area
-        sandy_bubble = st.empty()
+        # Sandy mascot (rendered once, never re-rendered)
+        sandy_col, bubble_col = st.columns([1, 3])
+        with sandy_col:
+            render_sandy_animated(size=100)
+        # Speech bubble (separate container, updates independently)
+        with bubble_col:
+            bubble_slot = st.empty()
         progress_bar = st.progress(0)
 
         def update_sandy(stage: str, progress: int, custom_msg: str = None):
             """Update Sandy's speech bubble and progress bar."""
             msg = custom_msg or get_commentary(stage, random.randint(0, 10))
-            sandy_bubble.markdown("", unsafe_allow_html=True)  # clear
-            with sandy_bubble.container():
-                render_sandy_speaking(msg, size=100)
+            with bubble_slot.container():
+                render_speech_bubble(msg)
             progress_bar.progress(progress)
 
         try:

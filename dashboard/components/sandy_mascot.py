@@ -178,6 +178,105 @@ def render_sandy_speaking(message: str, size: int = 100) -> None:
     )
 
 
+# Sandy SVG only (animated, no speech bubble) — for use with separate bubble container
+SANDY_SVG_ANIMATED_ONLY = """
+<style>
+  @keyframes sandy-bob {{
+    0%, 100% {{ transform: translateY(0px); }}
+    50% {{ transform: translateY(-6px); }}
+  }}
+  @keyframes sandy-blink {{
+    0%, 90%, 100% {{ transform: scaleY(1); }}
+    95% {{ transform: scaleY(0.1); }}
+  }}
+  @keyframes sprout-sway {{
+    0%, 100% {{ transform: rotate(0deg); }}
+    25% {{ transform: rotate(3deg); }}
+    75% {{ transform: rotate(-3deg); }}
+  }}
+  .sandy-container {{
+    animation: sandy-bob 3s ease-in-out infinite;
+    display: inline-block;
+  }}
+  .sandy-eyes {{
+    animation: sandy-blink 4s ease-in-out infinite;
+    transform-origin: center;
+  }}
+  .sandy-sprout {{
+    animation: sprout-sway 2.5s ease-in-out infinite;
+    transform-origin: bottom center;
+  }}
+</style>
+<div class="sandy-container">
+  <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" width="{size}">
+    <polygon points="20,140 90,105 90,205 20,240" fill="#9a9bc7" stroke="#8384b3" stroke-width="1.5"/>
+    <polygon points="90,105 175,130 175,230 90,205" fill="#b8b9dd" stroke="#8384b3" stroke-width="1.5"/>
+    <polygon points="20,240 90,205 175,230 105,265" fill="#8384b3" stroke="#7374a3" stroke-width="1"/>
+    <polygon points="20,140 90,105 175,130 105,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
+    <g class="sandy-sprout" transform="translate(100, 120)">
+      <line x1="0" y1="0" x2="0" y2="-52" stroke="#4a6e3a" stroke-width="3" stroke-linecap="round"/>
+      <path d="M0 -52 Q-4 -72 -10 -82 Q-16 -94 -8 -102 Q-2 -92 0 -78" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1.2"/>
+      <path d="M0 -52 Q4 -74 12 -84 Q20 -96 16 -106 Q8 -98 6 -80" fill="#7da668" stroke="#4a6e3a" stroke-width="1.2"/>
+      <path d="M0 -52 Q-6 -66 -14 -72 Q-20 -76 -16 -84" fill="none" stroke="#c47a7a" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    </g>
+    <g class="sandy-eyes">
+      <ellipse cx="118" cy="160" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+      <ellipse cx="118" cy="160" rx="9" ry="10" fill="#6b7058"/>
+      <circle cx="115" cy="157" r="3" fill="#8a8f75" opacity="0.6"/>
+      <circle cx="118" cy="160" r="4" fill="#2a2e1a"/>
+      <ellipse cx="148" cy="168" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+      <ellipse cx="148" cy="168" rx="9" ry="10" fill="#6b7058"/>
+      <circle cx="145" cy="165" r="3" fill="#8a8f75" opacity="0.6"/>
+      <circle cx="148" cy="168" r="4" fill="#2a2e1a"/>
+    </g>
+  </svg>
+</div>
+"""
+
+# Speech bubble only — for updating independently from Sandy
+SPEECH_BUBBLE_HTML = """
+<style>
+  .speech-bubble-standalone {{
+    background: linear-gradient(135deg, #fffbf0 0%, #fff5f8 100%);
+    border: 2px solid #ffb6c1;
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    color: #555;
+    font-style: italic;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(255, 107, 157, 0.15);
+    max-width: 400px;
+    margin-left: 1rem;
+  }}
+</style>
+<div class="speech-bubble-standalone">{message}</div>
+"""
+
+
+def render_sandy_animated(size: int = 100) -> None:
+    """Render just the animated Sandy SVG (no speech bubble).
+
+    Use with render_speech_bubble() in separate st.empty() containers
+    so Sandy stays in place while the bubble updates.
+    """
+    st.markdown(
+        SANDY_SVG_ANIMATED_ONLY.format(size=size),
+        unsafe_allow_html=True,
+    )
+
+
+def render_speech_bubble(message: str) -> None:
+    """Render just the speech bubble (no Sandy).
+
+    Use with render_sandy_animated() in separate st.empty() containers.
+    """
+    st.markdown(
+        SPEECH_BUBBLE_HTML.format(message=message),
+        unsafe_allow_html=True,
+    )
+
+
 # Sandy's commentary lines for each pipeline stage
 SANDY_COMMENTARY = {
     "init": [
