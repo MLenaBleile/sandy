@@ -94,7 +94,8 @@ with col2:
 st.markdown("""
 <p style='font-size: 0.9rem; color: #888;'>
     💡 <b>Tips:</b> Paste a URL, type a topic (Sandy will search for it!), or upload a file below.<br>
-    🌐 <b>Pro tip:</b> Wikipedia links work best! Try pasting a Wikipedia article about your favorite movie, band, or historical event.
+    🌐 <b>Pro tip:</b> Wikipedia links work best! Try pasting a Wikipedia article about your favorite movie, band, or historical event.<br>
+    🔀 <b>Multi-topic:</b> Try "butterflies and pancakes" or "jazz, origami, volcanoes" — Sandy will search each one!
 </p>
 """, unsafe_allow_html=True)
 
@@ -113,6 +114,97 @@ uploaded_file = st.file_uploader(
 )
 
 st.markdown("---")
+
+
+# ============================================================
+# Multi-topic helpers
+# ============================================================
+import re as _re
+
+
+def _split_multi_topic(text: str) -> list:
+    """Detect and split multi-topic input into individual topic strings.
+
+    Splits on: ' and ', ' & ', ' + ', ' vs ', ' vs. ', commas.
+    Returns a list of 1+ stripped, non-empty topic strings.
+    Caps at 3 topics to avoid excessive searching.
+    """
+    text = text.strip()
+
+    separators = [
+        r'\s+and\s+',    # " and " (whitespace-bounded to avoid "sandbox")
+        r'\s*&\s*',      # " & "
+        r'\s*\+\s*',     # " + "
+        r'\s+vs\.?\s+',  # " vs " or " vs. "
+        r'\s*,\s*',      # ", "
+    ]
+
+    for sep in separators:
+        parts = _re.split(sep, text, flags=_re.IGNORECASE)
+        parts = [p.strip() for p in parts if p.strip()]
+        if len(parts) >= 2:
+            return parts[:3]  # Cap at 3 topics
+
+    return [text]
+
+
+def _search_and_fetch_topic(topic: str, headers: dict, max_chars: int = 5000):
+    """Search DuckDuckGo for a single topic and extract plain text from the top result.
+
+    Returns:
+        Tuple of (extracted_plain_text or None, result_url or None).
+    """
+    import requests as _req
+    from bs4 import BeautifulSoup as _BS
+
+    try:
+        # Step 1: DuckDuckGo search
+        search_resp = _req.post(
+            "https://html.duckduckgo.com/html/",
+            data={"q": topic},
+            headers=headers,
+            timeout=15,
+        )
+        search_resp.raise_for_status()
+
+        soup = _BS(search_resp.text, "html.parser")
+        result_links = (
+            soup.select("a.result__a")
+            or soup.select("a.result-link")
+            or soup.select(".result a[href^='http']")
+        )
+
+        if not result_links:
+            result_links = [
+                a for a in soup.select("a[href^='http']")
+                if 'duckduckgo' not in (a.get('href', ''))
+            ]
+
+        search_url = None
+        for link in result_links[:5]:
+            href = link.get("href", "")
+            if href and href.startswith("http") and "duckduckgo" not in href:
+                search_url = href
+                break
+
+        if not search_url:
+            return None, None
+
+        # Step 2: Fetch the page
+        page_resp = _req.get(search_url, headers=headers, timeout=15)
+        page_resp.raise_for_status()
+
+        # Step 3: Extract plain text (strip non-content tags first)
+        page_soup = _BS(page_resp.text, "html.parser")
+        for tag in page_soup(["script", "style", "nav", "header", "footer", "aside"]):
+            tag.decompose()
+        text = page_soup.get_text(separator="\n", strip=True)
+
+        return text[:max_chars], search_url
+
+    except Exception:
+        return None, None
+
 
 # Handle sandwich making
 if make_button and (user_input or uploaded_file):
@@ -351,82 +443,153 @@ if make_button and (user_input or uploaded_file):
                     st.stop()
 
             elif user_input and user_input.strip():
-                # --- PLAIN TEXT → WEB SEARCH ---
+                # --- PLAIN TEXT → WEB SEARCH (single or multi-topic) ---
                 import requests as _requests
                 from bs4 import BeautifulSoup as _BS
                 from urllib.parse import urlparse as _urlparse
 
-                update_sandy("fetch", 20, get_error_commentary("search_start"))
+                _headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
 
-                try:
-                    _headers = {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                    }
+                topics = _split_multi_topic(user_input.strip())
 
-                    # Step 1: Search DuckDuckGo HTML interface
-                    search_resp = _requests.post(
-                        "https://html.duckduckgo.com/html/",
-                        data={"q": user_input.strip()},
-                        headers=_headers,
-                        timeout=15,
-                    )
-                    search_resp.raise_for_status()
+                if len(topics) == 1:
+                    # ---- SINGLE TOPIC (existing behaviour) ----
+                    update_sandy("fetch", 20, get_error_commentary("search_start"))
 
-                    soup = _BS(search_resp.text, "html.parser")
-                    # DuckDuckGo result links — try multiple selectors
-                    result_links = (
-                        soup.select("a.result__a")
-                        or soup.select("a.result-link")
-                        or soup.select(".result a[href^='http']")
-                    )
+                    try:
+                        # Step 1: Search DuckDuckGo HTML interface
+                        search_resp = _requests.post(
+                            "https://html.duckduckgo.com/html/",
+                            data={"q": user_input.strip()},
+                            headers=_headers,
+                            timeout=15,
+                        )
+                        search_resp.raise_for_status()
 
-                    if not result_links:
-                        # Fallback: try finding any external links in results
-                        result_links = [
-                            a for a in soup.select("a[href^='http']")
-                            if 'duckduckgo' not in (a.get('href', ''))
-                        ]
+                        soup = _BS(search_resp.text, "html.parser")
+                        result_links = (
+                            soup.select("a.result__a")
+                            or soup.select("a.result-link")
+                            or soup.select(".result a[href^='http']")
+                        )
 
-                    search_url = None
-                    search_title = None
-                    for link in result_links[:5]:
-                        href = link.get("href", "")
-                        if href and href.startswith("http") and "duckduckgo" not in href:
-                            search_url = href
-                            search_title = link.get_text(strip=True)
-                            break
+                        if not result_links:
+                            result_links = [
+                                a for a in soup.select("a[href^='http']")
+                                if 'duckduckgo' not in (a.get('href', ''))
+                            ]
 
-                    if not search_url:
+                        search_url = None
+                        search_title = None
+                        for link in result_links[:5]:
+                            href = link.get("href", "")
+                            if href and href.startswith("http") and "duckduckgo" not in href:
+                                search_url = href
+                                search_title = link.get_text(strip=True)
+                                break
+
+                        if not search_url:
+                            msg = get_error_commentary("search_failed")
+                            update_sandy("fetch", 20, msg)
+                            st.warning(msg)
+                            st.session_state.making_sandwich = False
+                            st.stop()
+
+                        # Step 2: Fetch the search result page
+                        update_sandy("fetch", 25, get_error_commentary("search_found"))
+
+                        page_resp = _requests.get(
+                            search_url, headers=_headers, timeout=15
+                        )
+                        page_resp.raise_for_status()
+
+                        content = page_resp.text
+                        parsed = _urlparse(search_url)
+                        source_metadata = SourceMetadata(
+                            url=search_url,
+                            domain=parsed.netloc,
+                            content_type='html',
+                        )
+
+                    except Exception as e:
                         msg = get_error_commentary("search_failed")
                         update_sandy("fetch", 20, msg)
                         st.warning(msg)
+                        with st.expander("Technical details"):
+                            st.code(str(e))
                         st.session_state.making_sandwich = False
                         st.stop()
 
-                    # Step 2: Fetch the search result page
-                    update_sandy("fetch", 25, get_error_commentary("search_found"))
+                else:
+                    # ---- MULTI-TOPIC FLOW ----
+                    update_sandy("fetch", 20, get_error_commentary("search_multi_start"))
 
-                    page_resp = _requests.get(
-                        search_url, headers=_headers, timeout=15
-                    )
-                    page_resp.raise_for_status()
+                    try:
+                        char_budget = 10000 // len(topics)
 
-                    content = page_resp.text
-                    parsed = _urlparse(search_url)
-                    source_metadata = SourceMetadata(
-                        url=search_url,
-                        domain=parsed.netloc,
-                        content_type='html',
-                    )
+                        fetched_parts = []   # list of (topic, text, url)
+                        failed_topics = []
 
-                except Exception as e:
-                    msg = get_error_commentary("search_failed")
-                    update_sandy("fetch", 20, msg)
-                    st.warning(msg)
-                    with st.expander("Technical details"):
-                        st.code(str(e))
-                    st.session_state.making_sandwich = False
-                    st.stop()
+                        for i, topic in enumerate(topics):
+                            progress_pct = 20 + int((i / len(topics)) * 10)
+                            update_sandy("fetch", progress_pct,
+                                         f"Searching for '{topic}'... ({i+1}/{len(topics)})")
+
+                            text, url = _search_and_fetch_topic(
+                                topic, _headers, max_chars=char_budget
+                            )
+
+                            if text and len(text.strip()) > 50:
+                                fetched_parts.append((topic, text, url))
+                            else:
+                                failed_topics.append(topic)
+
+                        # Handle results
+                        if not fetched_parts:
+                            msg = get_error_commentary("search_failed")
+                            update_sandy("fetch", 20, msg)
+                            st.warning(msg)
+                            st.session_state.making_sandwich = False
+                            st.stop()
+
+                        if failed_topics and fetched_parts:
+                            update_sandy("fetch", 28,
+                                         get_error_commentary("search_multi_partial"))
+                        elif len(fetched_parts) == len(topics):
+                            update_sandy("fetch", 28,
+                                         get_error_commentary("search_multi_found"))
+
+                        # Combine content with section headers
+                        combined_parts = []
+                        urls_used = []
+                        for topic, text, url in fetched_parts:
+                            combined_parts.append(
+                                f"=== Topic: {topic} ===\n\n{text}"
+                            )
+                            if url:
+                                urls_used.append(url)
+
+                        content = "\n\n".join(combined_parts)
+                        content = content[:10000]  # Hard cap
+
+                        # Build synthetic SourceMetadata
+                        topic_names = [t for t, _, _ in fetched_parts]
+                        source_metadata = SourceMetadata(
+                            url=urls_used[0] if len(urls_used) == 1 else None,
+                            domain=f"multi:{'+'.join(topic_names)}",
+                            content_type='text',
+                        )
+
+                    except Exception as e:
+                        msg = get_error_commentary("search_failed")
+                        update_sandy("fetch", 20, msg)
+                        st.warning(msg)
+                        with st.expander("Technical details"):
+                            st.code(str(e))
+                        st.session_state.making_sandwich = False
+                        st.stop()
 
             else:
                 st.warning("Please enter a URL, topic, or upload a file!")

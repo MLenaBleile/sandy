@@ -292,6 +292,21 @@ SANDY_COMMENTARY = {
         "DuckDuckGo couldn't find anything useful. Maybe try rephrasing?",
         "No search results I could use. Try a URL instead!",
     ],
+    "search_multi_start": [
+        "Ooh, multiple topics! Let me search for each one separately.",
+        "I see more than one topic here! Time for a multi-search.",
+        "Two topics, one sandwich? Challenge accepted! Searching both...",
+    ],
+    "search_multi_found": [
+        "Found content for both topics! Combining the ingredients...",
+        "Got results for each topic. Let me mix these together...",
+        "Both searches came back! Time to blend these worlds...",
+    ],
+    "search_multi_partial": [
+        "I could only find content for one of the topics. Working with what I've got!",
+        "One topic came up empty, but the other worked! Let me use that.",
+        "Partial success — one search hit, one miss. Making do!",
+    ],
     "upload_pdf": [
         "Ooh, a PDF! Let me read through this document...",
         "PDF detected! Time to extract some sandwich material.",
