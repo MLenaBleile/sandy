@@ -87,13 +87,13 @@ SANDY_SVG_ANIMATED = """
     box-shadow: 0 3px 10px rgba(255, 107, 157, 0.15);
     max-width: 400px;
     min-height: 40px;
+    margin-top: 20px;
   }}
   .speech-bubble::after {{
     content: '';
     position: absolute;
     left: -12px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 24px;
     border-width: 10px 12px 10px 0;
     border-style: solid;
     border-color: transparent #ffb6c1 transparent transparent;
@@ -102,8 +102,7 @@ SANDY_SVG_ANIMATED = """
     content: '';
     position: absolute;
     left: -9px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 26px;
     border-width: 8px 10px 8px 0;
     border-style: solid;
     border-color: transparent #fffbf0 transparent transparent;
@@ -111,7 +110,7 @@ SANDY_SVG_ANIMATED = """
   }}
   .sandy-thinking {{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
     justify-content: center;
     padding: 1rem 0;
