@@ -53,7 +53,7 @@ Also: it's fun.
 
 ---
 
-## Meet Reuben
+## Meet Sandy
 
 Sandy is inspired by the character from Lilo & Stitch—Experiment 625, who possesses all of Stitch's powers but prefers to make sandwiches.
 
