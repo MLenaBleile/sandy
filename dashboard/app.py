@@ -130,11 +130,28 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.caption("🌺 Inspired by Experiment 625")
 
-    # Main content with cute header
+    # Hero CTA - Sandy mascot front and center
+    try:
+        from components.sandy_mascot import render_sandy_speaking
+        st.markdown("")
+        render_sandy_speaking(
+            "Welcome to Sandy's Kitchen! Give me a topic or URL and I'll make "
+            "you a <b>knowledge sandwich</b>! Head to the <b>🎨 Make Sandwich</b> "
+            "page in the sidebar.",
+            size=100,
+        )
+        st.markdown("")
+    except ImportError:
+        # Fallback if mascot component unavailable
+        st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("""
-    <div style='text-align: center; padding: 2rem 0;'>
-        <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
-        <p style='font-size: 1.2rem; color: #666; font-style: italic; margin-top: 0.5rem;'>
+    <div style='text-align: center; padding: 0.5rem 0 1rem;'>
+        <p style='font-size: 1.1rem; color: #666; font-style: italic;'>
             "The internet is vast. Somewhere in it: bread."
         </p>
     </div>
@@ -142,7 +159,23 @@ def main():
 
     st.markdown("---")
 
-    # Quick stats with cute styling
+    # Fun introduction
+    st.markdown("""
+    ### 👋 What is this place?
+
+    Sandy is an AI agent, inspired by Experiment 625 from *Lilo & Stitch*, who **only makes sandwiches**.
+    Not just any sandwiches — **knowledge sandwiches**!
+
+    Each sandwich has:
+    - 🍞 **Two pieces of bread** (related concepts that bound something)
+    - 🥓 **A filling** (the thing being bounded)
+    - ⭐ **A quality score** (how good the sandwich is)
+    """)
+
+    st.markdown("---")
+
+    # Quick stats
+    st.markdown("### 📊 Kitchen Stats")
     try:
         col1, col2, col3, col4 = st.columns(4)
 
@@ -164,33 +197,6 @@ def main():
     except Exception as e:
         st.error(f"Couldn't load metrics: {e}")
         st.info("🔧 Make sure the database is initialized!")
-
-    st.markdown("---")
-
-    # Hero CTA - Sandy mascot inviting user to make a sandwich
-    try:
-        from components.sandy_mascot import render_sandy_speaking
-        render_sandy_speaking(
-            "Give me a topic or URL and I'll make you a knowledge sandwich! "
-            "Head to the <b>🎨 Make Sandwich</b> page in the sidebar.",
-            size=90,
-        )
-        st.markdown("")
-    except ImportError:
-        pass
-
-    # Fun introduction
-    st.markdown("""
-    ### 👋 What is this place?
-
-    Sandy is an AI agent, inspired by Experiment 625 from *Lilo & Stitch*, who **only makes sandwiches**.
-    Not just any sandwiches — **knowledge sandwiches**!
-
-    Each sandwich has:
-    - 🍞 **Two pieces of bread** (related concepts that bound something)
-    - 🥓 **A filling** (the thing being bounded)
-    - ⭐ **A quality score** (how good the sandwich is)
-    """)
 
     # Example sandwiches
     st.markdown("### 🌟 Example Sandwiches")

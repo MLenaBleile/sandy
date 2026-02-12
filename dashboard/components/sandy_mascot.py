@@ -9,34 +9,38 @@ import streamlit as st
 
 # Sandy SVG - lavender cube with eyes and sprout
 SANDY_SVG = """
-<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="max-width:{size}px;">
-  <!-- Sprout -->
-  <g transform="translate(85, 10)">
-    <path d="M15 60 Q12 40 8 30 Q2 20 10 12 Q15 18 15 30" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
-    <path d="M15 60 Q18 38 25 28 Q32 18 28 8 Q20 14 18 28" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
-    <path d="M15 60 Q10 45 3 40 Q-2 35 2 28" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
+<svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" style="max-width:{size}px;">
+  <!-- Sprout (stem connects to cube top) -->
+  <g transform="translate(85, 30)">
+    <line x1="15" y1="90" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M15 55 Q12 38 8 28 Q2 18 10 10 Q15 16 15 28" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
+    <path d="M15 55 Q18 36 25 26 Q32 16 28 6 Q20 12 18 26" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
+    <path d="M15 55 Q10 42 3 37 Q-2 32 2 25" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
   </g>
 
   <!-- Cube - left face (darker) -->
-  <polygon points="20,120 90,85 90,185 20,220" fill="#9a9bc7" stroke="#8384b3" stroke-width="1"/>
+  <polygon points="20,140 90,105 90,205 20,240" fill="#9a9bc7" stroke="#8384b3" stroke-width="1.5"/>
 
   <!-- Cube - right face (lighter) -->
-  <polygon points="90,85 175,110 175,210 90,185" fill="#b8b9dd" stroke="#8384b3" stroke-width="1"/>
+  <polygon points="90,105 175,130 175,230 90,205" fill="#b8b9dd" stroke="#8384b3" stroke-width="1.5"/>
+
+  <!-- Cube - bottom face (darkest, visible edge) -->
+  <polygon points="20,240 90,205 175,230 105,265" fill="#8384b3" stroke="#8384b3" stroke-width="1"/>
 
   <!-- Cube - top face -->
-  <polygon points="20,120 90,85 175,110 105,145" fill="#c8c9e8" stroke="#8384b3" stroke-width="1"/>
+  <polygon points="20,140 90,105 175,130 105,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
 
   <!-- Left eye -->
-  <ellipse cx="118" cy="140" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-  <ellipse cx="118" cy="140" rx="9" ry="10" fill="#6b7058"/>
-  <circle cx="115" cy="137" r="3" fill="#8a8f75" opacity="0.6"/>
-  <circle cx="118" cy="140" r="4" fill="#2a2e1a"/>
+  <ellipse cx="118" cy="160" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+  <ellipse cx="118" cy="160" rx="9" ry="10" fill="#6b7058"/>
+  <circle cx="115" cy="157" r="3" fill="#8a8f75" opacity="0.6"/>
+  <circle cx="118" cy="160" r="4" fill="#2a2e1a"/>
 
   <!-- Right eye -->
-  <ellipse cx="148" cy="148" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-  <ellipse cx="148" cy="148" rx="9" ry="10" fill="#6b7058"/>
-  <circle cx="145" cy="145" r="3" fill="#8a8f75" opacity="0.6"/>
-  <circle cx="148" cy="148" r="4" fill="#2a2e1a"/>
+  <ellipse cx="148" cy="168" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+  <ellipse cx="148" cy="168" rx="9" ry="10" fill="#6b7058"/>
+  <circle cx="145" cy="165" r="3" fill="#8a8f75" opacity="0.6"/>
+  <circle cx="148" cy="168" r="4" fill="#2a2e1a"/>
 </svg>
 """
 
@@ -113,29 +117,32 @@ SANDY_SVG_ANIMATED = """
     <div class="speech-bubble">{message}</div>
   </div>
   <div class="sandy-container">
-    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" width="{size}">
-      <!-- Sprout -->
-      <g class="sandy-sprout" transform="translate(85, 10)">
-        <path d="M15 60 Q12 40 8 30 Q2 20 10 12 Q15 18 15 30" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
-        <path d="M15 60 Q18 38 25 28 Q32 18 28 8 Q20 14 18 28" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
-        <path d="M15 60 Q10 45 3 40 Q-2 35 2 28" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
+    <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="{size}">
+      <!-- Sprout (stem connects to cube top) -->
+      <g class="sandy-sprout" transform="translate(85, 30)">
+        <line x1="15" y1="90" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M15 55 Q12 38 8 28 Q2 18 10 10 Q15 16 15 28" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
+        <path d="M15 55 Q18 36 25 26 Q32 16 28 6 Q20 12 18 26" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
+        <path d="M15 55 Q10 42 3 37 Q-2 32 2 25" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
       </g>
       <!-- Cube left face -->
-      <polygon points="20,120 90,85 90,185 20,220" fill="#9a9bc7" stroke="#8384b3" stroke-width="1"/>
+      <polygon points="20,140 90,105 90,205 20,240" fill="#9a9bc7" stroke="#8384b3" stroke-width="1.5"/>
       <!-- Cube right face -->
-      <polygon points="90,85 175,110 175,210 90,185" fill="#b8b9dd" stroke="#8384b3" stroke-width="1"/>
+      <polygon points="90,105 175,130 175,230 90,205" fill="#b8b9dd" stroke="#8384b3" stroke-width="1.5"/>
+      <!-- Cube bottom face -->
+      <polygon points="20,240 90,205 175,230 105,265" fill="#8384b3" stroke="#8384b3" stroke-width="1"/>
       <!-- Cube top face -->
-      <polygon points="20,120 90,85 175,110 105,145" fill="#c8c9e8" stroke="#8384b3" stroke-width="1"/>
+      <polygon points="20,140 90,105 175,130 105,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
       <!-- Eyes -->
       <g class="sandy-eyes">
-        <ellipse cx="118" cy="140" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-        <ellipse cx="118" cy="140" rx="9" ry="10" fill="#6b7058"/>
-        <circle cx="115" cy="137" r="3" fill="#8a8f75" opacity="0.6"/>
-        <circle cx="118" cy="140" r="4" fill="#2a2e1a"/>
-        <ellipse cx="148" cy="148" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-        <ellipse cx="148" cy="148" rx="9" ry="10" fill="#6b7058"/>
-        <circle cx="145" cy="145" r="3" fill="#8a8f75" opacity="0.6"/>
-        <circle cx="148" cy="148" r="4" fill="#2a2e1a"/>
+        <ellipse cx="118" cy="160" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+        <ellipse cx="118" cy="160" rx="9" ry="10" fill="#6b7058"/>
+        <circle cx="115" cy="157" r="3" fill="#8a8f75" opacity="0.6"/>
+        <circle cx="118" cy="160" r="4" fill="#2a2e1a"/>
+        <ellipse cx="148" cy="168" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+        <ellipse cx="148" cy="168" rx="9" ry="10" fill="#6b7058"/>
+        <circle cx="145" cy="165" r="3" fill="#8a8f75" opacity="0.6"/>
+        <circle cx="148" cy="168" r="4" fill="#2a2e1a"/>
       </g>
     </svg>
   </div>
