@@ -119,10 +119,10 @@ def main():
     st.sidebar.markdown("""
     ### 🎯 Navigation
     **Explore Sandy's creations:**
-    - 📊 **Live Feed** - Fresh sandwiches!
+    - 🎨 **Make Sandwich** - Create one yourself!
+    - 📊 **Live Feed** - Fresh sandwiches
     - 🔍 **Browser** - Search the corpus
     - 📈 **Analytics** - See the stats
-    - ✨ **Interactive** - Make one yourself
     - ⚙️ **Settings** - Configure & export
     """)
 

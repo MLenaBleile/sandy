@@ -220,10 +220,59 @@ if make_button and user_input:
                     config=PipelineConfig()
                 )
 
-            # Show a few more commentary updates before the long async call
-            update_sandy("identify", 45, "Analyzing the structure... looking for bounded patterns...")
+            # Run pipeline in background thread so we can update Sandy while waiting
+            import threading, time
 
-            stored_sandwich, outcome = asyncio.run(run_pipeline())
+            pipeline_result = {"sandwich": None, "outcome": None, "error": None, "done": False}
+
+            def run_pipeline_thread():
+                try:
+                    s, o = asyncio.run(run_pipeline())
+                    pipeline_result["sandwich"] = s
+                    pipeline_result["outcome"] = o
+                except Exception as e:
+                    pipeline_result["error"] = e
+                finally:
+                    pipeline_result["done"] = True
+
+            thread = threading.Thread(target=run_pipeline_thread, daemon=True)
+            thread.start()
+
+            # Cycle Sandy's commentary while pipeline runs
+            pipeline_quips = [
+                "Analyzing the structure... looking for bounded patterns...",
+                "Hmm, interesting material here...",
+                "I see some potential bread candidates...",
+                "Let me look at this from another angle...",
+                "Separating the wheat from the chaff. Literally.",
+                "The bread must relate independently of the filling!",
+                "Checking if these concepts bound something meaningful...",
+                "Constructing something beautiful here...",
+                "The containment argument is key. Trust me on this.",
+                "Almost there... just need to find the right filling...",
+                "Every great sandwich tells a story.",
+                "Is that a filling I spot? Let me look closer...",
+                "Quality takes time. Good sandwiches can't be rushed.",
+                "Bread on top... filling in the middle... bread on the bottom. Classic.",
+                "Let me taste-test this... metaphorically.",
+            ]
+            quip_idx = 0
+            stages = ["identify", "assemble", "validate"]
+
+            while not pipeline_result["done"]:
+                stage = stages[min(quip_idx // 5, len(stages) - 1)]
+                progress = min(45 + quip_idx * 3, 80)
+                update_sandy(stage, progress, pipeline_quips[quip_idx % len(pipeline_quips)])
+                quip_idx += 1
+                time.sleep(2.5)
+
+            thread.join()
+
+            if pipeline_result["error"]:
+                raise pipeline_result["error"]
+
+            stored_sandwich = pipeline_result["sandwich"]
+            outcome = pipeline_result["outcome"]
 
             if not stored_sandwich:
                 update_sandy("identify", 50, f"Hmm, couldn't make a sandwich: {outcome.detail}")
@@ -292,7 +341,8 @@ if make_button and user_input:
                 sandwich_emb=stored_sandwich.embeddings.full,
             )
 
-            update_sandy("save", 100, "Done! Fresh out of the oven. Well, the algorithm.")
+            # Clear the progress area — celebration Sandy will take over below
+            progress_bar.progress(100)
 
             # Store in session state for display
             st.session_state.sandwich_made = {
@@ -314,8 +364,9 @@ if make_button and user_input:
 
             st.session_state.making_sandwich = False
 
-            # Clear progress
-            progress_container.empty()
+            # Clear progress area so celebration Sandy is the only one
+            sandy_bubble.empty()
+            progress_bar.empty()
 
         except Exception as e:
             st.error(f"❌ Error creating sandwich: {e}")

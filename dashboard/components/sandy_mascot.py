@@ -12,7 +12,7 @@ SANDY_SVG = """
 <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" style="max-width:{size}px;">
   <!-- Sprout (stem connects to cube top) -->
   <g transform="translate(85, 30)">
-    <line x1="15" y1="90" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="15" y1="78" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
     <path d="M15 55 Q12 38 8 28 Q2 18 10 10 Q15 16 15 28" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
     <path d="M15 55 Q18 36 25 26 Q32 16 28 6 Q20 12 18 26" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
     <path d="M15 55 Q10 42 3 37 Q-2 32 2 25" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
@@ -119,7 +119,7 @@ SANDY_SVG_ANIMATED = """
     <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="{size}">
       <!-- Sprout (stem connects to cube top) -->
       <g class="sandy-sprout" transform="translate(85, 30)">
-        <line x1="15" y1="90" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="15" y1="78" x2="15" y2="55" stroke="#4a6e3a" stroke-width="2.5" stroke-linecap="round"/>
         <path d="M15 55 Q12 38 8 28 Q2 18 10 10 Q15 16 15 28" fill="#6b8e5a" stroke="#4a6e3a" stroke-width="1"/>
         <path d="M15 55 Q18 36 25 26 Q32 16 28 6 Q20 12 18 26" fill="#7da668" stroke="#4a6e3a" stroke-width="1"/>
         <path d="M15 55 Q10 42 3 37 Q-2 32 2 25" fill="#c47a7a" stroke="#a05a5a" stroke-width="0.8" opacity="0.7"/>
