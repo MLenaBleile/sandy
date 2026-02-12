@@ -624,12 +624,16 @@ if make_button and (user_input or uploaded_file):
             progress_bar.empty()
 
         except Exception as e:
-            msg = "Yikes! Something unexpected went wrong in my kitchen."
-            update_sandy("identify", 0, msg)
-            st.warning(msg)
+            import traceback
+            error_tb = traceback.format_exc()
+            try:
+                msg = "Yikes! Something unexpected went wrong in my kitchen."
+                update_sandy("identify", 1, msg)
+            except Exception:
+                pass  # update_sandy itself might fail
+            st.warning("Yikes! Something unexpected went wrong in my kitchen.")
             with st.expander("🔧 Technical details (for debugging)"):
-                import traceback
-                st.code(traceback.format_exc())
+                st.code(error_tb)
             st.session_state.making_sandwich = False
 
 # Display created sandwich
