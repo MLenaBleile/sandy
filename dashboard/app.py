@@ -181,8 +181,7 @@ def main():
     st.markdown("""
     ### 👋 What is this place?
 
-    Sandy is an AI agent, inspired by Experiment 625 from *Lilo & Stitch*, who **only makes sandwiches**.
-    Not just any sandwiches — **knowledge sandwiches**!
+    Sandy is an AI agent who, with all the knowledge in the world available, chooses to spend his time making sandwiches. Sandy is inspired by Experiment 625 in Lilo and Stitch, a super-powerful alien who wasn't useful to the scientest because he only wanted to make sandwiches.
 
     Each sandwich has:
     - 🍞 **Two pieces of bread** (related concepts that bound something)
