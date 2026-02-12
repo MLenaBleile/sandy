@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS human_ratings (
     sandwich_id UUID NOT NULL REFERENCES sandwiches(sandwich_id) ON DELETE CASCADE,
     session_id UUID NOT NULL,
 
-    -- Component scores (matching Reuben's dimensions)
+    -- Component scores (matching Sandy's dimensions)
     bread_compat_score FLOAT NOT NULL,
     containment_score FLOAT NOT NULL,
     nontrivial_score FLOAT NOT NULL,

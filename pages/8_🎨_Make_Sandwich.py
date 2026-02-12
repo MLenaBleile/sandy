@@ -5,6 +5,7 @@ Let Sandy make sandwiches from your URLs or topics in real-time.
 
 import streamlit as st
 import sys
+import random
 from pathlib import Path
 
 # Add project root and dashboard to path
@@ -16,6 +17,7 @@ sys.path.insert(0, str(project_root / "src"))
 
 try:
     from components.sandwich_card import sandwich_card
+    from components.sandy_mascot import render_sandy, render_sandy_speaking, get_commentary
     from utils.db import get_db_connection
 except ImportError as e:
     st.error(f"Import error: {e}")
@@ -61,7 +63,7 @@ st.title("🎨 Make a Sandwich with Sandy!")
 
 st.markdown("""
 <p style='font-size: 1.2rem; color: #666; font-style: italic;'>
-    Give Sandy a URL or topic, and watch as it creates a conceptual sandwich in real-time! ✨
+    Give Sandy a URL or topic, and watch as a conceptual sandwich gets created in real-time! ✨
 </p>
 """, unsafe_allow_html=True)
 
@@ -104,11 +106,17 @@ if make_button and user_input:
     progress_container = st.container()
 
     with progress_container:
-        st.markdown("### 🔮 Sandy is working...")
-
-        # Progress bar
+        # Sandy mascot + speech bubble area
+        sandy_bubble = st.empty()
         progress_bar = st.progress(0)
-        status_text = st.empty()
+
+        def update_sandy(stage: str, progress: int, custom_msg: str = None):
+            """Update Sandy's speech bubble and progress bar."""
+            msg = custom_msg or get_commentary(stage, random.randint(0, 10))
+            sandy_bubble.markdown("", unsafe_allow_html=True)  # clear
+            with sandy_bubble.container():
+                render_sandy_speaking(msg, size=100)
+            progress_bar.progress(progress)
 
         try:
             # Import Sandy's pipeline
@@ -127,9 +135,8 @@ if make_button and user_input:
                 st.info("Make sure all dependencies are installed: google-generativeai, anthropic, openai")
                 raise
 
-            # Setup
-            status_text.text("🔧 Initializing Sandy...")
-            progress_bar.progress(10)
+            # Stage: Init
+            update_sandy("init", 10)
 
             # Get API keys from Streamlit secrets
             gemini_key = st.secrets.get("GEMINI_API_KEY")
@@ -145,8 +152,6 @@ if make_button and user_input:
             llm = GeminiSandwichLLM(api_key=gemini_key)
 
             # Initialize embeddings
-            # Note: We use OpenAI for now because the database schema expects 1536-dim vectors
-            # TODO: Migrate to Gemini embeddings (768-dim) to be completely free
             if openai_key:
                 from sandwich.llm.embeddings import OpenAIEmbeddingService
                 from sandwich.config import LLMConfig; config = LLMConfig(openai_api_key=openai_key); embeddings = OpenAIEmbeddingService(config=config)
@@ -167,12 +172,12 @@ if make_button and user_input:
                     corpus.add_sandwich(emb, s.structural_type_id or 0)
             corpus.total_sandwiches = len(sandwiches)
 
-            progress_bar.progress(20)
+            update_sandy("init", 15, "Kitchen is ready. Let's see what we're working with...")
 
-            # Determine if input is URL or topic
-            status_text.text("📥 Fetching content...")
+            # Stage: Fetch content
+            update_sandy("fetch", 20)
+
             if user_input.startswith(('http://', 'https://')):
-                # Fetch URL content
                 import requests
                 from urllib.parse import urlparse
 
@@ -193,7 +198,6 @@ if make_button and user_input:
                     st.error(f"Failed to fetch URL: {e}")
                     st.stop()
             else:
-                # Use topic as content
                 content = user_input
                 source_metadata = SourceMetadata(
                     url=None,
@@ -201,10 +205,11 @@ if make_button and user_input:
                     content_type='text'
                 )
 
-            progress_bar.progress(35)
-            status_text.text("🔍 Sandy is analyzing the content...")
+            update_sandy("fetch", 30, "Got the ingredients. Now let me find the bread...")
 
-            # Run the pipeline
+            # Stage: Identify + Select + Assemble + Validate (pipeline)
+            update_sandy("identify", 40)
+
             async def run_pipeline():
                 return await make_sandwich(
                     content=content,
@@ -215,17 +220,19 @@ if make_button and user_input:
                     config=PipelineConfig()
                 )
 
+            # Show a few more commentary updates before the long async call
+            update_sandy("identify", 45, "Analyzing the structure... looking for bounded patterns...")
+
             stored_sandwich, outcome = asyncio.run(run_pipeline())
 
-            progress_bar.progress(80)
-
             if not stored_sandwich:
+                update_sandy("identify", 50, f"Hmm, couldn't make a sandwich: {outcome.detail}")
                 st.warning(f"😕 Sandy couldn't make a sandwich: {outcome.detail}")
                 st.info(f"Stage: {outcome.stage}, Outcome: {outcome.outcome}")
                 st.stop()
 
-            # Save to database
-            status_text.text("💾 Saving to database...")
+            # Stage: Save
+            update_sandy("save", 85, "That's a good one! Let me save it...")
 
             # Insert source
             content_hash = hashlib.sha256(
@@ -274,6 +281,8 @@ if make_button and user_input:
             )
             repo.insert_sandwich(sandwich)
 
+            update_sandy("save", 92, "Saving embeddings... almost there!")
+
             # Store embeddings
             repo.update_sandwich_embeddings(
                 stored_sandwich.sandwich_id,
@@ -283,8 +292,7 @@ if make_button and user_input:
                 sandwich_emb=stored_sandwich.embeddings.full,
             )
 
-            progress_bar.progress(100)
-            status_text.text("🎉 Sandwich created!")
+            update_sandy("save", 100, "Done! Fresh out of the oven. Well, the algorithm.")
 
             # Store in session state for display
             st.session_state.sandwich_made = {
@@ -320,6 +328,14 @@ if st.session_state.sandwich_made:
     st.markdown("### 🎉 Your Fresh Sandwich!")
     st.balloons()
 
+    # Show Sandy celebrating
+    render_sandy_speaking(
+        f"I call this one <b>{st.session_state.sandwich_made['name']}</b>. "
+        f"Scored {st.session_state.sandwich_made['validity_score']:.2f} — not bad!",
+        size=80
+    )
+
+    st.markdown("")
     sandwich_card(st.session_state.sandwich_made)
 
     st.markdown("---")
@@ -330,6 +346,10 @@ if st.session_state.sandwich_made:
 
 # Show example inputs
 if not st.session_state.sandwich_made and not st.session_state.making_sandwich:
+    # Show Sandy in idle state
+    render_sandy_speaking("Give me a topic or URL and I'll make you a sandwich!", size=80)
+
+    st.markdown("")
     st.markdown("### 💡 Example Topics to Try")
 
     examples = [

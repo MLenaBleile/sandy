@@ -167,6 +167,18 @@ def main():
 
     st.markdown("---")
 
+    # Hero CTA - Sandy mascot inviting user to make a sandwich
+    try:
+        from components.sandy_mascot import render_sandy_speaking
+        render_sandy_speaking(
+            "Give me a topic or URL and I'll make you a knowledge sandwich! "
+            "Head to the <b>🎨 Make Sandwich</b> page in the sidebar.",
+            size=90,
+        )
+        st.markdown("")
+    except ImportError:
+        pass
+
     # Fun introduction
     st.markdown("""
     ### 👋 What is this place?

@@ -63,8 +63,13 @@ try:
         with open('src/sandwich/db/init_schema.sql', 'r') as f:
             schema_sql = f.read()
 
-        # Drop existing tables
+        # Drop existing tables (human_ratings first to avoid CASCADE destroying it)
         print("   Dropping existing tables...")
+        cur.execute("DROP TABLE IF EXISTS human_ratings")
+        cur.execute("DROP TABLE IF EXISTS sandwich_ingredients")
+        cur.execute("DROP TABLE IF EXISTS sandwich_relations")
+        cur.execute("DROP TABLE IF EXISTS foraging_log")
+        cur.execute("DROP TABLE IF EXISTS ingredients")
         cur.execute("DROP TABLE IF EXISTS sandwiches CASCADE")
         cur.execute("DROP TABLE IF EXISTS sources CASCADE")
         cur.execute("DROP TABLE IF EXISTS structural_types CASCADE")
@@ -88,16 +93,33 @@ try:
     neon_conn = psycopg2.connect(NEON_URL)
 
     local_cur = local_conn.cursor(cursor_factory=RealDictCursor)
-    neon_cur = neon_conn.cursor()
+    neon_cur = neon_conn.cursor(cursor_factory=RealDictCursor)
 
     # Backup human ratings before clearing data (they only exist in Neon, not local)
     print("   Backing up human ratings...")
-    neon_cur.execute("SELECT * FROM human_ratings")
-    human_ratings_backup = neon_cur.fetchall()
-    print(f"   Backed up {len(human_ratings_backup)} human ratings")
+    try:
+        neon_cur.execute("SELECT * FROM human_ratings")
+        human_ratings_backup = neon_cur.fetchall()
+        print(f"   Backed up {len(human_ratings_backup)} human ratings")
+    except Exception:
+        human_ratings_backup = []
+        neon_conn.rollback()
+        print("   No human_ratings table found (will be created)")
 
-    # Delete in correct order (respecting foreign keys)
+    # Temporarily drop the CASCADE constraint so deleting sandwiches doesn't destroy ratings
     print("   Clearing existing data...")
+    try:
+        neon_cur.execute("DELETE FROM human_ratings")  # We'll restore from backup
+    except Exception:
+        neon_conn.rollback()
+    try:
+        neon_cur.execute("DELETE FROM sandwich_ingredients")
+    except Exception:
+        neon_conn.rollback()
+    try:
+        neon_cur.execute("DELETE FROM sandwich_relations")
+    except Exception:
+        neon_conn.rollback()
     neon_cur.execute("DELETE FROM sandwiches")
     neon_cur.execute("DELETE FROM sources")
     neon_cur.execute("DELETE FROM structural_types")
@@ -170,23 +192,33 @@ try:
     if human_ratings_backup:
         # Get list of valid sandwich IDs
         neon_cur.execute("SELECT sandwich_id FROM sandwiches")
-        valid_sandwich_ids = {row[0] for row in neon_cur.fetchall()}
+        valid_sandwich_ids = {row['sandwich_id'] for row in neon_cur.fetchall()}
+
+        # Switch to a plain cursor for inserts
+        neon_plain_cur = neon_conn.cursor()
 
         for rating in human_ratings_backup:
             # Only restore if the sandwich still exists
-            if rating[1] in valid_sandwich_ids:  # rating[1] is sandwich_id
-                neon_cur.execute("""
+            if rating['sandwich_id'] in valid_sandwich_ids:
+                neon_plain_cur.execute("""
                     INSERT INTO human_ratings (
                         rating_id, sandwich_id, session_id, bread_compat_score,
                         containment_score, nontrivial_score, novelty_score,
                         overall_validity, created_at, user_agent, ip_hash
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (rating_id) DO NOTHING
-                """, rating)
+                """, (
+                    rating['rating_id'], rating['sandwich_id'], rating['session_id'],
+                    rating['bread_compat_score'], rating['containment_score'],
+                    rating['nontrivial_score'], rating['novelty_score'],
+                    rating['overall_validity'], rating['created_at'],
+                    rating.get('user_agent'), rating.get('ip_hash'),
+                ))
                 ratings_restored += 1
             else:
                 ratings_orphaned += 1
 
+        neon_plain_cur.close()
         print(f"   OK Restored {ratings_restored} human ratings")
         if ratings_orphaned > 0:
             print(f"   WARNING: {ratings_orphaned} ratings skipped (sandwiches no longer exist)")
@@ -194,10 +226,10 @@ try:
     neon_conn.commit()
 
     # Verify
-    neon_cur.execute("SELECT COUNT(*) FROM sandwiches")
-    count = neon_cur.fetchone()[0]
-    neon_cur.execute("SELECT COUNT(*) FROM human_ratings")
-    ratings_count = neon_cur.fetchone()[0]
+    neon_cur.execute("SELECT COUNT(*) as cnt FROM sandwiches")
+    count = neon_cur.fetchone()['cnt']
+    neon_cur.execute("SELECT COUNT(*) as cnt FROM human_ratings")
+    ratings_count = neon_cur.fetchone()['cnt']
     print(f"\nOK Migration verified: {count} sandwiches, {ratings_count} human ratings in Neon")
 
     local_cur.close()
