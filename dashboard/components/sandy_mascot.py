@@ -307,6 +307,11 @@ SANDY_COMMENTARY = {
         "The file didn't have any content I could work with. Try another?",
         "Nothing to extract here. It's like opening a lunchbox and finding... air.",
     ],
+    "error_rate_limit": [
+        "I've been making too many sandwiches today! My kitchen needs a breather. Try again in a minute or two! 🫠",
+        "Whoa, I hit my daily sandwich quota! The Gemini free tier only allows so many requests. Try again shortly!",
+        "The API is telling me to slow down — too many requests! Give it a minute and try again. 🍞💤",
+    ],
 }
 
 

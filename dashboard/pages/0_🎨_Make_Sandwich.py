@@ -626,14 +626,39 @@ if make_button and (user_input or uploaded_file):
         except Exception as e:
             import traceback
             error_tb = traceback.format_exc()
-            try:
-                msg = "Yikes! Something unexpected went wrong in my kitchen."
-                update_sandy("identify", 1, msg)
-            except Exception:
-                pass  # update_sandy itself might fail
-            st.warning("Yikes! Something unexpected went wrong in my kitchen.")
-            with st.expander("🔧 Technical details (for debugging)"):
-                st.code(error_tb)
+
+            # Check for API rate limit / quota errors specifically
+            error_str = str(e).lower()
+            is_rate_limit = (
+                "resourceexhausted" in type(e).__name__.lower()
+                or "429" in str(e)
+                or "quota" in error_str
+                or "rate" in error_str and "limit" in error_str
+                or "too many requests" in error_str
+            )
+
+            if is_rate_limit:
+                msg = get_error_commentary("error_rate_limit")
+                try:
+                    update_sandy("identify", 1, msg)
+                except Exception:
+                    pass
+                st.warning(msg)
+                st.info("💡 The Gemini free tier has a limit of ~20 requests per day. "
+                        "Wait a minute or two, or check your API quota at "
+                        "[Google AI Studio](https://aistudio.google.com/apikey).")
+                with st.expander("🔧 Technical details"):
+                    st.code(error_tb)
+            else:
+                try:
+                    msg = "Yikes! Something unexpected went wrong in my kitchen."
+                    update_sandy("identify", 1, msg)
+                except Exception:
+                    pass  # update_sandy itself might fail
+                st.warning("Yikes! Something unexpected went wrong in my kitchen.")
+                with st.expander("🔧 Technical details (for debugging)"):
+                    st.code(error_tb)
+
             st.session_state.making_sandwich = False
 
 # Display created sandwich
