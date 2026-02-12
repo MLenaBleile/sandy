@@ -93,7 +93,8 @@ with col2:
 # Help text
 st.markdown("""
 <p style='font-size: 0.9rem; color: #888;'>
-    💡 <b>Tips:</b> Paste a URL, type a topic (Sandy will search for it!), or upload a file below.
+    💡 <b>Tips:</b> Paste a URL, type a topic (Sandy will search for it!), or upload a file below.<br>
+    🌐 <b>Pro tip:</b> Wikipedia links work best! Try pasting a Wikipedia article about your favorite movie, band, or historical event.
 </p>
 """, unsafe_allow_html=True)
 
@@ -691,19 +692,23 @@ if not st.session_state.sandwich_made and not st.session_state.making_sandwich:
     st.markdown("### 💡 Example Topics to Try")
 
     examples = [
-        "🌿 Biomimicry in design",
-        "🔬 Quantum entanglement",
-        "🎨 The philosophy of minimalism",
-        "🚀 Space exploration ethics",
-        "🧠 Neuroplasticity",
-        "https://en.wikipedia.org/wiki/Systems_thinking"
+        "🎬 https://en.wikipedia.org/wiki/The_Dark_Knight",
+        "🎵 https://en.wikipedia.org/wiki/Taylor_Swift",
+        "🧪 https://en.wikipedia.org/wiki/Oppenheimer_(film)",
+        "🏀 https://en.wikipedia.org/wiki/Michael_Jordan",
+        "🎮 https://en.wikipedia.org/wiki/Minecraft",
+        "🌌 https://en.wikipedia.org/wiki/Black_hole",
     ]
 
     cols = st.columns(3)
     for idx, example in enumerate(examples):
         with cols[idx % 3]:
-            if st.button(example, key=f"example_{idx}", use_container_width=True):
-                st.session_state.example_input = example.split(" ", 1)[1] if example.startswith(("🌿", "🔬", "🎨", "🚀", "🧠")) else example
+            # Display label is the emoji + topic name from the URL
+            label = example.split("/wiki/")[-1].replace("_", " ") if "/wiki/" in example else example
+            label = example[:2] + " " + label  # prepend emoji
+            url = example.split(" ", 1)[1] if " " in example else example
+            if st.button(label, key=f"example_{idx}", use_container_width=True):
+                st.session_state.example_input = url
                 st.rerun()
 
 # Handle example click
