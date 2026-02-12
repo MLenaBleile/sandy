@@ -76,46 +76,45 @@ SANDY_SVG_ANIMATED = """
     background: linear-gradient(135deg, #fffbf0 0%, #fff5f8 100%);
     border: 2px solid #ffb6c1;
     border-radius: 16px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     font-size: 0.95rem;
     color: #555;
     font-style: italic;
     position: relative;
     box-shadow: 0 3px 10px rgba(255, 107, 157, 0.15);
-    max-width: 350px;
+    max-width: 400px;
     min-height: 40px;
   }}
   .speech-bubble::after {{
     content: '';
     position: absolute;
-    bottom: -12px;
-    left: 30px;
-    border-width: 12px 10px 0;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 10px 12px 10px 0;
     border-style: solid;
-    border-color: #ffb6c1 transparent transparent transparent;
+    border-color: transparent #ffb6c1 transparent transparent;
   }}
   .speech-bubble::before {{
     content: '';
     position: absolute;
-    bottom: -9px;
-    left: 32px;
-    border-width: 10px 8px 0;
+    left: -9px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 8px 10px 8px 0;
     border-style: solid;
-    border-color: #fffbf0 transparent transparent transparent;
+    border-color: transparent #fffbf0 transparent transparent;
     z-index: 1;
   }}
   .sandy-thinking {{
     display: flex;
-    align-items: flex-end;
-    gap: 20px;
+    align-items: center;
+    gap: 16px;
     justify-content: center;
     padding: 1rem 0;
   }}
 </style>
 <div class="sandy-thinking">
-  <div>
-    <div class="speech-bubble">{message}</div>
-  </div>
   <div class="sandy-container">
     <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="{size}">
       <!-- Sprout (stem connects to cube top) -->
@@ -145,6 +144,9 @@ SANDY_SVG_ANIMATED = """
         <circle cx="148" cy="168" r="4" fill="#2a2e1a"/>
       </g>
     </svg>
+  </div>
+  <div>
+    <div class="speech-bubble">{message}</div>
   </div>
 </div>
 """

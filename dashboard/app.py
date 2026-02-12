@@ -130,30 +130,48 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.caption("🌺 Inspired by Experiment 625")
 
-    # Hero CTA - Sandy mascot front and center
+    # Page title
+    st.markdown("""
+    <div style='text-align: center; padding: 2rem 0 0.5rem;'>
+        <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Sandy mascot with speech bubble
     try:
         from components.sandy_mascot import render_sandy_speaking
-        st.markdown("")
         render_sandy_speaking(
-            "Welcome to Sandy's Kitchen! Give me a topic or URL and I'll make "
-            "you a <b>knowledge sandwich</b>! Head to the <b>🎨 Make Sandwich</b> "
-            "page in the sidebar.",
-            size=100,
+            "The universe is vast. Somewhere in it: bread.",
+            size=110,
         )
-        st.markdown("")
     except ImportError:
-        # Fallback if mascot component unavailable
         st.markdown("""
-        <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='font-size: 3rem; margin: 0;'>🥪 Welcome to Sandy's Kitchen! 🥪</h1>
+        <div style='text-align: center; padding: 0.5rem 0;'>
+            <p style='font-size: 1.1rem; color: #666; font-style: italic;'>
+                "The universe is vast. Somewhere in it: bread."
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
+    # Big prominent CTA to Make Sandwich
     st.markdown("""
-    <div style='text-align: center; padding: 0.5rem 0 1rem;'>
-        <p style='font-size: 1.1rem; color: #666; font-style: italic;'>
-            "The internet is vast. Somewhere in it: bread."
-        </p>
+    <div style='text-align: center; padding: 1rem 0 1.5rem;'>
+        <a href="/Make_Sandwich" target="_self" style='
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ff6b9d 100%);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0.8rem 2.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+        '
+        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(255,107,157,0.55)';"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(255,107,157,0.4)';"
+        >🎨 Make a Sandwich</a>
     </div>
     """, unsafe_allow_html=True)
 
