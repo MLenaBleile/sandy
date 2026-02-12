@@ -104,7 +104,7 @@ def main():
     st.sidebar.markdown("""
     <div style='text-align: center; padding: 1rem 0;'>
         <div style='font-size: 3rem;'>🥪</div>
-        <h2 style='color: #ff6b9d; margin: 0.5rem 0;'>REUBEN</h2>
+        <h2 style='color: #ff6b9d; margin: 0.5rem 0;'>SANDY</h2>
         <p style='color: #999; font-size: 0.9rem; font-style: italic;'>
             "I could make sandwiches!"
         </p>
@@ -128,7 +128,7 @@ def main():
 
     # Fun footer in sidebar
     st.sidebar.markdown("---")
-    st.sidebar.caption("🌺 Experiment 625 at your service!")
+    st.sidebar.caption("🌺 Inspired by Experiment 625")
 
     # Main content with cute header
     st.markdown("""
@@ -162,7 +162,7 @@ def main():
             st.metric("🌟 Made Today", today)
 
     except Exception as e:
-        st.error(f"Ohana means family! But I can't load metrics: {e}")
+        st.error(f"Couldn't load metrics: {e}")
         st.info("🔧 Make sure the database is initialized!")
 
     st.markdown("---")
@@ -171,7 +171,7 @@ def main():
     st.markdown("""
     ### 👋 What is this place?
 
-    Sandy (Experiment 625 from Lilo & Stitch) is an AI agent who **only makes sandwiches**.
+    Sandy is an AI agent, inspired by Experiment 625 from *Lilo & Stitch*, who **only makes sandwiches**.
     Not just any sandwiches — **knowledge sandwiches**!
 
     Each sandwich has:
@@ -235,11 +235,11 @@ def main():
     # About section
     with st.expander("🌺 About Sandy & The SANDWICH Project"):
         st.markdown("""
-        ### Who is Reuben?
+        ### Who is Sandy?
 
-        Sandy is **Experiment 625** from Disney's *Lilo & Stitch*. He has all of Stitch's powers
-        but chooses to make sandwiches instead. This captures the spirit of our project:
-        **capability constrained by aesthetic choice**.
+        Sandy is an AI sandwich-making agent inspired by Experiment 625 from Disney's *Lilo & Stitch* —
+        a character who has vast powers but chooses to make sandwiches instead. This captures the spirit
+        of our project: **capability constrained by aesthetic choice**.
 
         ### What is SANDWICH?
 
@@ -272,8 +272,7 @@ def main():
     <div style='text-align: center; color: #999; padding: 1rem;'>
         <p>🌺 Built with Streamlit & Love | Powered by Claude Sonnet 4.5 🤖</p>
         <p style='font-size: 0.9rem; font-style: italic;'>
-            "Ohana means family. Family means nobody gets left behind.
-            But if you want a sandwich, I got you covered." — Reuben
+            "The internet is vast. Somewhere in it: bread." — Sandy
         </p>
     </div>
     """, unsafe_allow_html=True)

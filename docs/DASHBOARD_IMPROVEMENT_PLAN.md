@@ -1,4 +1,4 @@
-# 🥪 Reuben Dashboard - Comprehensive Improvement Plan
+# 🥪 Sandy Dashboard - Comprehensive Improvement Plan
 
 ## Executive Summary
 

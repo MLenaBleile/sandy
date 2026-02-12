@@ -15,7 +15,7 @@ from utils.queries import get_structural_types
 
 st.set_page_config(page_title="Interactive", page_icon="✨", layout="wide")
 
-st.title("✨ Make a Sandwich with Reuben")
+st.title("✨ Make a Sandwich with Sandy")
 
 st.markdown("""
 Guide Sandy to create a sandwich from a topic or URL of your choice.

@@ -1,4 +1,4 @@
-"""Color palette for the Reuben dashboard.
+"""Color palette for the Sandy dashboard.
 
 Defines consistent color scheme across all dashboard components, including
 structural type colors, validity score colors, and UI element colors.

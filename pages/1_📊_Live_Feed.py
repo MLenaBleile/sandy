@@ -151,7 +151,7 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #999; padding: 1rem;'>
     <p style='font-size: 0.9rem; font-style: italic;'>
-        🌺 "Ohana means family. Family means nobody gets left behind... but first, let me make you a sandwich." — Reuben
+        🌺 "The internet is vast. Somewhere in it: bread." — Sandy
     </p>
 </div>
 """, unsafe_allow_html=True)

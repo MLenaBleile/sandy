@@ -1,8 +1,8 @@
 # Dashboard Improvement Prompts
 
-**Purpose:** Comprehensive prompting suite for upgrading the Reuben dashboard from a reporting tool to a research-grade analytics platform with human-in-the-loop evaluation.
+**Purpose:** Comprehensive prompting suite for upgrading the Sandy dashboard from a reporting tool to a research-grade analytics platform with human-in-the-loop evaluation.
 
-**Context:** The dashboard is built with Streamlit, connects to PostgreSQL + pgvector (Neon cloud), and is deployed at https://reuben.streamlit.app
+**Context:** The dashboard is built with Streamlit, connects to PostgreSQL + pgvector (Neon cloud), and is deployed on Streamlit Cloud
 
 **Reference Documents:**
 - `DASHBOARD_IMPROVEMENT_PLAN.md` - Complete improvement roadmap

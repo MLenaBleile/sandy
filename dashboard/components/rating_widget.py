@@ -175,8 +175,8 @@ def show_rating_comparison(sandwich: Dict[str, Any]) -> None:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        reuben_overall = sandwich.get('validity_score', 0)
-        st.metric("🤖 Sandy's Score", f"{reuben_overall:.2f}")
+        sandy_overall = sandwich.get('validity_score', 0)
+        st.metric("🤖 Sandy's Score", f"{sandy_overall:.2f}")
 
     with col2:
         human_overall = human_stats.get('avg_overall', 0) or 0
@@ -187,7 +187,7 @@ def show_rating_comparison(sandwich: Dict[str, Any]) -> None:
         )
 
     with col3:
-        delta = human_overall - reuben_overall
+        delta = human_overall - sandy_overall
         agreement_color = "normal" if abs(delta) < 0.2 else "inverse"
         st.metric(
             "Agreement",
@@ -207,18 +207,18 @@ def show_rating_comparison(sandwich: Dict[str, Any]) -> None:
         ('🌟 Novelty', 'novelty_score', 'avg_novelty')
     ]
 
-    for label, reuben_key, human_key in components:
+    for label, sandy_key, human_key in components:
         col1, col2, col3 = st.columns([2, 1, 1])
 
         with col1:
             st.write(f"**{label}:**")
 
         with col2:
-            reuben_val = sandwich.get(reuben_key, 0) or 0
-            st.write(f"🤖 {reuben_val:.2f}")
+            sandy_val = sandwich.get(sandy_key, 0) or 0
+            st.write(f"🤖 {sandy_val:.2f}")
 
         with col3:
             human_val = human_stats.get(human_key, 0) or 0
-            delta = human_val - reuben_val
+            delta = human_val - sandy_val
             color = "🟢" if abs(delta) < 0.15 else "🟡" if abs(delta) < 0.3 else "🔴"
             st.write(f"👥 {human_val:.2f} {color}")

@@ -279,4 +279,4 @@ Built with:
 - [NetworkX](https://networkx.org/) - Graph analysis
 - [PostgreSQL](https://www.postgresql.org/) + [pgvector](https://github.com/pgvector/pgvector) - Database
 
-*"The internet is vast. Somewhere in it: bread."* — Reuben
+*"The internet is vast. Somewhere in it: bread."* — Sandy

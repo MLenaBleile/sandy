@@ -483,7 +483,7 @@ def get_most_controversial_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
         SELECT
             s.*,
             st.name as structural_type,
-            s.validity_score as reuben_score,
+            s.validity_score as sandy_score,
             AVG(hr.overall_validity) as human_avg,
             ABS(s.validity_score - AVG(hr.overall_validity)) as disagreement,
             COUNT(hr.rating_id) as rating_count
@@ -500,7 +500,7 @@ def get_most_controversial_sandwiches(limit: int = 10) -> List[Dict[str, Any]]:
 
 
 @st.cache_data(ttl=60)
-def get_reuben_vs_human_comparison() -> List[Dict[str, Any]]:
+def get_sandy_vs_human_comparison() -> List[Dict[str, Any]]:
     """Get comparison data for Sandy vs human scores.
 
     Returns list of sandwiches with both Sandy and human scores.
@@ -510,7 +510,7 @@ def get_reuben_vs_human_comparison() -> List[Dict[str, Any]]:
         SELECT
             s.sandwich_id,
             s.name,
-            s.validity_score as reuben_score,
+            s.validity_score as sandy_score,
             AVG(hr.overall_validity) as human_score,
             COUNT(hr.rating_id) as rating_count,
             st.name as structural_type
@@ -530,13 +530,13 @@ def get_component_comparison() -> Dict[str, Any]:
     """Get average component scores for Sandy vs humans."""
     query = """
         SELECT
-            AVG(s.bread_compat_score) as reuben_bread,
+            AVG(s.bread_compat_score) as sandy_bread,
             AVG(hr.bread_compat_score) as human_bread,
-            AVG(s.containment_score) as reuben_contain,
+            AVG(s.containment_score) as sandy_contain,
             AVG(hr.containment_score) as human_contain,
-            AVG(s.nontrivial_score) as reuben_nontrivial,
+            AVG(s.nontrivial_score) as sandy_nontrivial,
             AVG(hr.nontrivial_score) as human_nontrivial,
-            AVG(s.novelty_score) as reuben_novelty,
+            AVG(s.novelty_score) as sandy_novelty,
             AVG(hr.novelty_score) as human_novelty
         FROM sandwiches s
         JOIN human_ratings hr ON s.sandwich_id = hr.sandwich_id
