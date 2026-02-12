@@ -426,4 +426,17 @@ A: His highest-scoring is The Density Switch (validity: 0.89) — helium flash i
 
 ---
 
+## About the Creator
+
+<p>
+<img src="dashboard/static/creator.png" alt="Mary Lena Bleile" width="160" align="left" style="margin-right: 16px; border-radius: 10px;" />
+
+Sandy was created by **Mary Lena Bleile** — [marylenableile.com](https://www.marylenableile.com)
+
+</p>
+
+<br clear="left"/>
+
+---
+
 *"I could solve any problem in the universe. But have you considered: a nice Reuben?"*

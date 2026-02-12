@@ -223,22 +223,22 @@ def main():
 
     with col1:
         st.info("""
-        **The Squeeze Theorem** 🎓
-        - 🍞 Upper bound g(x)
-        - 🥓 Target function f(x)
-        - 🍞 Lower bound h(x)
+        **The Dark Side of the Force** 🎬
+        - 🍞 Jedi Order's rigid discipline
+        - 🥓 Anakin's fall to the dark side
+        - 🍞 The Sith's seductive freedom
 
-        *"The filling does not choose its fate. It is determined by the bread."*
+        *"The turn only happens because both philosophies exist as extremes."*
         """)
 
     with col2:
         st.success("""
-        **The Bayesian BLT** 📊
-        - 🍞 Prior distribution
-        - 🥓 Posterior distribution
-        - 🍞 Likelihood function
+        **The Taylor Swift Discography** 🎵
+        - 🍞 Country roots (*Tim McGraw*)
+        - 🥓 The genre pivot (*1989*, *Reputation*)
+        - 🍞 Indie/folk reinvention (*Folklore*)
 
-        *"Always fresh, always constrained by what came before."*
+        *"Both breads are 'authentic Taylor' — the pop era is bounded by sincerity."*
         """)
 
     st.markdown("---")
@@ -306,9 +306,12 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #999; padding: 1rem;'>
-        <p>🌺 Built with Streamlit & Love | Powered by Claude Sonnet 4.5 🤖</p>
+        <p>🌺 Built with Streamlit & Love | Powered by Gemini 🤖</p>
         <p style='font-size: 0.9rem; font-style: italic;'>
             "The internet is vast. Somewhere in it: bread." — Sandy
+        </p>
+        <p style='font-size: 0.8rem; margin-top: 0.5rem;'>
+            Created by <a href="https://www.marylenableile.com" target="_blank" style="color: #ff8fab; text-decoration: none;">Mary Lena Bleile</a>
         </p>
     </div>
     """, unsafe_allow_html=True)
