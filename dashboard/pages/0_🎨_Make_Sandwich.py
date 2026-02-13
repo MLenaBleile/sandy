@@ -100,22 +100,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🎨 Make a Sandwich with Sandy!")
-
-st.markdown("""
-<p style='font-size: 1.2rem; color: #666; font-style: italic;'>
-    Give Sandy a URL, topic, or file — and watch as a conceptual sandwich gets created in real-time! ✨
-</p>
-""", unsafe_allow_html=True)
-
 # Initialize session state
 if 'sandwich_made' not in st.session_state:
     st.session_state.sandwich_made = None
 if 'making_sandwich' not in st.session_state:
     st.session_state.making_sandwich = False
 
-# Input section
-st.markdown("### 📝 What should Sandy make a sandwich about?")
+# Sandy greeting at the top
+if not st.session_state.making_sandwich and not st.session_state.sandwich_made:
+    render_sandy_speaking("Give me a topic or URL and I'll make you a sandwich!", size=80)
 
 col1, col2 = st.columns([3, 1])
 
@@ -1032,9 +1025,6 @@ if st.session_state.sandwich_made:
 
 # Show example inputs
 if not st.session_state.sandwich_made and not st.session_state.making_sandwich:
-    # Show Sandy in idle state
-    render_sandy_speaking("Give me a topic or URL and I'll make you a sandwich!", size=80)
-
     st.markdown("")
     st.markdown("### 💡 Example Topics to Try")
 
