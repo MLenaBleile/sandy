@@ -84,6 +84,12 @@ def search_sandwiches(
             s.bread_top,
             s.filling,
             s.bread_bottom,
+            s.description,
+            s.sandy_commentary,
+            s.bread_compat_score,
+            s.containment_score,
+            s.nontrivial_score,
+            s.novelty_score,
             s.created_at,
             st.name as structural_type,
             src.domain as source_domain
