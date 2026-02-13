@@ -256,7 +256,7 @@ python scripts/browse.py --id <sandwich-uuid>
 
 The dashboard includes:
 - 🎨 **Make Sandwich** - Create your own knowledge sandwich!
-- 🔍 **Browser** - Search and filter the corpus
+- ⭐ **Rate Sandwiches** - Browse, search, and rate sandwiches
 - 📈 **Analytics** - Charts, metrics, and structural type distributions
 - ⚙️ **Settings** - Export data and configure weights
 

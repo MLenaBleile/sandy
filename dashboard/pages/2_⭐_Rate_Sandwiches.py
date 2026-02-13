@@ -1,6 +1,6 @@
-"""Sandwich Browser page.
+"""Rate Sandwiches page.
 
-Searchable, filterable interface to the entire sandwich corpus.
+Browse, search, and rate sandwiches from the entire corpus.
 """
 
 import streamlit as st
@@ -16,11 +16,11 @@ sys.path.insert(0, str(dashboard_dir))
 from components.sandwich_card import sandwich_card
 from utils.queries import search_sandwiches, get_structural_types, get_source_domains
 
-st.set_page_config(page_title="Browser", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Rate Sandwiches", page_icon="⭐", layout="wide")
 
-st.title("🔍 Sandwich Browser")
+st.title("⭐ Rate Sandwiches")
 
-st.markdown("Search and explore the entire sandwich corpus with advanced filters.")
+st.markdown("Browse, search, and rate sandwiches from the entire corpus.")
 
 # Sidebar filters
 with st.sidebar:

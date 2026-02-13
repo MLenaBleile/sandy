@@ -74,6 +74,15 @@ st.markdown("""
     h2, h3 {
         color: #ff8fab;
     }
+
+    /* Override default "streamlit app" sidebar title */
+    [data-testid="stSidebarHeader"] [data-testid="stPageLink-NavLink"] span {
+        font-size: 0;
+    }
+    [data-testid="stSidebarHeader"] [data-testid="stPageLink-NavLink"] span::after {
+        content: "Sandy's Kitchen 🥪";
+        font-size: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -120,7 +129,7 @@ def main():
     ### 🎯 Navigation
     **Explore Sandy's creations:**
     - 🎨 **Make Sandwich** - Create one yourself!
-    - 🔍 **Browser** - Search the corpus
+    - ⭐ **Rate Sandwiches** - Browse & rate
     - 📈 **Analytics** - See the stats
     - ⚙️ **Settings** - Configure & export
     """)
@@ -249,7 +258,7 @@ def main():
     with col1:
         st.markdown("""
         **🔬 For Researchers:**
-        1. 🔍 Use **Browser** to search sandwiches
+        1. ⭐ Use **Rate Sandwiches** to browse & rate
         2. 📈 Dive into **Analytics** for patterns
         3. 💾 **Export** your findings
         """)

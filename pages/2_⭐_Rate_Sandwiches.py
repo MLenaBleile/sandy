@@ -1,6 +1,6 @@
-"""Sandwich Browser page.
+"""Rate Sandwiches page.
 
-Searchable, filterable interface to the entire sandwich corpus.
+Browse, search, and rate sandwiches from the entire corpus.
 """
 
 import streamlit as st
@@ -8,17 +8,19 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path
-dashboard_dir = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent
+dashboard_dir = project_root / "dashboard"
+sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(dashboard_dir))
 
 from components.sandwich_card import sandwich_card
 from utils.queries import search_sandwiches, get_structural_types, get_source_domains
 
-st.set_page_config(page_title="Browser", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Rate Sandwiches", page_icon="⭐", layout="wide")
 
-st.title("🔍 Sandwich Browser")
+st.title("⭐ Rate Sandwiches")
 
-st.markdown("Search and explore the entire sandwich corpus with advanced filters.")
+st.markdown("Browse, search, and rate sandwiches from the entire corpus.")
 
 # Sidebar filters
 with st.sidebar:
@@ -132,7 +134,7 @@ try:
 
         # Display all sandwiches in current page
         for sandwich in sandwiches_list:
-            sandwich_card(sandwich, expanded=False)
+            sandwich_card(sandwich, expanded=False, enable_rating=True)
 
 except Exception as e:
     st.error(f"Error searching sandwiches: {e}")
