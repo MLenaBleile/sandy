@@ -255,10 +255,9 @@ python scripts/browse.py --id <sandwich-uuid>
 **View Sandy's sandwiches at: [https://Sandy.streamlit.app](https://Sandy.streamlit.app)**
 
 The dashboard includes:
-- 📊 **Live Feed** - Real-time sandwich stream with auto-refresh
+- 🎨 **Make Sandwich** - Create your own knowledge sandwich!
 - 🔍 **Browser** - Search and filter the corpus
 - 📈 **Analytics** - Charts, metrics, and structural type distributions
-- ✨ **Interactive** - Experiment with sandwich creation
 - ⚙️ **Settings** - Export data and configure weights
 
 The dashboard is hosted on Streamlit Cloud and connects to a cloud PostgreSQL database (Neon). All sandwiches Sandy creates locally are synced to the cloud and appear on the public dashboard within seconds.

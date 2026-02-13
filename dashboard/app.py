@@ -120,7 +120,6 @@ def main():
     ### 🎯 Navigation
     **Explore Sandy's creations:**
     - 🎨 **Make Sandwich** - Create one yourself!
-    - 📊 **Live Feed** - Fresh sandwiches
     - 🔍 **Browser** - Search the corpus
     - 📈 **Analytics** - See the stats
     - ⚙️ **Settings** - Configure & export
@@ -250,10 +249,9 @@ def main():
     with col1:
         st.markdown("""
         **🔬 For Researchers:**
-        1. 📊 Check the **Live Feed** for recent creations
-        2. 🔍 Use **Browser** to search sandwiches
-        3. 📈 Dive into **Analytics** for patterns
-        4. 💾 **Export** your findings
+        1. 🔍 Use **Browser** to search sandwiches
+        2. 📈 Dive into **Analytics** for patterns
+        3. 💾 **Export** your findings
         """)
 
     with col2:
