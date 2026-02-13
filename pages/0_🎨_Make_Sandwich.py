@@ -907,7 +907,7 @@ if make_button and (user_input or uploaded_file):
             st.session_state.making_sandwich = False
 
             # Clear progress area so celebration Sandy is the only one
-            sandy_bubble.empty()
+            bubble_slot.empty()
             progress_bar.empty()
 
         except Exception as e:
