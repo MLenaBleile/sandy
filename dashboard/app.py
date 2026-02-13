@@ -130,6 +130,7 @@ def main():
     **Explore Sandy's creations:**
     - 🎨 **Make Sandwich** - Create one yourself!
     - ⭐ **Rate Sandwiches** - Browse & rate
+    - 🧠 **How It Works** - Architecture & tech stack
     - 📈 **Analytics** - See the stats
     - ⚙️ **Settings** - Configure & export
     """)
