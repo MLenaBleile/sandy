@@ -317,11 +317,17 @@ if make_button and (user_input or uploaded_file):
                     st.stop()
                 llm = GeminiSandwichLLM(api_key=gemini_key)
 
-            # Initialize embeddings (always Gemini to match existing corpus dimensions)
-            if gemini_key:
+            # Initialize embeddings (OpenAI — matches existing corpus)
+            openai_key = st.secrets.get("OPENAI_API_KEY")
+            if openai_key:
+                import os as _os
+                _os.environ["OPENAI_API_KEY"] = openai_key
+                from sandwich.llm.embeddings import OpenAIEmbeddingService
+                embeddings = OpenAIEmbeddingService()
+            elif gemini_key:
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
             else:
-                st.warning("⚠️ No Gemini key available for embeddings. Some features may not work.")
+                st.warning("⚠️ No API key available for embeddings.")
                 embeddings = GeminiEmbeddingService(api_key="")
 
             # Get database connection
