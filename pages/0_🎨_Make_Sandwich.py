@@ -29,6 +29,44 @@ except ImportError as e:
 
 st.set_page_config(page_title="Make a Sandwich", page_icon="🎨", layout="wide")
 
+# ---- Sidebar: Bring Your Own API Key ----
+with st.sidebar:
+    st.markdown("### 🔑 API Key")
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#888;'>"
+        "Use your own API key to avoid shared rate limits.</p>",
+        unsafe_allow_html=True,
+    )
+    _provider_choice = st.selectbox(
+        "Provider",
+        ["Gemini (default)", "Claude (Anthropic)"],
+        index=0,
+        help="Which LLM provider to use for sandwich making.",
+    )
+    _user_key_input = st.text_input(
+        "API Key",
+        type="password",
+        placeholder="Paste your key...",
+        label_visibility="collapsed",
+        help="Stored only in your browser session. Never saved to disk.",
+    )
+    # Store in session state
+    st.session_state.user_api_key = _user_key_input.strip() if _user_key_input else ""
+    st.session_state.user_provider = _provider_choice
+
+    if st.session_state.user_api_key:
+        st.success("Using your key", icon="✅")
+    else:
+        st.caption("Using shared Gemini key (may hit rate limits)")
+
+    # Provider-specific link to get a key
+    _key_links = {
+        "Gemini (default)": "[Get a free Gemini key ↗](https://aistudio.google.com/apikey)",
+        "Claude (Anthropic)": "[Get a Claude key ↗](https://console.anthropic.com/settings/keys)",
+    }
+    st.markdown(_key_links.get(_provider_choice, ""))
+    st.divider()
+
 # Add cute styling
 st.markdown("""
 <style>
@@ -252,28 +290,39 @@ if make_button and (user_input or uploaded_file):
             # Stage: Init
             update_sandy("init", 10)
 
-            # Get API keys from Streamlit secrets
-            gemini_key = st.secrets.get("GEMINI_API_KEY")
-            openai_key = st.secrets.get("OPENAI_API_KEY")
+            # Resolve API key: user's own key takes priority over shared default
+            user_key = st.session_state.get("user_api_key", "")
+            provider = st.session_state.get("user_provider", "Gemini (default)")
+            default_gemini_key = st.secrets.get("GEMINI_API_KEY")
 
-            if not gemini_key:
-                st.error("⚠️ Missing GEMINI_API_KEY in Streamlit secrets!")
-                st.info("Please add GEMINI_API_KEY to Streamlit secrets.")
-                st.info("Get your free key at: https://aistudio.google.com/apikey")
-                st.stop()
-
-            # Initialize LLM (using Gemini - free!)
-            llm = GeminiSandwichLLM(api_key=gemini_key)
-
-            # Initialize embeddings
-            if openai_key:
-                from sandwich.llm.embeddings import OpenAIEmbeddingService
-                from sandwich.config import LLMConfig
-                config = LLMConfig(openai_api_key=openai_key)
-                embeddings = OpenAIEmbeddingService(config=config)
+            if user_key and "Claude" in provider:
+                # Use Anthropic Claude with user's key
+                from sandwich.llm.anthropic import AnthropicSandwichLLM
+                import os
+                os.environ["ANTHROPIC_API_KEY"] = user_key
+                llm = AnthropicSandwichLLM()
+                # Embeddings: use shared Gemini key (Claude doesn't do embeddings)
+                gemini_key = default_gemini_key
+            elif user_key and "Gemini" in provider:
+                # Use user's own Gemini key
+                gemini_key = user_key
+                llm = GeminiSandwichLLM(api_key=gemini_key)
             else:
-                st.warning("⚠️ No OPENAI_API_KEY found. Using Gemini embeddings (may not match existing corpus).")
+                # No user key — fall back to shared Gemini key
+                gemini_key = default_gemini_key
+                if not gemini_key:
+                    st.error("⚠️ No API key available!")
+                    st.info("Paste your own key in the **sidebar**, or add GEMINI_API_KEY to Streamlit secrets.")
+                    st.info("Get your free key at: https://aistudio.google.com/apikey")
+                    st.stop()
+                llm = GeminiSandwichLLM(api_key=gemini_key)
+
+            # Initialize embeddings (always Gemini to match existing corpus dimensions)
+            if gemini_key:
                 embeddings = GeminiEmbeddingService(api_key=gemini_key)
+            else:
+                st.warning("⚠️ No Gemini key available for embeddings. Some features may not work.")
+                embeddings = GeminiEmbeddingService(api_key="")
 
             # Get database connection
             database_url = st.secrets["DATABASE_URL"]
@@ -925,15 +974,21 @@ if make_button and (user_input or uploaded_file):
             )
 
             if is_rate_limit:
-                msg = get_error_commentary("error_rate_limit")
+                using_own_key = bool(st.session_state.get("user_api_key", ""))
+                commentary_key = "error_rate_limit" if using_own_key else "error_rate_limit_byok"
+                msg = get_error_commentary(commentary_key)
                 try:
                     update_sandy("identify", 1, msg)
                 except Exception:
                     pass
                 st.warning(msg)
-                st.info("💡 The Gemini free tier has a limit of ~20 requests per day. "
-                        "Wait a minute or two, or check your API quota at "
-                        "[Google AI Studio](https://aistudio.google.com/apikey).")
+                if not using_own_key:
+                    st.info("💡 You're using the shared API key, which has a low rate limit. "
+                            "**Paste your own key in the sidebar** to get your own quota! "
+                            "[Get a free Gemini key](https://aistudio.google.com/apikey)")
+                else:
+                    st.info("💡 Your API key hit its rate limit. "
+                            "Wait a minute or two and try again.")
                 with st.expander("🔧 Technical details"):
                     st.code(error_tb)
             else:

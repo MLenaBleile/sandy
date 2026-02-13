@@ -427,6 +427,11 @@ SANDY_COMMENTARY = {
         "Whoa, I hit my daily sandwich quota! The Gemini free tier only allows so many requests. Try again shortly!",
         "The API is telling me to slow down — too many requests! Give it a minute and try again. 🍞💤",
     ],
+    "error_rate_limit_byok": [
+        "The shared kitchen is too crowded! Bring your own key — there's a spot in the sidebar. 🔑",
+        "Too many cooks in this kitchen! Paste your own API key in the sidebar to get your own lane.",
+        "Rate limited on the communal key. Check the sidebar — you can add your own for free!",
+    ],
 }
 
 
