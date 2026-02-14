@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS human_ratings (
     rating_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    sandwich_id UUID NOT NULL REFERENCES sandwiches(sandwich_id) ON DELETE CASCADE,
+    sandwich_id UUID REFERENCES sandwiches(sandwich_id) ON DELETE SET NULL,
     session_id UUID NOT NULL,
 
     -- Component scores (matching Sandy's dimensions)

@@ -63,9 +63,18 @@ try:
         with open('src/sandwich/db/init_schema.sql', 'r') as f:
             schema_sql = f.read()
 
-        # Drop existing tables (human_ratings first to avoid CASCADE destroying it)
-        print("   Dropping existing tables...")
-        cur.execute("DROP TABLE IF EXISTS human_ratings")
+        # Drop existing tables — but NEVER drop human_ratings (user data!)
+        # Detach ratings FK first so sandwiches can be dropped safely
+        print("   Dropping existing tables (preserving human_ratings)...")
+        try:
+            cur.execute("""
+                DO $$ BEGIN
+                    ALTER TABLE human_ratings DROP CONSTRAINT IF EXISTS fk_ratings_sandwich;
+                EXCEPTION WHEN undefined_table THEN NULL;
+                END $$;
+            """)
+        except Exception:
+            pass  # Table may not exist yet
         cur.execute("DROP TABLE IF EXISTS sandwich_ingredients")
         cur.execute("DROP TABLE IF EXISTS sandwich_relations")
         cur.execute("DROP TABLE IF EXISTS foraging_log")
@@ -78,6 +87,18 @@ try:
         print("   Creating fresh schema...")
         cur.execute(schema_sql)
         print("   OK Schema created")
+
+        # Re-attach FK on human_ratings (if it exists) with SET NULL
+        try:
+            cur.execute("""
+                ALTER TABLE human_ratings
+                    ADD CONSTRAINT fk_ratings_sandwich
+                    FOREIGN KEY (sandwich_id) REFERENCES sandwiches(sandwich_id)
+                    ON DELETE SET NULL;
+            """)
+            print("   OK Re-attached human_ratings FK")
+        except Exception:
+            pass  # Table or constraint may already exist from init_schema
 
     cur.close()
     neon_conn.close()
@@ -95,23 +116,21 @@ try:
     local_cur = local_conn.cursor(cursor_factory=RealDictCursor)
     neon_cur = neon_conn.cursor(cursor_factory=RealDictCursor)
 
-    # Backup human ratings before clearing data (they only exist in Neon, not local)
-    print("   Backing up human ratings...")
+    # Save rating→sandwich mapping BEFORE deleting sandwiches.
+    # ON DELETE SET NULL will NULL out sandwich_id, so we need to remember
+    # the original mapping to re-link after re-importing sandwiches.
+    print("   Saving human ratings mapping...")
+    rating_sandwich_map = {}
     try:
-        neon_cur.execute("SELECT * FROM human_ratings")
-        human_ratings_backup = neon_cur.fetchall()
-        print(f"   Backed up {len(human_ratings_backup)} human ratings")
+        neon_cur.execute("SELECT rating_id, sandwich_id FROM human_ratings WHERE sandwich_id IS NOT NULL")
+        for row in neon_cur.fetchall():
+            rating_sandwich_map[row['rating_id']] = row['sandwich_id']
+        print(f"   {len(rating_sandwich_map)} ratings to preserve")
     except Exception:
-        human_ratings_backup = []
         neon_conn.rollback()
         print("   No human_ratings table found (will be created)")
 
-    # Temporarily drop the CASCADE constraint so deleting sandwiches doesn't destroy ratings
     print("   Clearing existing data...")
-    try:
-        neon_cur.execute("DELETE FROM human_ratings")  # We'll restore from backup
-    except Exception:
-        neon_conn.rollback()
     try:
         neon_cur.execute("DELETE FROM sandwich_ingredients")
     except Exception:
@@ -184,44 +203,28 @@ try:
 
     print(f"   OK Copied {len(sandwiches)} sandwiches")
 
-    # Restore human ratings
-    print("   Restoring human ratings...")
-    ratings_restored = 0
-    ratings_orphaned = 0
-
-    if human_ratings_backup:
-        # Get list of valid sandwich IDs
+    # Re-link ratings using the saved mapping
+    print("   Re-linking human ratings...")
+    try:
         neon_cur.execute("SELECT sandwich_id FROM sandwiches")
-        valid_sandwich_ids = {row['sandwich_id'] for row in neon_cur.fetchall()}
+        valid_ids = {row['sandwich_id'] for row in neon_cur.fetchall()}
 
-        # Switch to a plain cursor for inserts
-        neon_plain_cur = neon_conn.cursor()
-
-        for rating in human_ratings_backup:
-            # Only restore if the sandwich still exists
-            if rating['sandwich_id'] in valid_sandwich_ids:
-                neon_plain_cur.execute("""
-                    INSERT INTO human_ratings (
-                        rating_id, sandwich_id, session_id, bread_compat_score,
-                        containment_score, nontrivial_score, novelty_score,
-                        overall_validity, created_at, user_agent, ip_hash
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (rating_id) DO NOTHING
-                """, (
-                    rating['rating_id'], rating['sandwich_id'], rating['session_id'],
-                    rating['bread_compat_score'], rating['containment_score'],
-                    rating['nontrivial_score'], rating['novelty_score'],
-                    rating['overall_validity'], rating['created_at'],
-                    rating.get('user_agent'), rating.get('ip_hash'),
-                ))
-                ratings_restored += 1
+        relinked = 0
+        orphaned = 0
+        for rating_id, sandwich_id in rating_sandwich_map.items():
+            if sandwich_id in valid_ids:
+                neon_cur.execute(
+                    "UPDATE human_ratings SET sandwich_id = %s WHERE rating_id = %s",
+                    (sandwich_id, rating_id)
+                )
+                relinked += 1
             else:
-                ratings_orphaned += 1
+                orphaned += 1
 
-        neon_plain_cur.close()
-        print(f"   OK Restored {ratings_restored} human ratings")
-        if ratings_orphaned > 0:
-            print(f"   WARNING: {ratings_orphaned} ratings skipped (sandwiches no longer exist)")
+        print(f"   OK {relinked} ratings re-linked, {orphaned} orphaned (sandwich no longer exists)")
+    except Exception as e:
+        neon_conn.rollback()
+        print(f"   WARNING: Could not re-link ratings: {e}")
 
     neon_conn.commit()
 

@@ -106,6 +106,10 @@ def execute_query(query: str, params: tuple = None, fetch_one: bool = False):
     max_retries = 2
     last_error = None
 
+    # Detect if this is a write operation that needs a commit
+    trimmed = query.strip().upper()
+    is_write = trimmed.startswith(("INSERT", "UPDATE", "DELETE"))
+
     for attempt in range(max_retries):
         try:
             conn = get_db_connection()
@@ -117,6 +121,14 @@ def execute_query(query: str, params: tuple = None, fetch_one: bool = False):
             # If alive, execute the actual query
             with conn.cursor() as cur:
                 cur.execute(query, params or ())
+
+                if is_write:
+                    # Grab results before committing (if query returns rows)
+                    result = None
+                    if cur.description:
+                        result = cur.fetchone() if fetch_one else cur.fetchall()
+                    conn.commit()
+                    return result if result is not None else []
 
                 if fetch_one:
                     return cur.fetchone()
@@ -138,6 +150,12 @@ def execute_query(query: str, params: tuple = None, fetch_one: bool = False):
 
         except Exception as e:
             logger.error(f"Query failed: {query[:100]}... Error: {e}")
+            # Roll back failed write to keep connection usable
+            try:
+                conn = get_db_connection()
+                conn.rollback()
+            except Exception:
+                pass
             raise
 
     # If we get here, all retries failed
