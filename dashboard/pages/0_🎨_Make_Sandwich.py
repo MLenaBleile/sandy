@@ -105,6 +105,8 @@ if 'sandwich_made' not in st.session_state:
     st.session_state.sandwich_made = None
 if 'making_sandwich' not in st.session_state:
     st.session_state.making_sandwich = False
+if 'existing_matches' not in st.session_state:
+    st.session_state.existing_matches = None
 
 # ============================================================
 # Single Sandy slot — only ONE Sandy visible at any time
@@ -235,11 +237,66 @@ def _search_and_fetch_topic(topic: str, headers: dict, max_chars: int = 5000):
 
 
 # ============================================================
+# Check for existing sandwiches before making a new one
+# ============================================================
+def _check_existing_sandwiches(query_text: str) -> list:
+    """Search the DB for sandwiches that already match this topic."""
+    try:
+        from utils.queries import search_sandwiches as _search
+        results = _search(query=query_text, limit=5)
+        if results is not None and not results.empty:
+            return results.to_dict('records')
+    except Exception:
+        pass
+    return []
+
+# Show existing matches if we found some (user hasn't clicked "Make New Anyway" yet)
+_force_make = False
+if st.session_state.existing_matches:
+    with sandy_slot.container():
+        render_sandy_speaking(
+            f"I've already made sandwiches about this! Check them out below, "
+            f"or I can make a brand new one.",
+            size=80,
+        )
+
+    st.markdown("### 🥪 Existing Sandwiches on This Topic")
+    for match in st.session_state.existing_matches:
+        sandwich_card(match)
+
+    st.markdown("")
+    col_new, col_clear = st.columns([1, 1])
+    with col_new:
+        if st.button("🆕 Make a New One Anyway", use_container_width=True):
+            _force_make = True
+            st.session_state.existing_matches = None
+    with col_clear:
+        if st.button("👍 These are good, never mind", use_container_width=True):
+            st.session_state.existing_matches = None
+            st.rerun()
+
+# ============================================================
 # Handle sandwich making
 # ============================================================
-if make_button and (user_input or uploaded_file):
+if (make_button or _force_make) and (user_input or uploaded_file):
+    # Check for duplicates first (unless forcing)
+    if make_button and not _force_make and user_input and not uploaded_file:
+        _search_term = user_input.strip()
+        # For URLs, extract the meaningful part
+        if _search_term.startswith(("http://", "https://")) and "/wiki/" in _search_term:
+            _search_term = _search_term.split("/wiki/")[-1].replace("_", " ").replace("(", "").replace(")", "")
+        elif _search_term.startswith(("http://", "https://")):
+            from urllib.parse import urlparse as _up
+            _search_term = _up(_search_term).netloc
+
+        existing = _check_existing_sandwiches(_search_term)
+        if existing:
+            st.session_state.existing_matches = existing
+            st.rerun()
+
     st.session_state.making_sandwich = True
     st.session_state.sandwich_made = None
+    st.session_state.existing_matches = None
 
     # Replace greeting Sandy with progress Sandy + speech bubble
     with sandy_slot.container():
