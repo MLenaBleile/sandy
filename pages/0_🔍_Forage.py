@@ -1,6 +1,7 @@
-"""Interactive Sandwich Maker - Chat with Sandy!
+"""Sandy's Sandwich Finder.
 
-Let Sandy make sandwiches from your URLs, topics, or uploaded files in real-time.
+Give Sandy a topic, URL, or file and he'll tell you if there's a sandwich in it.
+Not everything has one. That's kind of the point.
 """
 
 import streamlit as st
@@ -27,7 +28,7 @@ except ImportError as e:
     st.info("This page requires the full sandwich codebase to be available.")
     st.stop()
 
-st.set_page_config(page_title="Make a Sandwich", page_icon="🎨", layout="wide")
+st.set_page_config(page_title="Forage for Sandwiches", page_icon="🔍", layout="wide")
 
 # ---- Sidebar: Bring Your Own API Key ----
 with st.sidebar:
@@ -116,7 +117,7 @@ sandy_slot = st.empty()
 # Show greeting Sandy (will be replaced when making starts or result shows)
 if not st.session_state.making_sandwich and not st.session_state.sandwich_made:
     with sandy_slot.container():
-        render_sandy_speaking("Give me a topic or URL and I'll make you a sandwich!", size=80)
+        render_sandy_speaking("Think there's a sandwich in something? Show me and I'll find out.", size=80)
 
 # ============================================================
 # Input area
@@ -131,13 +132,13 @@ with col1:
     )
 
 with col2:
-    make_button = st.button("🥪 Make Sandwich", use_container_width=True)
+    make_button = st.button("🔍 Is there a sandwich?", use_container_width=True)
 
 # Help text
 st.markdown("""
 <p style='font-size: 0.9rem; color: #888;'>
-    💡 <b>Tips:</b> Paste a URL, type a topic (Sandy will search for it!), or upload a file below.<br>
-    🌐 <b>Pro tip:</b> Wikipedia links work best! Try pasting a Wikipedia article about your favorite movie, band, or historical event.
+    💡 Paste a URL, type a topic, or upload a file. Sandy will look for sandwiches in it.<br>
+    🌐 Wikipedia links work great — try your favorite movie, band, or historical event. Not everything has a sandwich in it!
 </p>
 """, unsafe_allow_html=True)
 
@@ -152,7 +153,7 @@ uploaded_file = st.file_uploader(
     "Upload a PDF or CSV file",
     type=["pdf", "csv"],
     label_visibility="collapsed",
-    help="Sandy can extract sandwich material from PDFs and CSV files!",
+    help="Sandy can look for sandwiches in PDFs and CSV files too!",
 )
 
 st.markdown("---")
@@ -731,7 +732,7 @@ if (make_button or _force_make) and (user_input or uploaded_file):
             st.session_state.making_sandwich = False
             st.stop()
 
-        update_sandy("fetch", 30, "Got the ingredients. Now let me find the bread...")
+        update_sandy("fetch", 30, "Got the content. Now let me see if there's bread in here...")
 
         # ============================================================
         # Extract topic keywords for commentary
@@ -811,69 +812,67 @@ if (make_button or _force_make) and (user_input or uploaded_file):
         _stage_quips = {
             "preprocess": [
                 "Reading through the raw material...",
-                "Cleaning up the text. Gotta remove the crusts first.",
+                "Cleaning up the text first.",
                 "Stripping away the boilerplate...",
-                "Checking if this content is sandwich-worthy...",
+                "Let's see if there's anything structural in here...",
             ],
             "identify": [
                 "Scanning for bread candidates...",
                 "Looking for concepts that bound something meaningful...",
-                "I see some potential structures here...",
+                "Hmm, is there structure here?",
                 "The bread must relate independently of the filling!",
-                "Hmm, interesting patterns emerging...",
-                "Separating the wheat from the chaff. Literally.",
+                "Interesting patterns emerging...",
                 "Checking if any concepts naturally pair up...",
+                "Not everything has a sandwich in it. Let me look carefully.",
             ],
             "select": [
-                "Found some candidates! Let me pick the best one...",
-                "Comparing these structures against the existing corpus...",
-                "Novelty check — have I made this sandwich before?",
+                "Found some candidates! Let me see which is strongest...",
+                "Checking these against the existing corpus...",
+                "Novelty check — have I seen this one before?",
             ],
             "assemble": [
-                "Constructing something beautiful here...",
+                "There might be something here...",
                 "Bread on top... filling in the middle... bread on the bottom.",
-                "Writing the containment argument. This is the fun part.",
-                "Naming this creation. Every great sandwich needs a name.",
+                "Writing the containment argument. This is where it gets real.",
+                "If this is a real sandwich, it needs a name.",
                 "The containment argument is key. Trust me on this.",
             ],
             "validate": [
-                "Taste-testing... metaphorically.",
+                "Now the hard part — is this actually a sandwich?",
                 "Is the bread compatible? Is the filling truly bounded?",
                 "Running the quality checks. I have standards.",
                 "Scoring: bread compatibility, containment, specificity...",
             ],
             "embeddings": [
                 "Almost there! Generating the fingerprint...",
-                "Computing the mathematical essence of this sandwich...",
-                "Mapping this sandwich into the flavor space...",
+                "Computing the mathematical essence...",
+                "Mapping this into the sandwich space...",
             ],
         }
 
         _topic_quips = [
-            "I wonder what kind of sandwich hides inside '{topic}'...",
-            "'{topic}' — now THAT has sandwich potential.",
-            "Let me see what '{topic}' looks like between two slices of bread...",
-            "There's definitely some structure in '{topic}'. I can feel it.",
+            "I wonder if there's a sandwich hiding inside '{topic}'...",
+            "'{topic}' — let me see if there's structure in there.",
+            "Is there a sandwich in '{topic}'? Only one way to find out...",
             "'{topic}'... I've been curious about this one.",
-            "The thing about '{topic}' is that there's always a hidden sandwich.",
+            "The question is: does '{topic}' have bread in it?",
+            "Not everything has a sandwich. Let's see about '{topic}'.",
         ]
 
         _personality_quips = [
             "Fun fact: the Earl of Sandwich invented the sandwich so he wouldn't have to leave the card table.",
-            "Did you know? The world's largest sandwich weighed over 5,000 pounds.",
             "I once found a sandwich in a legal brief about maritime law. Bread: jurisdiction, filling: liability.",
-            "My personal best? A sandwich about black holes where the event horizon was the bread. Chef's kiss.",
+            "My personal best? A sandwich about black holes where the event horizon was the bread.",
             "Hot take: a taco is NOT a sandwich. Don't @ me.",
-            "Sandwich philosophy: the filling doesn't choose its fate. It is determined by the bread.",
-            "I've made hundreds of sandwiches. Every single one taught me something.",
+            "The filling doesn't choose its fate. It is determined by the bread.",
+            "Not everything is a sandwich. That's what makes the real ones special.",
             "Some say I could solve any problem in the universe. But have you considered: a nice Reuben?",
-            "The universe is just one big sandwich if you think about it. Don't think about it too hard.",
             "Patience is a virtue. Also a sandwich — bounded by anticipation and reward.",
-            "They ask why I make sandwiches. But have they asked why the sandwich makes itself?",
-            "In all things: bread, filling, bread. The universe is hungry for structure.",
-            "Every domain has sandwiches. Math, music, history, movies — I find them everywhere.",
+            "They ask why I find sandwiches. But have they asked why the sandwich finds itself?",
+            "Every domain has sandwiches. Math, music, history, movies — if you know where to look.",
             "The best sandwiches are the ones where you didn't expect the bread to go together.",
-            "Quality takes time. Good sandwiches can't be rushed.",
+            "A lot of things that look like sandwiches aren't. That's half the fun.",
+            "If I don't find one, don't take it personally. Some things just aren't sandwiches.",
         ]
 
         _stage_progress = {
@@ -945,7 +944,7 @@ if (make_button or _force_make) and (user_input or uploaded_file):
             st.stop()
 
         # Stage: Save
-        update_sandy("save", 85, "That's a good one! Let me save it...")
+        update_sandy("save", 85, "Found one. Let me save it...")
 
         # Insert source
         content_hash = hashlib.sha256(
@@ -1031,8 +1030,8 @@ if (make_button or _force_make) and (user_input or uploaded_file):
         progress_bar.empty()
         with sandy_slot.container():
             render_sandy_speaking(
-                f"I call this one <b>{sw.name}</b>. "
-                f"Scored {v.overall_score:.2f} — not bad!",
+                f"There <em>is</em> a sandwich in there. I call it <b>{sw.name}</b>. "
+                f"Scored {v.overall_score:.2f}.",
                 size=80
             )
 
@@ -1086,20 +1085,20 @@ if st.session_state.sandwich_made and not st.session_state.making_sandwich:
     # Replace Sandy slot with celebration Sandy (handles page rerun case)
     with sandy_slot.container():
         render_sandy_speaking(
-            f"I call this one <b>{st.session_state.sandwich_made['name']}</b>. "
-            f"Scored {st.session_state.sandwich_made['validity_score']:.2f} — not bad!",
+            f"There <em>is</em> a sandwich in there. I call it <b>{st.session_state.sandwich_made['name']}</b>. "
+            f"Scored {st.session_state.sandwich_made['validity_score']:.2f}.",
             size=80
         )
 
-    st.markdown("### 🎉 Your Fresh Sandwich!")
+    st.markdown("### 🎉 Found One!")
     st.balloons()
 
     st.markdown("")
     sandwich_card(st.session_state.sandwich_made)
 
     st.markdown("---")
-    st.markdown("### ✨ Make Another?")
-    if st.button("🔄 Clear and Make Another Sandwich"):
+    st.markdown("### ✨ Try Another?")
+    if st.button("🔄 Try Something Else"):
         st.session_state.sandwich_made = None
         st.rerun()
 

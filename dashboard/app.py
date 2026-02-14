@@ -128,7 +128,7 @@ def main():
     st.sidebar.markdown("""
     ### 🎯 Navigation
     **Explore Sandy's creations:**
-    - 🎨 **Make Sandwich** - Create one yourself!
+    - 🔍 **Forage** - Is there a sandwich in it?
     - ⭐ **Rate Sandwiches** - Browse & rate
     - 🧠 **How It Works** - Architecture & tech stack
     - 📈 **Analytics** - See the stats
@@ -162,10 +162,10 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    # Big prominent CTA to Make Sandwich
+    # Big prominent CTA to Forage
     st.markdown("""
     <div style='text-align: center; padding: 1rem 0 1.5rem;'>
-        <a href="/Make_Sandwich" target="_self" style='
+        <a href="/Forage" target="_self" style='
             display: inline-block;
             background: linear-gradient(135deg, #ffd700 0%, #ff6b9d 100%);
             color: white;
@@ -180,7 +180,7 @@ def main():
         '
         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(255,107,157,0.55)';"
         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(255,107,157,0.4)';"
-        >🎨 Make a Sandwich</a>
+        >🔍 Is There a Sandwich?</a>
     </div>
     """, unsafe_allow_html=True)
 

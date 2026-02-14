@@ -255,7 +255,7 @@ python scripts/browse.py --id <sandwich-uuid>
 **View Sandy's sandwiches at: [https://Sandy.streamlit.app](https://Sandy.streamlit.app)**
 
 The dashboard includes:
-- 🎨 **Make Sandwich** - Create your own knowledge sandwich!
+- 🔍 **Forage** - Is there a sandwich in it?
 - ⭐ **Rate Sandwiches** - Browse, search, and rate sandwiches
 - 📈 **Analytics** - Charts, metrics, and structural type distributions
 - ⚙️ **Settings** - Export data and configure weights
