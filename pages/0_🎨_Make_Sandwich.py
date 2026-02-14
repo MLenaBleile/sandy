@@ -239,13 +239,50 @@ def _search_and_fetch_topic(topic: str, headers: dict, max_chars: int = 5000):
 # ============================================================
 # Check for existing sandwiches before making a new one
 # ============================================================
-def _check_existing_sandwiches(query_text: str) -> list:
-    """Search the DB for sandwiches that already match this topic."""
+def _check_existing_sandwiches(query_text: str, source_url: str = None) -> list:
+    """Search the DB broadly for sandwiches matching this topic or source URL."""
     try:
-        from utils.queries import search_sandwiches as _search
-        results = _search(query=query_text, limit=5)
-        if results is not None and not results.empty:
-            return results.to_dict('records')
+        from utils.db import execute_query
+
+        # Search across name, description, bread, filling, commentary, AND source URL
+        sql = """
+            SELECT
+                s.sandwich_id, s.name, s.validity_score,
+                s.bread_top, s.filling, s.bread_bottom,
+                s.description, s.sandy_commentary,
+                s.bread_compat_score, s.containment_score,
+                s.nontrivial_score, s.novelty_score,
+                s.created_at,
+                st.name as structural_type,
+                src.domain as source_domain,
+                src.url as source_url
+            FROM sandwiches s
+            LEFT JOIN structural_types st ON s.structural_type_id = st.type_id
+            LEFT JOIN sources src ON s.source_id = src.source_id
+            WHERE (
+                s.name ILIKE %s
+                OR s.description ILIKE %s
+                OR s.bread_top ILIKE %s
+                OR s.bread_bottom ILIKE %s
+                OR s.filling ILIKE %s
+                OR s.sandy_commentary ILIKE %s
+        """
+        pattern = f"%{query_text}%"
+        params = [pattern, pattern, pattern, pattern, pattern, pattern]
+
+        # Also match by source URL if provided
+        if source_url:
+            sql += " OR src.url = %s"
+            params.append(source_url)
+
+        sql += """
+            )
+            ORDER BY s.validity_score DESC
+            LIMIT 5
+        """
+
+        results = execute_query(sql, tuple(params))
+        return results if results else []
     except Exception:
         pass
     return []
@@ -281,15 +318,21 @@ if st.session_state.existing_matches:
 if (make_button or _force_make) and (user_input or uploaded_file):
     # Check for duplicates first (unless forcing)
     if make_button and not _force_make and user_input and not uploaded_file:
-        _search_term = user_input.strip()
-        # For URLs, extract the meaningful part
-        if _search_term.startswith(("http://", "https://")) and "/wiki/" in _search_term:
-            _search_term = _search_term.split("/wiki/")[-1].replace("_", " ").replace("(", "").replace(")", "")
-        elif _search_term.startswith(("http://", "https://")):
-            from urllib.parse import urlparse as _up
-            _search_term = _up(_search_term).netloc
+        _raw_input = user_input.strip()
+        _source_url = None
 
-        existing = _check_existing_sandwiches(_search_term)
+        if _raw_input.startswith(("http://", "https://")):
+            _source_url = _raw_input  # exact URL match
+            # Also extract readable text for ILIKE search
+            if "/wiki/" in _raw_input:
+                _search_term = _raw_input.split("/wiki/")[-1].replace("_", " ").replace("(", "").replace(")", "")
+            else:
+                from urllib.parse import urlparse as _up
+                _search_term = _up(_raw_input).netloc
+        else:
+            _search_term = _raw_input
+
+        existing = _check_existing_sandwiches(_search_term, source_url=_source_url)
         if existing:
             st.session_state.existing_matches = existing
             st.rerun()
