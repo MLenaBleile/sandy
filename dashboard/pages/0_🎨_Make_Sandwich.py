@@ -660,7 +660,16 @@ if make_button and (user_input or uploaded_file):
             return keywords[:8]
 
         topic_keywords = _extract_topic_keywords(content, source_metadata, user_input)
-        topic_label = topic_keywords[0] if topic_keywords else "this topic"
+
+        # Use the full user input as the topic label (not a single extracted word)
+        if user_input and not user_input.strip().startswith("http"):
+            topic_label = user_input.strip()
+        elif source_metadata and source_metadata.url and "/wiki/" in source_metadata.url:
+            topic_label = source_metadata.url.split("/wiki/")[-1].replace("_", " ").replace("(", "").replace(")", "")
+        elif source_metadata and source_metadata.domain:
+            topic_label = source_metadata.domain
+        else:
+            topic_label = "this topic"
 
         # ============================================================
         # Stage: Pipeline (identify → select → assemble → validate)
