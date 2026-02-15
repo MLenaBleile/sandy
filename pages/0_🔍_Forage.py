@@ -190,6 +190,10 @@ def _search_and_fetch_topic(topic: str, headers: dict, max_chars: int = 5000):
     """Search DuckDuckGo for a single topic and extract plain text."""
     import requests as _req
     from bs4 import BeautifulSoup as _BS
+    from urllib.parse import urlparse as _up3
+
+    _ad_domains = {"duckduckgo.com", "bing.com", "amazon.com",
+                   "ebay.com", "etsy.com", "abebooks.com"}
 
     try:
         search_resp = _req.post(
@@ -213,12 +217,27 @@ def _search_and_fetch_topic(topic: str, headers: dict, max_chars: int = 5000):
                 if 'duckduckgo' not in (a.get('href', ''))
             ]
 
-        search_url = None
-        for link in result_links[:5]:
+        # Filter out ads and tracking links
+        good_links = []
+        for link in result_links:
             href = link.get("href", "")
-            if href and href.startswith("http") and "duckduckgo" not in href:
+            if not href or not href.startswith("http"):
+                continue
+            if "duckduckgo.com" in href:
+                continue
+            domain = _up3(href).netloc.lower()
+            if any(ad in domain for ad in _ad_domains):
+                continue
+            good_links.append(href)
+
+        # Prefer Wikipedia
+        search_url = None
+        for href in good_links:
+            if "wikipedia.org" in href:
                 search_url = href
                 break
+        if not search_url and good_links:
+            search_url = good_links[0]
 
         if not search_url:
             return None, None
@@ -600,9 +619,14 @@ if (make_button or _force_make) and (user_input or uploaded_file):
                 update_sandy("fetch", 20, get_error_commentary("search_start"))
 
                 try:
+                    # Append "wikipedia" to bias toward high-quality sources
+                    _search_query = user_input.strip()
+                    if "wikipedia" not in _search_query.lower():
+                        _search_query += " wikipedia"
+
                     search_resp = _requests.post(
                         "https://html.duckduckgo.com/html/",
-                        data={"q": user_input.strip()},
+                        data={"q": _search_query},
                         headers=_headers,
                         timeout=15,
                     )
@@ -621,14 +645,36 @@ if (make_button or _force_make) and (user_input or uploaded_file):
                             if 'duckduckgo' not in (a.get('href', ''))
                         ]
 
+                    # Filter out ads, tracking redirects, and irrelevant links
+                    _ad_domains = {"duckduckgo.com", "bing.com", "amazon.com",
+                                   "ebay.com", "etsy.com", "abebooks.com"}
+                    _good_links = []
+                    for link in result_links:
+                        href = link.get("href", "")
+                        if not href or not href.startswith("http"):
+                            continue
+                        # Skip DuckDuckGo ad/tracking redirects
+                        if "duckduckgo.com" in href:
+                            continue
+                        # Skip common shopping/ad domains
+                        from urllib.parse import urlparse as _up2
+                        _domain = _up2(href).netloc.lower()
+                        if any(ad in _domain for ad in _ad_domains):
+                            continue
+                        _good_links.append((href, link.get_text(strip=True)))
+
+                    # Prefer Wikipedia — it's the most reliable source
                     search_url = None
                     search_title = None
-                    for link in result_links[:5]:
-                        href = link.get("href", "")
-                        if href and href.startswith("http") and "duckduckgo" not in href:
+                    for href, title in _good_links:
+                        if "wikipedia.org" in href:
                             search_url = href
-                            search_title = link.get_text(strip=True)
+                            search_title = title
                             break
+
+                    # Fallback: first non-ad result
+                    if not search_url and _good_links:
+                        search_url, search_title = _good_links[0]
 
                     if not search_url:
                         msg = get_error_commentary("search_failed")
@@ -637,7 +683,10 @@ if (make_button or _force_make) and (user_input or uploaded_file):
                         st.session_state.making_sandwich = False
                         st.stop()
 
-                    update_sandy("fetch", 25, get_error_commentary("search_found"))
+                    update_sandy("fetch", 25, f"Found a source: {search_title or search_url}")
+
+                    # Show the user which URL Sandy picked
+                    st.caption(f"📄 Source: [{search_title or search_url}]({search_url})")
 
                     page_resp = _requests.get(
                         search_url, headers=_headers, timeout=15
