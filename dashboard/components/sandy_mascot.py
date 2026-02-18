@@ -21,25 +21,27 @@ SANDY_SVG = """
   <!-- Cube - top face (flat diamond) -->
   <polygon points="25,130 100,95 175,130 100,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
 
-  <!-- Sprout stem -->
-  <line x1="100" y1="120" x2="100" y2="40" stroke="#3d6b2e" stroke-width="4" stroke-linecap="round"/>
-  <!-- Left leaf -->
-  <path d="M100 50 Q90 30 82 20 Q74 8 85 2 Q94 14 100 35" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
-  <!-- Right leaf -->
-  <path d="M100 50 Q110 28 120 18 Q130 6 124 -2 Q114 10 108 33" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
-  <!-- Small accent bud -->
-  <path d="M100 50 Q92 34 84 28 Q76 22 82 12" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <!-- Sprout -->
+  <g transform="translate(100, 130)">
+    <line x1="0" y1="0" x2="0" y2="-30" stroke="#3d6b2e" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 -25 Q-8 -38 -14 -45 Q-20 -52 -12 -56 Q-5 -47 0 -32" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
+    <path d="M0 -25 Q8 -40 16 -47 Q24 -54 19 -59 Q11 -50 5 -35" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
+    <path d="M0 -25 Q-6 -35 -12 -39 Q-18 -43 -14 -49" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  </g>
 
   <!-- Eyes (both on the right face) -->
-  <ellipse cx="120" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-  <ellipse cx="120" cy="190" rx="9" ry="10" fill="#6b7058"/>
-  <circle cx="117" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
-  <circle cx="120" cy="190" r="4" fill="#2a2e1a"/>
-
-  <ellipse cx="150" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-  <ellipse cx="150" cy="190" rx="9" ry="10" fill="#6b7058"/>
-  <circle cx="147" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
-  <circle cx="150" cy="190" r="4" fill="#2a2e1a"/>
+  <g>
+    <ellipse cx="120" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+    <ellipse cx="120" cy="190" rx="9" ry="10" fill="#6b7058"/>
+    <circle cx="117" cy="193" r="3" fill="#8a8f75" opacity="0.6"/>
+    <circle cx="120" cy="190" r="4" fill="#2a2e1a"/>
+  </g>
+  <g>
+    <ellipse cx="150" cy="176" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+    <ellipse cx="150" cy="176" rx="9" ry="10" fill="#6b7058"/>
+    <circle cx="147" cy="173" r="3" fill="#8a8f75" opacity="0.6"/>
+    <circle cx="150" cy="176" r="4" fill="#2a2e1a"/>
+  </g>
 </svg>
 """
 
@@ -55,22 +57,21 @@ SANDY_SVG_ANIMATED = """
     95% {{ transform: scaleY(0.1); }}
   }}
   @keyframes sprout-sway {{
-    0%, 100% {{ transform: rotate(0deg); }}
-    25% {{ transform: rotate(3deg); }}
-    75% {{ transform: rotate(-3deg); }}
+    0%, 100% {{ transform: translate(100px, 130px) rotate(0deg); }}
+    25% {{ transform: translate(100px, 130px) rotate(3deg); }}
+    75% {{ transform: translate(100px, 130px) rotate(-3deg); }}
   }}
   .sandy-container {{
     animation: sandy-bob 3s ease-in-out infinite;
     display: inline-block;
     flex-shrink: 0;
   }}
-  .sandy-eyes {{
+  .sandy-eye {{
     animation: sandy-blink 4s ease-in-out infinite;
-    transform-origin: center;
   }}
   .sandy-sprout {{
     animation: sprout-sway 2.5s ease-in-out infinite;
-    transform-origin: bottom center;
+    transform-origin: 0px 0px;
   }}
   .speech-bubble {{
     background: linear-gradient(135deg, #fffbf0 0%, #fff5f8 100%);
@@ -124,22 +125,24 @@ SANDY_SVG_ANIMATED = """
       <!-- Cube top face -->
       <polygon points="25,130 100,95 175,130 100,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
       <!-- Sprout -->
-      <g class="sandy-sprout" transform="translate(100, 125)">
-        <line x1="0" y1="-5" x2="0" y2="-85" stroke="#3d6b2e" stroke-width="4" stroke-linecap="round"/>
-        <path d="M0 -75 Q-10 -95 -18 -105 Q-26 -117 -15 -123 Q-6 -111 0 -90" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
-        <path d="M0 -75 Q10 -97 20 -107 Q30 -119 24 -127 Q14 -115 8 -92" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
-        <path d="M0 -75 Q-8 -91 -16 -97 Q-24 -103 -18 -113" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+      <g class="sandy-sprout" transform="translate(100, 130)">
+        <line x1="0" y1="0" x2="0" y2="-30" stroke="#3d6b2e" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0 -25 Q-8 -38 -14 -45 Q-20 -52 -12 -56 Q-5 -47 0 -32" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
+        <path d="M0 -25 Q8 -40 16 -47 Q24 -54 19 -59 Q11 -50 5 -35" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
+        <path d="M0 -25 Q-6 -35 -12 -39 Q-18 -43 -14 -49" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
       </g>
       <!-- Eyes (both on right face) -->
-      <g class="sandy-eyes">
+      <g class="sandy-eye" style="transform-origin: 120px 190px;">
         <ellipse cx="120" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
         <ellipse cx="120" cy="190" rx="9" ry="10" fill="#6b7058"/>
-        <circle cx="117" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
+        <circle cx="117" cy="193" r="3" fill="#8a8f75" opacity="0.6"/>
         <circle cx="120" cy="190" r="4" fill="#2a2e1a"/>
-        <ellipse cx="150" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-        <ellipse cx="150" cy="190" rx="9" ry="10" fill="#6b7058"/>
-        <circle cx="147" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
-        <circle cx="150" cy="190" r="4" fill="#2a2e1a"/>
+      </g>
+      <g class="sandy-eye" style="transform-origin: 150px 176px;">
+        <ellipse cx="150" cy="176" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+        <ellipse cx="150" cy="176" rx="9" ry="10" fill="#6b7058"/>
+        <circle cx="147" cy="173" r="3" fill="#8a8f75" opacity="0.6"/>
+        <circle cx="150" cy="176" r="4" fill="#2a2e1a"/>
       </g>
     </svg>
   </div>
@@ -184,21 +187,20 @@ SANDY_SVG_ANIMATED_ONLY = """
     95% {{ transform: scaleY(0.1); }}
   }}
   @keyframes sprout-sway {{
-    0%, 100% {{ transform: rotate(0deg); }}
-    25% {{ transform: rotate(3deg); }}
-    75% {{ transform: rotate(-3deg); }}
+    0%, 100% {{ transform: translate(100px, 130px) rotate(0deg); }}
+    25% {{ transform: translate(100px, 130px) rotate(3deg); }}
+    75% {{ transform: translate(100px, 130px) rotate(-3deg); }}
   }}
   .sandy-container {{
     animation: sandy-bob 3s ease-in-out infinite;
     display: inline-block;
   }}
-  .sandy-eyes {{
+  .sandy-eye {{
     animation: sandy-blink 4s ease-in-out infinite;
-    transform-origin: center;
   }}
   .sandy-sprout {{
     animation: sprout-sway 2.5s ease-in-out infinite;
-    transform-origin: bottom center;
+    transform-origin: 0px 0px;
   }}
 </style>
 <div class="sandy-container">
@@ -206,21 +208,23 @@ SANDY_SVG_ANIMATED_ONLY = """
     <polygon points="100,165 25,130 25,230 100,265" fill="#9a9bc7" stroke="#8384b3" stroke-width="1.5"/>
     <polygon points="100,165 175,130 175,230 100,265" fill="#b8b9dd" stroke="#8384b3" stroke-width="1.5"/>
     <polygon points="25,130 100,95 175,130 100,165" fill="#c8c9e8" stroke="#8384b3" stroke-width="1.5"/>
-    <g class="sandy-sprout" transform="translate(100, 125)">
-      <line x1="0" y1="-5" x2="0" y2="-85" stroke="#3d6b2e" stroke-width="4" stroke-linecap="round"/>
-      <path d="M0 -75 Q-10 -95 -18 -105 Q-26 -117 -15 -123 Q-6 -111 0 -90" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
-      <path d="M0 -75 Q10 -97 20 -107 Q30 -119 24 -127 Q14 -115 8 -92" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
-      <path d="M0 -75 Q-8 -91 -16 -97 Q-24 -103 -18 -113" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <g class="sandy-sprout" transform="translate(100, 130)">
+      <line x1="0" y1="0" x2="0" y2="-30" stroke="#3d6b2e" stroke-width="3" stroke-linecap="round"/>
+      <path d="M0 -25 Q-8 -38 -14 -45 Q-20 -52 -12 -56 Q-5 -47 0 -32" fill="#5a9e3a" stroke="#3d6b2e" stroke-width="1.5"/>
+      <path d="M0 -25 Q8 -40 16 -47 Q24 -54 19 -59 Q11 -50 5 -35" fill="#6bb84a" stroke="#3d6b2e" stroke-width="1.5"/>
+      <path d="M0 -25 Q-6 -35 -12 -39 Q-18 -43 -14 -49" fill="none" stroke="#d4757a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
     </g>
-    <g class="sandy-eyes">
+    <g class="sandy-eye" style="transform-origin: 120px 190px;">
       <ellipse cx="120" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
       <ellipse cx="120" cy="190" rx="9" ry="10" fill="#6b7058"/>
-      <circle cx="117" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
+      <circle cx="117" cy="193" r="3" fill="#8a8f75" opacity="0.6"/>
       <circle cx="120" cy="190" r="4" fill="#2a2e1a"/>
-      <ellipse cx="150" cy="190" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
-      <ellipse cx="150" cy="190" rx="9" ry="10" fill="#6b7058"/>
-      <circle cx="147" cy="187" r="3" fill="#8a8f75" opacity="0.6"/>
-      <circle cx="150" cy="190" r="4" fill="#2a2e1a"/>
+    </g>
+    <g class="sandy-eye" style="transform-origin: 150px 176px;">
+      <ellipse cx="150" cy="176" rx="12" ry="13" fill="#5a5e4a" stroke="#3a3e2a" stroke-width="1"/>
+      <ellipse cx="150" cy="176" rx="9" ry="10" fill="#6b7058"/>
+      <circle cx="147" cy="173" r="3" fill="#8a8f75" opacity="0.6"/>
+      <circle cx="150" cy="176" r="4" fill="#2a2e1a"/>
     </g>
   </svg>
 </div>
