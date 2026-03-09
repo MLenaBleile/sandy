@@ -132,7 +132,7 @@ with col1:
     )
 
 with col2:
-    make_button = st.button("🔍 Is there a sandwich?", use_container_width=True)
+    make_button = st.button("🔍 Forage for Sandwiches", use_container_width=True)
 
 # Help text
 st.markdown("""

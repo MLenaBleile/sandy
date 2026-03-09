@@ -180,7 +180,7 @@ def main():
         '
         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(255,107,157,0.55)';"
         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(255,107,157,0.4)';"
-        >🔍 Is There a Sandwich?</a>
+        >🔍 Forage for Sandwiches</a>
     </div>
     """, unsafe_allow_html=True)
 
